@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberAcademy // Red Team Training</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="logo">CYBER<span>ACADEMY</span></a>
+  <div class="nav-links">
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">// Red Team Training Platform</div>
+  <h1>HACK.<br><span>LEARN.</span><br>DOMINATE.</h1>
+  <p>Real-world cybersecurity challenges. Capture the flag. Rank up. Become elite.</p>
+  <div class="typewriter" id="typewriter"></div>
+  <div class="btn-group">
+    <a href="register.html" class="btn">[ ENLIST NOW ]</a>
+    <a href="login.html" class="btn btn-ghost">[ BREACH ACCESS ]</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="container">
+  <div class="grid-3 mb-32">
+    <div class="stat-box">
+      <span class="number">500+</span>
+      <div class="label">Operatives Trained</div>
+    </div>
+    <div class="stat-box">
+      <span class="number">120</span>
+      <div class="label">Active Challenges</div>
+    </div>
+    <div class="stat-box">
+      <span class="number">18</span>
+      <div class="label">Domains Covered</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="section-title">// Mission Brief</div>
+  <div class="terminal mb-32">
+    <div class="line">CyberAcademy is a red team training ground for aspiring ethical hackers.</div>
+    <div class="line">Solve real CTF challenges. Master recon, exploitation, and post-exploitation.</div>
+    <div class="line">Earn points. Climb the leaderboard. Unlock classified ranks.</div>
+    <div class="comment">// No prior experience required — just the will to break things.</div>
+  </div>
+
+  <!-- TRACKS -->
+  <div class="section-title">// Training Tracks</div>
+  <div class="grid-2 mb-32">
+    <div class="card">
+      <div class="card-header">🔴 Offensive Security</div>
+      <p class="text-muted" style="font-size:.82rem;line-height:1.8;">Web exploitation, buffer overflows, privilege escalation, reverse shells, and social engineering.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">🔵 Defensive Ops</div>
+      <p class="text-muted" style="font-size:.82rem;line-height:1.8;">Log analysis, intrusion detection, malware triage, incident response, and OSINT.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">🟡 Cryptography</div>
+      <p class="text-muted" style="font-size:.82rem;line-height:1.8;">Break ciphers, crack hashes, reverse RSA implementations, and decode obfuscated payloads.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">🟢 Network Recon</div>
+      <p class="text-muted" style="font-size:.82rem;line-height:1.8;">Port scanning, protocol analysis, packet crafting, pivoting through network segments.</p>
+    </div>
+  </div>
+
+  <!-- RANK SYSTEM -->
+  <div class="section-title">// Rank System</div>
+  <div class="grid-2 mb-32">
+    <div class="lb-row"><span class="lb-rank">#</span><span class="lb-name">Bronze Operative<small>0 — 999 PTS</small></span><span class="lb-badge badge-bronze">Bronze</span></div>
+    <div class="lb-row"><span class="lb-rank">#</span><span class="lb-name">Silver Agent<small>1000 — 4999 PTS</small></span><span class="lb-badge badge-silver">Silver</span></div>
+    <div class="lb-row"><span class="lb-rank">#</span><span class="lb-name">Gold Analyst<small>5000 — 14999 PTS</small></span><span class="lb-badge badge-gold">Gold</span></div>
+    <div class="lb-row"><span class="lb-rank">#</span><span class="lb-name">Platinum Ghost<small>15000+ PTS</small></span><span class="lb-badge badge-platinum">Platinum</span></div>
+  </div>
+
+  <div class="text-center mb-32">
+    <a href="register.html" class="btn">[ BEGIN TRAINING ]</a>
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 Nigthers  // AUTHORIZED TRAINING USE ONLY // ALL RIGHTS RESERVED
+</footer>
+
+<script src="app.js"></script>
+<script>
+  typewriter('typewriter', [
+    'Infiltrate. Exploit. Report.',
+    'Master SQL Injection...',
+    'Break the cipher. Own the box.',
+    'From script kiddie to elite ghost.',
+    'Your journey to the top 1% starts here.'
+  ]);
+</script>
+
+</body>
+</html>

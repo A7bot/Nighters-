@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard // Nighters</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">CYBER<span>ACADEMY</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="leaderboard.html" style="color:var(--green);">Leaderboard</a>
+    <a href="login.html">Login</a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:40px;">
+
+  <div class="section-title">// Global Rankings</div>
+
+  <div class="terminal mb-32">
+    <div class="line">Pulling operative rankings from secure database...</div>
+    <div class="comment">// Rankings update every 60 seconds. Top 100 displayed.</div>
+  </div>
+
+  <!-- TOP 3 PODIUM -->
+  <div style="display:flex;gap:12px;justify-content:center;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;" id="podium">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- FULL LIST -->
+  <div class="card" style="padding:0;">
+    <div class="card-header" style="padding:16px 20px;margin-bottom:0;border-bottom:1px solid var(--border);">FULL RANKING TABLE</div>
+    <div id="leaderboard-list">
+      <div style="padding:40px;text-align:center;color:var(--muted);font-size:.8rem;">Loading operatives...</div>
+    </div>
+  </div>
+
+  <div class="mt-32 text-center">
+    <a href="dashboard.html" class="btn btn-ghost">[ MY DASHBOARD ]</a>
+  </div>
+
+</div>
+
+<footer>
+  &copy; 2026 Nighters // AUTHORIZED TRAINING USE ONLY
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function getRank(pts) {
+  if (pts >= 15000) return { name: 'Platinum', cls: 'badge-platinum' };
+  if (pts >= 5000)  return { name: 'Gold',     cls: 'badge-gold' };
+  if (pts >= 1000)  return { name: 'Silver',   cls: 'badge-silver' };
+  return                   { name: 'Bronze',   cls: 'badge-bronze' };
+}
+
+// DEMO data — replace with real Supabase query when you have a profiles table
+const demoData = [
+  { username: 'gh0st_r00t',   points: 18200, completed: 42 },
+  { username: 'n3t_r4ptor',   points: 14500, completed: 35 },
+  { username: 'darkph4ntom',  points: 11800, completed: 30 },
+  { username: 'z3r0_c00l',    points: 8900,  completed: 24 },
+  { username: 'binary_witch',  points: 7200,  completed: 20 },
+  { username: 'xpl0it_fx',    points: 5500,  completed: 17 },
+  { username: 'void_ptr',     points: 3800,  completed: 13 },
+  { username: 'p4yl04d_pro',  points: 2100,  completed: 9  },
+  { username: 'h4x0r_neo',    points: 1400,  completed: 6  },
+  { username: 'newb_shell',   points: 400,   completed: 3  },
+];
+
+function buildPodium(data) {
+  const places = [data[1], data[0], data[2]]; // 2nd, 1st, 3rd
+  const heights = ['140px', '180px', '110px'];
+  const labels  = ['2nd', '1st', '3rd'];
+  const colors  = ['#c0c0c0', '#ffd700', '#cd7f32'];
+  const html = places.map((p, i) => p ? `
+    <div style="text-align:center;flex:1;max-width:200px;">
+      <div style="font-size:.75rem;color:${colors[i]};letter-spacing:2px;margin-bottom:8px;">${labels[i]}</div>
+      <div style="width:48px;height:48px;border:2px solid ${colors[i]};margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:1.2rem;color:${colors[i]};text-shadow:0 0 12px ${colors[i]};">${p.username[0].toUpperCase()}</div>
+      <div style="font-size:.85rem;color:var(--text);">${p.username}</div>
+      <div style="font-family:var(--font-head);font-size:.9rem;color:${colors[i]};text-shadow:0 0 8px ${colors[i]};margin-top:4px;">${p.points} PTS</div>
+      <div style="height:${heights[i]};background:rgba(${i===1?'255,215,0':'i===0?192,192,192:205,127,50'},0.08);border:1px solid ${colors[i]};margin-top:8px;"></div>
+    </div>` : '').join('');
+  document.getElementById('podium').innerHTML = html;
+}
+
+function buildList(data) {
+  const html = data.map((op, i) => {
+    const rank = getRank(op.points);
+    const rowClass = i === 0 ? 'lb-row top-1' : i === 1 ? 'lb-row top-2' : i === 2 ? 'lb-row top-3' : 'lb-row';
+    return `
+      <div class="${rowClass}">
+        <span class="lb-rank">#${i + 1}</span>
+        <span class="lb-name">
+          ${op.username}
+          <small>${op.completed} challenges completed</small>
+        </span>
+        <span class="lb-badge ${rank.cls}">${rank.name}</span>
+        <span class="lb-points">${op.points} PTS</span>
+      </div>`;
+  }).join('');
+  document.getElementById('leaderboard-list').innerHTML = html;
+}
+
+// LOAD (swap demoData for real Supabase query later)
+async function loadLeaderboard() {
+  // Real query when you have a 'profiles' table:
+  // const { data } = await supabase
+  //   .from('profiles')
+  //   .select('username, points, completed')
+  //   .order('points', { ascending: false })
+  //   .limit(100);
+  // buildPodium(data); buildList(data);
+
+  buildPodium(demoData);
+  buildList(demoData);
+}
+
+loadLeaderboard();
+setInterval(loadLeaderboard, 60000);
+</script>
+
+</body>
+</html>

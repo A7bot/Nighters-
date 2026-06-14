@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard // Nighters</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">CYBER<span>ACADEMY</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:40px;">
+
+  <!-- PROFILE HEADER -->
+  <div class="card mb-32" id="profile-card">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="width:60px;height:60px;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:1.4rem;color:var(--green);text-shadow:0 0 12px var(--green);" id="avatar-letter">?</div>
+      <div style="flex:1;">
+        <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);" id="profile-name">Loading...</div>
+        <div style="font-size:.75rem;color:var(--muted);letter-spacing:2px;margin-top:4px;" id="profile-email"></div>
+      </div>
+      <div style="text-align:right;">
+        <span class="lb-badge" id="rank-badge">—</span>
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--green);text-shadow:0 0 12px var(--green);margin-top:6px;" id="profile-points">0 PTS</div>
+      </div>
+    </div>
+    <div class="progress-bar mt-16">
+      <div class="progress-fill" id="rank-progress" style="width:0%"></div>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted);margin-top:6px;letter-spacing:1px;" id="progress-label"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-3 mb-32">
+    <div class="stat-box">
+      <span class="number" id="stat-completed">0</span>
+      <div class="label">Challenges Done</div>
+    </div>
+    <div class="stat-box">
+      <span class="number" id="stat-rank">#—</span>
+      <div class="label">Global Rank</div>
+    </div>
+    <div class="stat-box">
+      <span class="number" id="stat-streak">0</span>
+      <div class="label">Day Streak</div>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="section-title">// Active Challenges</div>
+
+  <div class="task-card">
+    <div class="task-icon">🔴</div>
+    <div class="task-info">
+      <div class="task-name">SQL Injection — Login Bypass</div>
+      <div class="task-meta"><span class="difficulty diff-easy">Easy</span> Web Exploitation</div>
+    </div>
+    <div class="task-pts">+100 PTS<br><small style="color:var(--muted);font-size:.65rem;">OPEN</small></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-icon">🔐</div>
+    <div class="task-info">
+      <div class="task-name">ROT13 Cipher Decode</div>
+      <div class="task-meta"><span class="difficulty diff-easy">Easy</span> Cryptography</div>
+    </div>
+    <div class="task-pts">+75 PTS<br><small style="color:var(--muted);font-size:.65rem;">OPEN</small></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-icon">🕵️</div>
+    <div class="task-info">
+      <div class="task-name">OSINT — Find the Ghost</div>
+      <div class="task-meta"><span class="difficulty diff-medium">Medium</span> Recon</div>
+    </div>
+    <div class="task-pts">+250 PTS<br><small style="color:var(--muted);font-size:.65rem;">OPEN</small></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-icon">💥</div>
+    <div class="task-info">
+      <div class="task-name">Buffer Overflow — Ret2Win</div>
+      <div class="task-meta"><span class="difficulty diff-hard">Hard</span> Binary Exploitation</div>
+    </div>
+    <div class="task-pts">+500 PTS<br><small style="color:var(--muted);font-size:.65rem;">OPEN</small></div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-icon">🌐</div>
+    <div class="task-info">
+      <div class="task-name">XSS — Cookie Stealer</div>
+      <div class="task-meta"><span class="difficulty diff-medium">Medium</span> Web Exploitation</div>
+    </div>
+    <div class="task-pts">+200 PTS<br><small style="color:var(--muted);font-size:.65rem;">OPEN</small></div>
+  </div>
+
+  <div class="mt-32 mb-32 text-center">
+    <a href="leaderboard.html" class="btn btn-ghost">[ VIEW LEADERBOARD ]</a>
+  </div>
+
+</div>
+
+<footer>
+  &copy; 2026 Nighters // AUTHORIZED TRAINING USE ONLY
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function getRank(pts) {
+  if (pts >= 15000) return { name: 'Platinum', cls: 'badge-platinum', next: null, max: 15000 };
+  if (pts >= 5000)  return { name: 'Gold',     cls: 'badge-gold',     next: 15000, max: 5000 };
+  if (pts >= 1000)  return { name: 'Silver',   cls: 'badge-silver',   next: 5000,  max: 1000 };
+  return                   { name: 'Bronze',   cls: 'badge-bronze',   next: 1000,  max: 0 };
+}
+
+async function loadProfile() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { window.location = 'login.html'; return; }
+
+  const meta = user.user_metadata;
+  const username = meta.username || user.email.split('@')[0];
+  const points   = meta.points || 0;
+  const rank     = getRank(points);
+
+  document.getElementById('avatar-letter').textContent = username[0].toUpperCase();
+  document.getElementById('profile-name').textContent  = username;
+  document.getElementById('profile-email').textContent = user.email;
+  document.getElementById('profile-points').textContent = points + ' PTS';
+
+  const badge = document.getElementById('rank-badge');
+  badge.textContent = rank.name;
+  badge.className = 'lb-badge ' + rank.cls;
+
+  if (rank.next) {
+    const pct = Math.min(((points - rank.max) / (rank.next - rank.max)) * 100, 100);
+    document.getElementById('rank-progress').style.width = pct + '%';
+    document.getElementById('progress-label').textContent =
+      `Progress to ${rank.name === 'Bronze' ? 'Silver' : rank.name === 'Silver' ? 'Gold' : 'Platinum'}: ${points} / ${rank.next} PTS`;
+  } else {
+    document.getElementById('rank-progress').style.width = '100%';
+    document.getElementById('progress-label').textContent = 'MAX RANK ACHIEVED';
+  }
+
+  document.getElementById('stat-completed').textContent = meta.completed || 0;
+  document.getElementById('stat-streak').textContent    = meta.streak || 0;
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location = 'index.html';
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

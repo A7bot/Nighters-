@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login // CyberAcademy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="matrix-bg"></canvas>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">CYBER<span>ACADEMY</span></a>
+  <div class="nav-links">
+    <a href="register.html">Register</a>
+  </div>
+</nav>
+
+<div class="container" style="max-width:440px;padding-top:60px;">
+
+  <div class="section-title">// Breach Access</div>
+
+  <div class="terminal mb-32">
+    <div class="line">Awaiting credentials...</div>
+    <div class="comment">// Unauthorized access will be logged and reported.</div>
+  </div>
+
+  <div class="card">
+    <div id="alert-box" class="alert"></div>
+
+    <div class="form-group">
+      <label><span>01</span> EMAIL ADDRESS</label>
+      <input type="email" id="email" placeholder="operative@domain.com">
+    </div>
+
+    <div class="form-group">
+      <label><span>02</span> ACCESS KEY</label>
+      <input type="password" id="password" placeholder="••••••••">
+    </div>
+
+    <button class="btn" style="width:100%;margin-top:8px;" onclick="login()">
+      [ INITIATE LOGIN ]
+    </button>
+
+    <p class="text-center mt-16" style="font-size:.78rem;color:var(--muted);">
+      No account? <a href="register.html" style="color:var(--green);">Enlist as operative &rarr;</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 Nighters // AUTHORIZED TRAINING USE ONLY
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+<script>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function login() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    return showAlert('alert-box', 'Credentials required.', 'error');
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) return showAlert('alert-box', error.message, 'error');
+
+  showAlert('alert-box', 'Access granted. Redirecting...', 'success');
+  setTimeout(() => window.location = 'dashboard.html', 1200);
+}
+</script>
+
+</body>
+</html>
