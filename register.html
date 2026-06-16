@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enlist // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<canvas id="bg-canvas"></canvas>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING PLATFORM</small></a>
+    <div class="nav-links"><a href="login.html">Login</a></div>
+  </div>
+</nav>
+
+<div class="wrap-sm" style="padding-top:50px;padding-bottom:60px;">
+  <div class="stitle mb16">Enlist as Operative</div>
+
+  <div class="term mb24">
+    <div class="p">Opening secure registration channel...</div>
+    <div class="c">Callsign cannot be changed after registration.</div>
+    <div class="c">Use a real email — required for login.</div>
+  </div>
+
+  <div class="card">
+    <div id="ra" class="alert"></div>
+
+    <div class="field">
+      <label>Callsign (Username)</label>
+      <input type="text" id="uname" placeholder="e.g. ghost_r00t" maxlength="20" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="operative@domain.com" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Access Key (Password)</label>
+      <input type="password" id="pw" placeholder="Minimum 8 characters">
+    </div>
+    <div class="field">
+      <label>Confirm Access Key</label>
+      <input type="password" id="pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doRegister()">
+    </div>
+
+    <div style="font-family:var(--M);font-size:.7rem;color:var(--textdim);padding:10px 12px;border:1px solid var(--goldbdr);line-height:1.9;margin-bottom:18px;">
+      By enlisting you agree to the <a href="rules.html" style="color:var(--gold);">Rules of Engagement</a>.<br>
+      Cheating, sharing flags, or harassment = permanent removal.
+    </div>
+
+    <button class="btn btn-block" id="reg-btn" onclick="doRegister()">Enlist Operative</button>
+    <p class="tc mt16 mono tm" style="font-size:.73rem;">Already enlisted? <a href="login.html" style="color:var(--gold);">Breach access →</a></p>
+  </div>
+</div>
+
+<footer class="footer">
+  <strong>NIGHTERS CYBER ACADEMY</strong>
+  Authorized Training Platform
+</footer>
+
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Redirect if already logged in
+(async()=>{
+  const {data:{user}} = await sb.auth.getUser();
+  if(user) window.location='dashboard.html';
+})();
+
+async function doRegister(){
+  const uname = document.getElementById('uname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const pw    = document.getElementById('pw').value;
+  const pw2   = document.getElementById('pw2').value;
+  const btn   = document.getElementById('reg-btn');
+
+  // Validate
+  if(!uname||!email||!pw||!pw2) return showAlert('ra','All fields are required.','err');
+  if(!/^[a-z0-9_]{3,20}$/i.test(uname)) return showAlert('ra','Callsign: 3–20 characters, letters/numbers/underscore only.','err');
+  if(pw.length<8) return showAlert('ra','Password must be at least 8 characters.','err');
+  if(pw!==pw2) return showAlert('ra','Passwords do not match.','err');
+
+  btn.disabled = true;
+  btn.textContent = 'Enlisting...';
+
+  try {
+    // Step 1: Register with Supabase Auth
+    const {data, error:authErr} = await sb.auth.signUp({email, password:pw});
+
+    if(authErr){
+      showAlert('ra', authErr.message, 'err');
+      btn.disabled=false; btn.textContent='Enlist Operative'; return;
+    }
+
+    // Step 2: Create profile (wrapped in try — runs after email confirm)
+    // If email confirmation is OFF in Supabase, data.user will be set now.
+    // If email confirmation is ON, data.user might be null — profile created on first login.
+    if(data && data.user){
+      try {
+        await sb.from('profiles').insert({
+          id: data.user.id,
+          username: uname,
+          email: email,
+          points: 0, phase: 1, strikes: 0,
+          completed_challenges: 0, attendance_days: 0, streak: 0
+        });
+      } catch(profileErr){
+        // Profile insert failed but auth account was created — not fatal
+        console.warn('Profile insert failed:', profileErr);
+      }
+    }
+
+    showAlert('ra','Registration complete! Redirecting to login...','ok');
+    setTimeout(()=>window.location='login.html', 2000);
+
+  } catch(e){
+    showAlert('ra','Unexpected error. Check your Supabase URL and Key in app.js.','err');
+    console.error(e);
+    btn.disabled=false; btn.textContent='Enlist Operative';
+  }
+}
+</script>
+</body>
+</html>

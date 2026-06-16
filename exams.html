@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exams // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING PLATFORM</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="exams.html" class="on">Exams</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" onclick="doLogout()" class="danger">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+
+  <!-- LIST VIEW -->
+  <div id="view-list">
+    <div class="stitle mb16">Exams</div>
+    <div class="term mb24">
+      <div class="p">Exams auto-submit when the timer expires.</div>
+      <div class="c">Pass ≥60% to unlock the next phase.</div>
+      <div class="c">Each exam can only be taken once.</div>
+    </div>
+    <div class="stitle mb12">Open Now</div>
+    <div id="exams-open" class="mb24"></div>
+    <div class="stitle mb12">Upcoming</div>
+    <div id="exams-upcoming" class="mb32"></div>
+    <div class="stitle mb12">Your Results</div>
+    <div id="my-results"></div>
+  </div>
+
+  <!-- EXAM VIEW -->
+  <div id="view-exam" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+      <div class="stitle" style="margin-bottom:0;" id="exam-title">Exam</div>
+      <div class="card" style="padding:14px 20px;margin-bottom:0;display:flex;align-items:center;gap:16px;">
+        <div>
+          <div class="mono tm" style="font-size:.65rem;letter-spacing:2px;">TIME REMAINING</div>
+          <div class="timer-display" id="timer">∞</div>
+        </div>
+        <div class="mono tm" style="font-size:.7rem;" id="q-prog">0/0</div>
+      </div>
+    </div>
+    <div id="q-container"></div>
+    <div class="mt24" style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn" onclick="submitExam()">Submit Exam</button>
+      <button class="btn btn-ghost" onclick="if(confirm('Cancel exam? Progress will be lost.'))showList()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- RESULT VIEW -->
+  <div id="view-result" style="display:none;">
+    <div class="stitle mb16">Exam Result</div>
+    <div class="card" style="text-align:center;padding:48px 24px;">
+      <div style="font-size:3.5rem;margin-bottom:16px;" id="res-icon">📊</div>
+      <div style="font-family:var(--H);font-size:3rem;color:var(--gold);margin-bottom:8px;" id="res-pct">—</div>
+      <div class="mono" style="font-size:.85rem;color:var(--textdim);margin-bottom:8px;" id="res-raw"></div>
+      <div class="mono" style="font-size:.85rem;" id="res-msg"></div>
+      <div class="mono ts mt8" style="font-size:.82rem;" id="res-phase"></div>
+      <a href="dashboard.html" class="btn mt24 btn-lg">Back to Dashboard</a>
+    </div>
+  </div>
+
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let me=null, prof=null, activeExam=null, answers={}, timerRef=null;
+
+async function init(){
+  me = await requireAuth(sb);
+  if(!me) return;
+  const {data:p} = await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){ window.location='login.html'; return; }
+  prof=p;
+  loadExamList();
+  loadMyResults();
+}
+
+async function loadExamList(){
+  const now=new Date().toISOString();
+  try{
+    const {data:open} = await sb.from('exams').select('*')
+      .lte('opens_at',now).gte('closes_at',now)
+      .eq('phase',prof.phase||1).order('opens_at');
+    const {data:upcoming} = await sb.from('exams').select('*')
+      .gt('opens_at',now).order('opens_at').limit(5);
+
+    const boxO = document.getElementById('exams-open');
+    const boxU = document.getElementById('exams-upcoming');
+
+    if(!open||!open.length) boxO.innerHTML='<div class="term"><div class="c">No exams open right now.</div></div>';
+    else boxO.innerHTML = open.map(e=>examCard(e,true)).join('');
+
+    if(!upcoming||!upcoming.length) boxU.innerHTML='<div class="term"><div class="c">No upcoming exams scheduled.</div></div>';
+    else boxU.innerHTML = upcoming.map(e=>examCard(e,false)).join('');
+  }catch(e){
+    document.getElementById('exams-open').innerHTML='<div class="term"><div class="err">Failed to load.</div></div>';
+  }
+}
+
+function examCard(e,open){
+  return `<div class="card mb10" style="padding:16px 20px;">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;">
+        <div style="font-weight:600;color:var(--text);margin-bottom:4px;">📝 ${esc(e.title)}</div>
+        <div class="mono tm" style="font-size:.7rem;line-height:1.9;">
+          Opens: ${fmtDate(e.opens_at)} ${fmtTime(e.opens_at)} &nbsp;·&nbsp;
+          Closes: ${fmtDate(e.closes_at)} ${fmtTime(e.closes_at)}<br>
+          ${e.duration_minutes?'Duration: '+e.duration_minutes+' minutes':'Untimed'} &nbsp;·&nbsp;
+          Pass: ≥${e.pass_percentage||60}%
+        </div>
+      </div>
+      ${open?`<button class="btn btn-sm" onclick="startExam('${e.id}')">Start Exam</button>`:'<span class="badge bz">UPCOMING</span>'}
+    </div>
+  </div>`;
+}
+
+async function startExam(examId){
+  // Check not already taken
+  try{
+    const {data:prev} = await sb.from('exam_results').select('id,score_pct,passed')
+      .eq('user_id',me.id).eq('exam_id',examId).maybeSingle();
+    if(prev){
+      toast(`You already took this exam. Score: ${prev.score_pct}% — ${prev.passed?'PASSED':'FAILED'}`,'');
+      return;
+    }
+  }catch(e){}
+
+  try{
+    const {data:exam} = await sb.from('exams').select('*').eq('id',examId).single();
+    const {data:qs}   = await sb.from('exam_questions').select('*').eq('exam_id',examId).order('order_num');
+    if(!exam||!qs||!qs.length){ toast('Exam not available yet.','err'); return; }
+
+    activeExam=exam; activeExam.questions=qs; answers={};
+
+    document.getElementById('view-list').style.display='none';
+    document.getElementById('view-exam').style.display='block';
+    document.getElementById('exam-title').textContent=exam.title;
+
+    renderQuestions(qs);
+
+    if(exam.duration_minutes){
+      const endISO=new Date(Date.now()+exam.duration_minutes*60000).toISOString();
+      timerRef=countdown(endISO,'timer');
+      setTimeout(()=>{ toast('Time up! Auto-submitting...','err'); submitExam(); }, exam.duration_minutes*60000);
+    } else {
+      document.getElementById('timer').textContent='∞';
+    }
+  }catch(e){ toast('Could not load exam.','err'); console.error(e); }
+}
+
+function renderQuestions(qs){
+  const c=document.getElementById('q-container');
+  c.innerHTML=qs.map((q,i)=>{
+    let opts='';
+    if(q.type==='mcq'){
+      const options=Array.isArray(q.options)?q.options:(JSON.parse(q.options||'[]'));
+      opts=`<div class="q-opts">${options.map((o,j)=>`
+        <button class="q-opt" onclick="selectAns('${q.id}','${j}',this)" data-q="${q.id}">
+          <span class="q-ltr">${String.fromCharCode(65+j)}.</span> ${esc(o)}
+        </button>`).join('')}</div>`;
+    } else {
+      opts=`<div class="field" style="margin-bottom:0;"><input type="text" placeholder="Your answer..."
+        onchange="answers['${q.id}']=this.value;updProg()" oninput="answers['${q.id}']=this.value;updProg()"></div>`;
+    }
+    return `<div class="q-wrap">
+      <div class="q-num">Q${i+1} of ${qs.length} · ${q.points||1} pt${(q.points||1)>1?'s':''}</div>
+      <div class="q-text">${esc(q.question)}</div>
+      ${opts}
+    </div>`;
+  }).join('');
+  updProg();
+}
+
+function selectAns(qId,val,el){
+  document.querySelectorAll(`[data-q="${qId}"]`).forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  answers[qId]=val;
+  updProg();
+}
+
+function updProg(){
+  const total=activeExam?.questions?.length||0;
+  document.getElementById('q-prog').textContent=Object.keys(answers).length+'/'+total+' answered';
+}
+
+async function submitExam(){
+  if(timerRef) clearInterval(timerRef);
+  const qs=activeExam.questions;
+  let score=0,total=0;
+  qs.forEach(q=>{
+    total+=(q.points||1);
+    const ans=answers[q.id];
+    if(q.type==='mcq'){
+      if(String(ans)===String(q.correct_answer)) score+=(q.points||1);
+    } else {
+      if(ans && ans.trim().toLowerCase()===(q.correct_answer||'').trim().toLowerCase()) score+=(q.points||1);
+    }
+  });
+  const pct=Math.round((score/total)*100);
+  const passed=pct>=(activeExam.pass_percentage||60);
+
+  try{
+    await sb.from('exam_results').insert({
+      user_id:me.id, username:prof.username,
+      exam_id:activeExam.id,
+      score_raw:score, score_pct:pct, total_pts:total,
+      passed, answers:JSON.stringify(answers)
+    });
+    // Award points = score_raw
+    const newPts=(prof.points||0)+score;
+    let updates={points:newPts};
+    if(passed && activeExam.unlocks_next_phase && prof.phase===activeExam.phase){
+      updates.phase=(prof.phase||1)+1;
+    }
+    await sb.from('profiles').update(updates).eq('id',me.id);
+
+    document.getElementById('view-exam').style.display='none';
+    document.getElementById('view-result').style.display='block';
+    document.getElementById('res-pct').textContent=pct+'%';
+    document.getElementById('res-icon').textContent=passed?'🏆':'📋';
+    document.getElementById('res-raw').textContent='Score: '+score+' / '+total+' points';
+    document.getElementById('res-msg').textContent=passed?'PASSED — Well done, operative!':'NOT PASSED — Score ≥'+( activeExam.pass_percentage||60)+'% required.';
+    document.getElementById('res-msg').className='mono '+(passed?'ts':'tr')+' mt8';
+    document.getElementById('res-phase').textContent=
+      (passed&&activeExam.unlocks_next_phase)?'🎉 Next phase unlocked! +'+score+' pts':'Points earned: +'+score;
+  }catch(e){ toast('Error saving result: '+e.message,'err'); }
+}
+
+async function loadMyResults(){
+  try{
+    const {data} = await sb.from('exam_results')
+      .select('*,exams(title)')
+      .eq('user_id',me.id).order('submitted_at',{ascending:false});
+    const box=document.getElementById('my-results');
+    if(!data||!data.length){ box.innerHTML='<div class="term"><div class="c">No exam results yet.</div></div>'; return; }
+    box.innerHTML=`<table class="dtable">
+      <thead><tr><th>Exam</th><th>Score</th><th>Points</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>${data.map(r=>`<tr>
+        <td>${esc(r.exams?.title||'—')}</td>
+        <td>${r.score_pct}%</td>
+        <td class="tg">+${r.score_raw}</td>
+        <td>${r.passed?'<span class="badge bg">PASSED</span>':'<span class="badge bz">FAILED</span>'}</td>
+        <td class="mono tm" style="font-size:.7rem;">${fmtDate(r.submitted_at)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }catch(e){}
+}
+
+function showList(){
+  if(timerRef) clearInterval(timerRef);
+  document.getElementById('view-exam').style.display='none';
+  document.getElementById('view-list').style.display='block';
+}
+
+async function doLogout(){ await sb.auth.signOut(); window.location='index.html'; }
+init();
+</script>
+</body>
+</html>

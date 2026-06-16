@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Profile // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING PLATFORM</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="exams.html">Exams</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html" class="on">Profile</a>
+      <a href="#" onclick="doLogout()" class="danger">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb16">Operative Profile</div>
+
+  <!-- PROFILE CARD -->
+  <div class="card mb24" id="prof-card" style="padding:28px;">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="width:64px;height:64px;border:2px solid var(--gold);background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--H);font-size:1.7rem;color:var(--gold);flex-shrink:0;" id="p-av">?</div>
+      <div style="flex:1;">
+        <div style="font-family:var(--H);font-size:1.3rem;color:var(--text);" id="p-name">—</div>
+        <div class="mono tm mt4" style="font-size:.72rem;" id="p-email">—</div>
+        <div class="mt8"><span class="badge" id="p-rank">—</span> <span class="badge bz mt4" id="p-phase">Phase 1</span></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:var(--H);font-size:2rem;color:var(--gold);" id="p-pts">0</div>
+        <div class="mono tm" style="font-size:.65rem;">TOTAL POINTS</div>
+        <div class="mono tm mt8" style="font-size:.68rem;" id="p-joined">Joined —</div>
+      </div>
+    </div>
+    <div class="pbar mt16"><div class="fill" id="p-bar" style="width:0%"></div></div>
+    <div class="mono tm mt8" style="font-size:.67rem;" id="p-prog"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="g4 mb32">
+    <div class="stat"><span class="n" id="s-chall">0</span><div class="l">Solved</div></div>
+    <div class="stat"><span class="n" id="s-att">0</span><div class="l">Present Days</div></div>
+    <div class="stat"><span class="n" id="s-streak">0</span><div class="l">Streak</div></div>
+    <div class="stat"><span class="n" id="s-rank">#—</span><div class="l">Global Rank</div></div>
+  </div>
+
+  <div class="g2">
+    <!-- RECENT SOLVES -->
+    <div>
+      <div class="stitle mb16">Recent Challenges Solved</div>
+      <div id="recent-solves"></div>
+    </div>
+    <!-- EXAM RESULTS -->
+    <div>
+      <div class="stitle mb16">Exam History</div>
+      <div id="exam-hist"></div>
+    </div>
+  </div>
+
+  <!-- STRIKES -->
+  <div class="stitle mt24 mb16">Strike Record</div>
+  <div class="card" id="strikes-card">
+    <div class="strike-row mb12" id="strike-dots"></div>
+    <div id="strike-list"></div>
+  </div>
+
+</div>
+
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const {data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+
+  document.getElementById('p-av').textContent   =prof.username[0].toUpperCase();
+  document.getElementById('p-name').textContent =prof.username;
+  document.getElementById('p-email').textContent=me.email;
+  document.getElementById('p-pts').textContent  =(prof.points||0)+' PTS';
+  document.getElementById('p-phase').textContent='Phase '+(prof.phase||1);
+  document.getElementById('p-joined').textContent='Joined '+fmtDate(prof.created_at);
+
+  const rank=getRank(prof.points||0);
+  const rb=document.getElementById('p-rank');
+  rb.textContent=rank.name;rb.className='badge '+rank.cls;
+
+  const prog=getRankProgress(prof.points||0);
+  document.getElementById('p-bar').style.width=prog.pct+'%';
+  document.getElementById('p-prog').textContent=prog.label;
+
+  document.getElementById('s-chall').textContent =prof.completed_challenges||0;
+  document.getElementById('s-att').textContent   =prof.attendance_days||0;
+  document.getElementById('s-streak').textContent=prof.streak||0;
+
+  const {count}=await sb.from('profiles').select('*',{count:'exact',head:true}).gt('points',prof.points||0);
+  document.getElementById('s-rank').textContent='#'+((count||0)+1);
+
+  // Strike dots
+  const sd=document.getElementById('strike-dots');
+  for(let i=0;i<3;i++){
+    const d=document.createElement('div');
+    d.className='strike-dot'+(i<(prof.strikes||0)?' active':'');
+    sd.appendChild(d);
+  }
+
+  loadSolves();loadExams();loadStrikes();
+}
+
+async function loadSolves(){
+  const {data}=await sb.from('submissions')
+    .select('*,challenges_public(title,category,difficulty,points)')
+    .eq('user_id',me.id).eq('correct',true)
+    .order('submitted_at',{ascending:false}).limit(10);
+  const box=document.getElementById('recent-solves');
+  if(!data||!data.length){box.innerHTML='<div class="term"><div class="c">No challenges solved yet.</div></div>';return;}
+  box.innerHTML=data.map(s=>`
+    <div class="card mb8" style="padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:.88rem;color:var(--text);font-weight:600;">${esc(s.challenges_public?.title||'—')}</div>
+        <div class="mono tm" style="font-size:.68rem;">${esc(s.challenges_public?.category||'')} · ${fmtDate(s.submitted_at)}</div>
+      </div>
+      <div class="tg mono" style="font-size:.8rem;">+${s.challenges_public?.points||0}</div>
+    </div>`).join('');
+}
+
+async function loadExams(){
+  const {data}=await sb.from('exam_results').select('*,exams(title)')
+    .eq('user_id',me.id).order('submitted_at',{ascending:false}).limit(8);
+  const box=document.getElementById('exam-hist');
+  if(!data||!data.length){box.innerHTML='<div class="term"><div class="c">No exams taken yet.</div></div>';return;}
+  box.innerHTML=data.map(r=>`
+    <div class="card mb8" style="padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:.88rem;color:var(--text);font-weight:600;">${esc(r.exams?.title||'—')}</div>
+        <div class="mono tm" style="font-size:.68rem;">${fmtDate(r.submitted_at)}</div>
+      </div>
+      <span class="badge ${r.passed?'bg':'bz'}">${r.score_pct}%</span>
+    </div>`).join('');
+}
+
+async function loadStrikes(){
+  const {data}=await sb.from('strike_log').select('*').eq('user_id',me.id).order('issued_at',{ascending:false});
+  const box=document.getElementById('strike-list');
+  if(!data||!data.length){box.innerHTML='<div class="mono tm" style="font-size:.8rem;">No strikes on record. Keep it clean.</div>';return;}
+  box.innerHTML=data.map(s=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--goldbdr);">
+      <div style="font-size:.85rem;color:var(--red);">${esc(s.reason)}</div>
+      <div class="mono tm" style="font-size:.68rem;">${fmtDate(s.issued_at)}</div>
+    </div>`).join('');
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

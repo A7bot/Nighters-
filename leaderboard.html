@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Leaderboard // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING PLATFORM</small></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="leaderboard.html" class="on">Leaderboard</a>
+      <a href="hall-of-fame.html">Hall of Fame</a>
+      <a href="login.html">Login</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb16">Global Leaderboard</div>
+  <div class="term mb24">
+    <div class="p">Live rankings — updates in real time.</div>
+    <div class="c">Points from: Challenges + Exams + Attendance.</div>
+  </div>
+
+  <!-- PHASE FILTER -->
+  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+    <button class="btn btn-sm" onclick="filter('all',this)">All Phases</button>
+    <button class="btn btn-sm btn-ghost" onclick="filter(1,this)">Phase 1</button>
+    <button class="btn btn-sm btn-ghost" onclick="filter(2,this)">Phase 2</button>
+    <button class="btn btn-sm btn-ghost" onclick="filter(3,this)">Phase 3</button>
+  </div>
+
+  <!-- PODIUM TOP 3 -->
+  <div id="podium" style="display:flex;justify-content:center;align-items:flex-end;gap:12px;margin-bottom:32px;flex-wrap:wrap;"></div>
+
+  <!-- FULL TABLE -->
+  <div class="card" style="padding:0;overflow:auto;">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--goldbdr);" class="card-hd">FULL RANKINGS</div>
+    <div id="lb-list"></div>
+  </div>
+
+  <!-- YOUR POSITION -->
+  <div id="my-pos" style="display:none;" class="card mt16" style="padding:16px 20px;">
+    <div class="mono tg" style="font-size:.75rem;letter-spacing:2px;">YOUR POSITION</div>
+    <div id="my-pos-inner"></div>
+  </div>
+</div>
+
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let activePhase='all', me=null;
+
+async function init(){
+  try{const {data:{user}}=await sb.auth.getUser();me=user;}catch(e){}
+  load();
+  setInterval(load,60000); // auto-refresh every 60s
+}
+
+async function filter(phase,btn){
+  activePhase=phase;
+  document.querySelectorAll('.wrap button').forEach(b=>b.className='btn btn-sm btn-ghost');
+  btn.className='btn btn-sm';
+  load();
+}
+
+async function load(){
+  try{
+    let q=sb.from('profiles').select('id,username,points,phase,completed_challenges,strikes')
+      .order('points',{ascending:false}).limit(100);
+    if(activePhase!=='all') q=q.eq('phase',activePhase);
+    const {data}=await q;
+    if(!data||!data.length){
+      document.getElementById('lb-list').innerHTML='<div style="padding:32px;text-align:center;" class="mono tm">No operatives yet.</div>';
+      document.getElementById('podium').innerHTML='';return;
+    }
+    buildPodium(data.slice(0,3));
+    buildList(data);
+    if(me){
+      const myRank=data.findIndex(p=>p.id===me.id);
+      if(myRank>=0){
+        const mp=document.getElementById('my-pos');
+        mp.style.display='block';
+        document.getElementById('my-pos-inner').innerHTML=buildRow(data[myRank],myRank,'',true);
+      }
+    }
+  }catch(e){
+    document.getElementById('lb-list').innerHTML='<div style="padding:32px;" class="mono tr tc">Failed to load rankings.</div>';
+  }
+}
+
+function buildPodium(top){
+  if(!top||top.length<1){document.getElementById('podium').innerHTML='';return;}
+  const order=top.length>=2?[top[1],top[0],top[2]]:[top[0]];
+  const heights=['130px','170px','100px'];
+  const colors=['#b8c0cc','#f0c040','#cd7f32'];
+  const places=['2nd','1st','3rd'];
+  document.getElementById('podium').innerHTML=order.map((p,i)=>{
+    if(!p)return'';
+    const rank=getRank(p.points||0);
+    return `<div style="text-align:center;flex:1;max-width:180px;">
+      <div class="mono" style="font-size:.65rem;color:${colors[i]};letter-spacing:2px;margin-bottom:8px;">${places[i]}</div>
+      <div style="width:44px;height:44px;border:2px solid ${colors[i]};background:var(--g2);display:flex;align-items:center;justify-content:center;font-family:var(--H);font-size:1.1rem;color:${colors[i]};margin:0 auto 8px;">${p.username[0].toUpperCase()}</div>
+      <div style="font-size:.85rem;color:var(--text);font-weight:600;">${esc(p.username)}</div>
+      <div style="font-family:var(--H);font-size:.82rem;color:${colors[i]};margin-top:3px;">${p.points||0} PTS</div>
+      <span class="badge ${rank.cls}" style="margin-top:6px;">${rank.name}</span>
+      <div style="height:${heights[i]};background:rgba(200,168,75,0.04);border:1px solid ${colors[i]};border-bottom:none;margin-top:8px;"></div>
+    </div>`;
+  }).join('');
+}
+
+function buildList(data){
+  document.getElementById('lb-list').innerHTML=data.map((p,i)=>{
+    const rowClass=i===0?'lb-row r1':i===1?'lb-row r2':i===2?'lb-row r3':'lb-row';
+    return buildRow(p,i,rowClass,me&&me.id===p.id);
+  }).join('');
+}
+
+function buildRow(p,i,cls,isMe){
+  const rank=getRank(p.points||0);
+  return `<div class="${cls||'lb-row'}" style="${isMe?'background:rgba(200,168,75,0.08);':''}">
+    <div class="lb-num">#${i+1}</div>
+    <div class="lb-av">${p.username[0].toUpperCase()}</div>
+    <div class="lb-info">
+      <strong>${esc(p.username)}${isMe?' <span class="mono tg" style="font-size:.62rem;">(You)</span>':''}</strong>
+      <small>${p.completed_challenges||0} challenges · Phase ${p.phase||1}${p.strikes>0?` · ${p.strikes} strike${p.strikes>1?'s':''}`:''}</small>
+    </div>
+    <span class="badge ${rank.cls}">${rank.name}</span>
+    <div class="lb-pts">${p.points||0} PTS</div>
+  </div>`;
+}
+
+init();
+</script>
+</body>
+</html>
