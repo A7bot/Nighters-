@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// ADMIN PANEL</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="admin.html" class="on">Admin</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap" style="padding-top:28px;padding-bottom:60px;">
+  <div class="stitle mb8">Admin Command Center</div>
+  <div class="term mb24">
+    <div class="p">ELEVATED PRIVILEGES ACTIVE — All actions logged.</div>
+    <div class="c">Only authorized admins can access this panel.</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="g4 mb28">
+    <div class="stat"><span class="n" id="a-ops">—</span><div class="l">Students</div></div>
+    <div class="stat"><span class="n" id="a-tickets">—</span><div class="l">Open Tickets</div></div>
+    <div class="stat"><span class="n" id="a-assign">—</span><div class="l">Pending Reviews</div></div>
+    <div class="stat"><span class="n" id="a-att">—</span><div class="l">Check-ins Today</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--rbdr);">
+    <button class="btn btn-sm" id="tb-tickets" onclick="showTab('tickets',this)">Help Tickets</button>
+    <button class="btn btn-sm btn-dark" id="tb-assignments" onclick="showTab('assignments',this)">Assignments</button>
+    <button class="btn btn-sm btn-dark" id="tb-students" onclick="showTab('students',this)">Students</button>
+    <button class="btn btn-sm btn-dark" id="tb-ctf" onclick="showTab('ctf',this)">CTF Challenges</button>
+    <button class="btn btn-sm btn-dark" id="tb-exams" onclick="showTab('exams',this)">Exams</button>
+    <button class="btn btn-sm btn-dark" id="tb-announce" onclick="showTab('announce',this)">Announcements</button>
+    <button class="btn btn-sm btn-dark" id="tb-points" onclick="showTab('points',this)">Points &amp; Strikes</button>
+  </div>
+
+  <!-- ─── HELP TICKETS ─── -->
+  <div id="tab-tickets">
+    <div class="stitle mb16">Open Help Tickets</div>
+    <div id="ticket-list"></div>
+  </div>
+
+  <!-- ─── ASSIGNMENTS ─── -->
+  <div id="tab-assignments" style="display:none;">
+    <div class="stitle mb16">Pending Assignment Reviews</div>
+    <div id="assign-review-list"></div>
+  </div>
+
+  <!-- ─── STUDENTS ─── -->
+  <div id="tab-students" style="display:none;">
+    <div class="stitle mb16">All Students</div>
+    <div class="card" style="padding:0;overflow:auto;">
+      <table class="dtable" id="student-table">
+        <thead><tr><th>Username</th><th>Points</th><th>Level</th><th>Phase</th><th>Challenges</th><th>Strikes</th><th>Joined</th></tr></thead>
+        <tbody id="student-tbody"><tr><td colspan="7" class="tc mono td" style="padding:24px;">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── CTF CHALLENGES ─── -->
+  <div id="tab-ctf" style="display:none;">
+    <div class="stitle mb16">Create CTF Challenge</div>
+    <div class="card-red mb24">
+      <div id="ctf-alert" class="alert"></div>
+      <div class="g2">
+        <div class="field"><label>Title</label><input type="text" id="ch-title" placeholder="e.g. SQL Login Bypass"></div>
+        <div class="field"><label>Category</label>
+          <select id="ch-cat"><option value="web">Web</option><option value="system">System</option><option value="recon">Recon</option><option value="crypto">Crypto</option><option value="forensics">Forensics</option></select>
+        </div>
+        <div class="field"><label>Difficulty</label>
+          <select id="ch-diff"><option value="easy">Easy (+10 pts)</option><option value="medium">Medium (+20 pts)</option><option value="hard">Hard (+50 pts)</option></select>
+        </div>
+        <div class="field"><label>Points</label><input type="number" id="ch-pts" value="10"></div>
+        <div class="field"><label>Icon (emoji)</label><input type="text" id="ch-icon" value="🚩" maxlength="4"></div>
+        <div class="field"><label>Week Date (optional)</label><input type="date" id="ch-date"></div>
+      </div>
+      <div class="field"><label>Description</label><textarea id="ch-desc" placeholder="Describe the challenge..."></textarea></div>
+      <div class="g2">
+        <div class="field"><label>Flag (plaintext — stored as SHA-256 hash)</label><input type="text" id="ch-flag" placeholder="FLAG{example_flag}" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label>Hint 1 Text</label><input type="text" id="ch-h1" placeholder="First hint..."></div>
+        <div class="field"><label>Hint 2 Text</label><input type="text" id="ch-h2" placeholder="Second hint..."></div>
+      </div>
+      <button class="btn" onclick="createCTF()">Deploy Challenge</button>
+    </div>
+    <div class="stitle mb16">Existing CTF Challenges</div>
+    <div id="ctf-list"></div>
+  </div>
+
+  <!-- ─── EXAMS ─── -->
+  <div id="tab-exams" style="display:none;">
+    <div class="stitle mb16">Create Exam</div>
+    <div class="card-red mb24">
+      <div id="ex-alert" class="alert"></div>
+      <div class="g2">
+        <div class="field"><label>Exam Title</label><input type="text" id="ex-title" placeholder="Month 1 Exam — Foundations"></div>
+        <div class="field"><label>Phase</label><select id="ex-phase"><option value="1">Phase 1</option><option value="2">Phase 2</option><option value="3">Phase 3</option></select></div>
+        <div class="field"><label>Opens At</label><input type="datetime-local" id="ex-open"></div>
+        <div class="field"><label>Closes At</label><input type="datetime-local" id="ex-close"></div>
+        <div class="field"><label>Duration (minutes)</label><input type="number" id="ex-dur" placeholder="60 (blank=unlimited)"></div>
+        <div class="field"><label>Pass % Required</label><input type="number" id="ex-pass" value="60"></div>
+      </div>
+      <button class="btn" onclick="createExam()">Create Exam</button>
+    </div>
+
+    <div class="stitle mb16">Add Question to Exam</div>
+    <div class="card-red mb24">
+      <div id="q-alert" class="alert"></div>
+      <div class="g2">
+        <div class="field"><label>Exam</label><select id="q-exam"><option value="">Loading...</option></select></div>
+        <div class="field"><label>Type</label><select id="q-type" onchange="toggleQType()"><option value="mcq">Multiple Choice</option><option value="short">Short Answer</option></select></div>
+      </div>
+      <div class="field"><label>Question</label><textarea id="q-text" placeholder="What command lists all files?"></textarea></div>
+      <div id="mcq-area">
+        <div class="g2">
+          <div class="field"><label>Option A</label><input type="text" id="q-a"></div>
+          <div class="field"><label>Option B</label><input type="text" id="q-b"></div>
+          <div class="field"><label>Option C</label><input type="text" id="q-c"></div>
+          <div class="field"><label>Option D</label><input type="text" id="q-d"></div>
+        </div>
+        <div class="field"><label>Correct Answer</label><select id="q-correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+      </div>
+      <div id="short-area" style="display:none;">
+        <div class="field"><label>Correct Answer (exact match)</label><input type="text" id="q-short-ans" placeholder="ls"></div>
+      </div>
+      <div class="field"><label>Points</label><input type="number" id="q-pts" value="1"></div>
+      <button class="btn" onclick="addQuestion()">Add Question</button>
+    </div>
+    <div class="stitle mb16">Existing Exams</div>
+    <div id="exam-list"></div>
+  </div>
+
+  <!-- ─── ANNOUNCEMENTS ─── -->
+  <div id="tab-announce" style="display:none;">
+    <div class="stitle mb16">Post Announcement</div>
+    <div class="card-red mb24">
+      <div id="ann-alert" class="alert"></div>
+      <div class="field"><label>Title</label><input type="text" id="ann-title" placeholder="Announcement title..."></div>
+      <div class="field"><label>Body</label><textarea id="ann-body" placeholder="Announcement content..."></textarea></div>
+      <div class="field"><label>Urgent?</label><select id="ann-urgent"><option value="false">No</option><option value="true">Yes — show in red</option></select></div>
+      <button class="btn" onclick="postAnnouncement()">Post Announcement</button>
+    </div>
+    <div class="stitle mb16">Recent Announcements</div>
+    <div id="ann-list"></div>
+  </div>
+
+  <!-- ─── POINTS & STRIKES ─── -->
+  <div id="tab-points" style="display:none;">
+    <div class="g2">
+      <div>
+        <div class="stitle mb16">Award / Deduct Points</div>
+        <div class="card-red mb16">
+          <div id="pts-alert" class="alert"></div>
+          <div class="field"><label>Username</label><input type="text" id="pts-user" placeholder="username" autocomplete="off"></div>
+          <div class="field"><label>Points (use − to deduct)</label><input type="number" id="pts-amount" placeholder="50 or -20"></div>
+          <div class="field"><label>Reason</label><input type="text" id="pts-reason" placeholder="e.g. Bonus for excellent work"></div>
+          <button class="btn" onclick="awardPoints()">Apply Points</button>
+        </div>
+      </div>
+      <div>
+        <div class="stitle mb16">Issue Strike</div>
+        <div class="card-red mb16">
+          <div id="str-alert" class="alert"></div>
+          <div class="field"><label>Username</label><input type="text" id="str-user" placeholder="username" autocomplete="off"></div>
+          <div class="field"><label>Reason</label>
+            <select id="str-reason">
+              <option value="Cheating on challenge">Cheating on challenge</option>
+              <option value="Sharing flags or answers">Sharing flags or answers</option>
+              <option value="Fake submission attempt">Fake submission</option>
+              <option value="Harassment">Harassment</option>
+              <option value="Unauthorized activity">Unauthorized activity</option>
+            </select>
+          </div>
+          <button class="btn btn-dark" onclick="issueStrike()">Issue Strike</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Admin Panel — Restricted Access</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null;
+
+async function init(){
+  me=await requireAdmin(sb);if(!me)return;
+  loadStats();loadTickets();
+}
+
+function showTab(name,btn){
+  ['tickets','assignments','students','ctf','exams','announce','points'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display='none';
+    const b=document.getElementById('tb-'+t);if(b)b.className='btn btn-sm btn-dark';
+  });
+  document.getElementById('tab-'+name).style.display='block';
+  btn.className='btn btn-sm';
+  if(name==='students')   loadStudents();
+  if(name==='assignments')loadAssignmentReviews();
+  if(name==='ctf')        loadCTFList();
+  if(name==='exams')      {loadExamList();populateExamSelect();}
+  if(name==='announce')   {loadAnnouncements();}
+}
+
+async function loadStats(){
+  try{
+    const [{count:ops},{count:tickets},{count:assign},{count:att}]=await Promise.all([
+      sb.from('profiles').select('*',{count:'exact',head:true}),
+      sb.from('help_tickets').select('*',{count:'exact',head:true}).eq('status','open'),
+      sb.from('assignments').select('*',{count:'exact',head:true}).eq('status','pending'),
+      sb.from('attendance').select('*',{count:'exact',head:true}).eq('date',today())
+    ]);
+    document.getElementById('a-ops').textContent=ops||0;
+    document.getElementById('a-tickets').textContent=tickets||0;
+    document.getElementById('a-assign').textContent=assign||0;
+    document.getElementById('a-att').textContent=att||0;
+  }catch(e){}
+}
+
+/* ── TICKETS ── */
+async function loadTickets(){
+  const box=document.getElementById('ticket-list');
+  try{
+    const{data}=await sb.from('help_tickets').select('*').order('created_at',{ascending:false}).limit(50);
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No tickets yet.</div>';return;}
+    box.innerHTML=data.map(t=>`
+      <div class="ticket ${t.status} mb12">
+        <div class="ticket-hd">
+          <div>
+            <div class="ticket-title">${esc(t.username)} — ${t.level_num?'Level '+t.level_num:''}</div>
+            <div class="ticket-meta">${fmtDate(t.created_at)} ${fmtTime(t.created_at)}</div>
+          </div>
+          <span class="badge ${t.status==='answered'?'bgreen':t.status==='closed'?'bs':'bz'}">${t.status.toUpperCase()}</span>
+        </div>
+        <div class="ticket-body">${esc(t.problem)}</div>
+        ${t.admin_reply?`<div class="ticket-reply">Your reply: ${esc(t.admin_reply)}</div>`:''}
+        <div class="flex-center gap8 mt12">
+          <input type="text" placeholder="Type your reply..." style="flex:1;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="reply-${t.id}">
+          <button class="btn btn-sm" onclick="replyTicket('${t.id}')">Reply</button>
+          <button class="btn btn-sm btn-dark" onclick="closeTicket('${t.id}')">Close</button>
+        </div>
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box warn">Failed to load.</div>';}
+}
+
+async function replyTicket(id){
+  const reply=document.getElementById('reply-'+id)?.value.trim();
+  if(!reply)return;
+  await sb.from('help_tickets').update({status:'answered',admin_reply:reply,replied_at:new Date().toISOString()}).eq('id',id);
+  toast('Reply sent.','ok');loadTickets();
+}
+
+async function closeTicket(id){
+  await sb.from('help_tickets').update({status:'closed'}).eq('id',id);
+  toast('Ticket closed.','');loadTickets();
+}
+
+/* ── ASSIGNMENTS ── */
+async function loadAssignmentReviews(){
+  const box=document.getElementById('assign-review-list');
+  try{
+    const{data}=await sb.from('assignments').select('*').order('submitted_at').limit(50);
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No assignments to review.</div>';return;}
+    box.innerHTML=data.map(a=>`
+      <div class="card mb12" style="padding:18px 20px;">
+        <div class="flex-between mb10">
+          <div><div style="font-weight:600;color:var(--txt);">${esc(a.username)} — Level ${a.level_num}: ${esc(a.level_title||'')}</div>
+          <div class="mono td" style="font-size:.68rem;">${fmtDate(a.submitted_at)}</div></div>
+          <span class="badge ${a.status==='passed'?'bgreen':a.status==='failed'?'':a.status==='reviewed'?'bs':'bz'}">${a.status.toUpperCase()}</span>
+        </div>
+        <div class="td mb12" style="font-size:.84rem;line-height:1.65;background:var(--bg2);padding:12px;border:1px solid var(--line);">${esc(a.content)}</div>
+        <div class="flex-center gap8">
+          <input type="number" min="0" max="100" placeholder="Score /100" style="width:100px;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="sc-${a.id}" value="${a.score||''}">
+          <input type="text" placeholder="Feedback..." style="flex:1;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="fb-${a.id}" value="${a.admin_feedback||''}">
+          <button class="btn btn-sm btn-dark" onclick="markAssignment('${a.id}','passed')">Pass</button>
+          <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="markAssignment('${a.id}','failed')">Fail</button>
+        </div>
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box warn">Failed to load.</div>';}
+}
+
+async function markAssignment(id,status){
+  const score=parseInt(document.getElementById('sc-'+id)?.value)||null;
+  const feedback=document.getElementById('fb-'+id)?.value.trim()||null;
+  await sb.from('assignments').update({status,score,admin_feedback:feedback,reviewed_at:new Date().toISOString()}).eq('id',id);
+  if(score){
+    const{data:a}=await sb.from('assignments').select('user_id').eq('id',id).single();
+    if(a)await sb.from('profiles').update({points:sb.rpc('increment')}).eq('id',a.user_id).catch(()=>{});
+  }
+  toast(status==='passed'?'Assignment passed.':'Assignment failed.','ok');
+  loadAssignmentReviews();loadStats();
+}
+
+/* ── STUDENTS ── */
+async function loadStudents(){
+  const{data}=await sb.from('profiles').select('*').order('points',{ascending:false});
+  const tbody=document.getElementById('student-tbody');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="7" class="tc mono td" style="padding:24px;">No students yet.</td></tr>';return;}
+  tbody.innerHTML=data.map(p=>`<tr>
+    <td style="font-weight:600;color:var(--txt);">${esc(p.username)}</td>
+    <td class="tr mono">${p.points||0}</td>
+    <td>${p.current_level||1}</td>
+    <td><span class="badge bsys">Phase ${p.phase||1}</span></td>
+    <td class="mono td">${p.completed_challenges||0}</td>
+    <td class="mono ${p.strikes>0?'tr':''}">${p.strikes||0}/3</td>
+    <td class="mono td" style="font-size:.7rem;">${fmtDate(p.created_at)}</td>
+  </tr>`).join('');
+}
+
+/* ── CTF ── */
+async function createCTF(){
+  const title=document.getElementById('ch-title').value.trim();
+  const cat=document.getElementById('ch-cat').value;
+  const diff=document.getElementById('ch-diff').value;
+  const pts=parseInt(document.getElementById('ch-pts').value)||10;
+  const icon=document.getElementById('ch-icon').value||'🚩';
+  const date=document.getElementById('ch-date').value||null;
+  const desc=document.getElementById('ch-desc').value.trim();
+  const flag=document.getElementById('ch-flag').value.trim();
+  const h1=document.getElementById('ch-h1').value.trim();
+  const h2=document.getElementById('ch-h2').value.trim();
+  if(!title||!desc||!flag)return showAlert('ctf-alert','Title, description and flag are required.','err');
+  const flagHash=await sha256(flag.toLowerCase().trim());
+  const{error}=await sb.from('ctf_challenges').insert({title,category:cat,difficulty:diff,points:pts,flag_hash:flagHash,hint1:h1||null,hint2:h2||null,icon,description:desc,week_date:date,active:true});
+  if(error)return showAlert('ctf-alert',error.message,'err');
+  showAlert('ctf-alert','Challenge deployed!','ok');
+  ['ch-title','ch-desc','ch-flag','ch-h1','ch-h2'].forEach(id=>document.getElementById(id).value='');
+  loadCTFList();loadStats();
+}
+
+async function loadCTFList(){
+  const{data}=await sb.from('ctf_public').select('*').order('created_at',{ascending:false}).limit(20);
+  const box=document.getElementById('ctf-list');
+  if(!data||!data.length){box.innerHTML='<div class="info-box">No challenges yet.</div>';return;}
+  box.innerHTML=data.map(c=>`
+    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="font-size:1.3rem;">${esc(c.icon)}</div>
+      <div style="flex:1;"><div style="font-weight:600;color:var(--txt);">${esc(c.title)}</div>
+      <div class="mono td" style="font-size:.7rem;"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.points} pts · ${c.solver_count||0} solvers${c.first_blood?' · 🩸 '+esc(c.first_blood):''}</div></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm btn-dark" onclick="toggleCTF('${c.id}',${!c.active})">${c.active?'Deactivate':'Activate'}</button>
+        <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="deleteCTF('${c.id}','${esc(c.title)}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function toggleCTF(id,val){await sb.from('ctf_challenges').update({active:val}).eq('id',id);loadCTFList();toast(val?'Activated.':'Deactivated.','ok');}
+async function deleteCTF(id,title){if(!confirm('Delete "'+title+'"?'))return;await sb.from('ctf_challenges').delete().eq('id',id);loadCTFList();toast('Deleted.','');}
+
+/* ── EXAMS ── */
+async function createExam(){
+  const title=document.getElementById('ex-title').value.trim();
+  const phase=parseInt(document.getElementById('ex-phase').value)||1;
+  const opens=document.getElementById('ex-open').value;
+  const closes=document.getElementById('ex-close').value;
+  const dur=parseInt(document.getElementById('ex-dur').value)||null;
+  const pass=parseInt(document.getElementById('ex-pass').value)||60;
+  if(!title||!opens||!closes)return showAlert('ex-alert','Title, open and close times required.','err');
+  const{error}=await sb.from('exams').insert({title,phase,opens_at:new Date(opens).toISOString(),closes_at:new Date(closes).toISOString(),duration_minutes:dur,pass_percentage:pass});
+  if(error)return showAlert('ex-alert',error.message,'err');
+  showAlert('ex-alert','Exam created!','ok');
+  document.getElementById('ex-title').value='';
+  populateExamSelect();loadExamList();
+}
+
+async function populateExamSelect(){
+  const{data}=await sb.from('exams').select('id,title').order('created_at',{ascending:false}).limit(20);
+  const sel=document.getElementById('q-exam');
+  if(data&&data.length)sel.innerHTML=data.map(e=>`<option value="${e.id}">${esc(e.title)}</option>`).join('');
+}
+
+function toggleQType(){
+  const t=document.getElementById('q-type').value;
+  document.getElementById('mcq-area').style.display=t==='mcq'?'block':'none';
+  document.getElementById('short-area').style.display=t==='short'?'block':'none';
+}
+
+async function addQuestion(){
+  const examId=document.getElementById('q-exam').value;
+  const type=document.getElementById('q-type').value;
+  const question=document.getElementById('q-text').value.trim();
+  const pts=parseInt(document.getElementById('q-pts').value)||1;
+  if(!examId||!question)return showAlert('q-alert','Select exam and enter question.','err');
+  let options=null,correct='';
+  if(type==='mcq'){
+    const a=document.getElementById('q-a').value.trim();
+    const b=document.getElementById('q-b').value.trim();
+    const c=document.getElementById('q-c').value.trim();
+    const d=document.getElementById('q-d').value.trim();
+    if(!a||!b)return showAlert('q-alert','Need at least A and B options.','err');
+    options=JSON.stringify([a,b,c,d].filter(Boolean));
+    correct=document.getElementById('q-correct').value;
+  } else {
+    correct=document.getElementById('q-short-ans').value.trim();
+    if(!correct)return showAlert('q-alert','Enter the correct answer.','err');
+  }
+  const{count}=await sb.from('exam_questions').select('*',{count:'exact',head:true}).eq('exam_id',examId);
+  const{error}=await sb.from('exam_questions').insert({exam_id:examId,type,question,options,correct_answer:correct,points:pts,order_num:count||0});
+  if(error)return showAlert('q-alert',error.message,'err');
+  showAlert('q-alert','Question added!','ok');
+  document.getElementById('q-text').value='';
+  ['q-a','q-b','q-c','q-d','q-short-ans'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+async function loadExamList(){
+  const{data}=await sb.from('exams').select('*').order('opens_at',{ascending:false}).limit(20);
+  const box=document.getElementById('exam-list');
+  if(!data||!data.length){box.innerHTML='<div class="info-box">No exams yet.</div>';return;}
+  box.innerHTML=data.map(e=>`
+    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;"><div style="font-weight:600;color:var(--txt);">📝 ${esc(e.title)}</div>
+      <div class="mono td" style="font-size:.7rem;">Phase ${e.phase} · ${fmtDate(e.opens_at)} → ${fmtDate(e.closes_at)} · Pass: ${e.pass_percentage}%${e.duration_minutes?' · '+e.duration_minutes+' min':''}</div></div>
+      <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="deleteExam('${e.id}')">Delete</button>
+    </div>`).join('');
+}
+
+async function deleteExam(id){
+  if(!confirm('Delete exam? Questions and results will be lost.'))return;
+  await sb.from('exam_questions').delete().eq('exam_id',id);
+  await sb.from('exam_results').delete().eq('exam_id',id);
+  await sb.from('exams').delete().eq('id',id);
+  loadExamList();toast('Exam deleted.','');
+}
+
+/* ── ANNOUNCEMENTS ── */
+async function postAnnouncement(){
+  const title=document.getElementById('ann-title').value.trim();
+  const body=document.getElementById('ann-body').value.trim();
+  const urgent=document.getElementById('ann-urgent').value==='true';
+  if(!title||!body)return showAlert('ann-alert','Title and body required.','err');
+  const{error}=await sb.from('announcements').insert({title,body,urgent});
+  if(error)return showAlert('ann-alert',error.message,'err');
+  showAlert('ann-alert','Announcement posted!','ok');
+  document.getElementById('ann-title').value='';
+  document.getElementById('ann-body').value='';
+  loadAnnouncements();
+}
+
+async function loadAnnouncements(){
+  const{data}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(10);
+  const box=document.getElementById('ann-list');
+  if(!data||!data.length){box.innerHTML='<div class="info-box">No announcements yet.</div>';return;}
+  box.innerHTML=data.map(a=>`
+    <div class="card mb8" style="padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;"><div style="font-weight:600;color:${a.urgent?'var(--red)':'var(--txt)'};">${a.urgent?'🚨 ':''}${esc(a.title)}</div><div class="td fs">${esc(a.body)}</div></div>
+      <button class="btn btn-sm btn-dark" onclick="deleteAnn('${a.id}')">Delete</button>
+    </div>`).join('');
+}
+
+async function deleteAnn(id){await sb.from('announcements').delete().eq('id',id);loadAnnouncements();toast('Deleted.','');}
+
+/* ── POINTS & STRIKES ── */
+async function awardPoints(){
+  const uname=document.getElementById('pts-user').value.trim();
+  const amount=parseInt(document.getElementById('pts-amount').value);
+  if(!uname||isNaN(amount))return showAlert('pts-alert','Username and points required.','err');
+  const{data:p}=await sb.from('profiles').select('id,points').eq('username',uname).maybeSingle();
+  if(!p)return showAlert('pts-alert','Student "'+uname+'" not found.','err');
+  const newPts=Math.max(0,(p.points||0)+amount);
+  await sb.from('profiles').update({points:newPts}).eq('id',p.id);
+  showAlert('pts-alert',(amount>0?'+'+amount:amount)+' pts applied to '+uname+'. New total: '+newPts,'ok');
+  document.getElementById('pts-user').value='';document.getElementById('pts-amount').value='';
+}
+
+async function issueStrike(){
+  const uname=document.getElementById('str-user').value.trim();
+  const reason=document.getElementById('str-reason').value;
+  if(!uname)return showAlert('str-alert','Username required.','err');
+  const{data:p}=await sb.from('profiles').select('id,strikes').eq('username',uname).maybeSingle();
+  if(!p)return showAlert('str-alert','Student "'+uname+'" not found.','err');
+  const newStrikes=(p.strikes||0)+1;
+  await sb.from('profiles').update({strikes:newStrikes}).eq('id',p.id);
+  await sb.from('strike_log').insert({user_id:p.id,username:uname,reason});
+  showAlert('str-alert','Strike '+newStrikes+'/3 issued to '+uname+(newStrikes>=3?' — THIRD STRIKE! Consider disabling their account.':'.'),'ok');
+  document.getElementById('str-user').value='';
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

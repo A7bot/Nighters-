@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="on">Dashboard</a>
+      <a href="levels.html">Levels</a>
+      <a href="ctf.html">CTF</a>
+      <a href="exams.html">Exams</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="help.html">🆘 Help</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" style="padding-top:28px;padding-bottom:60px;">
+
+  <!-- PROFILE HEADER -->
+  <div class="card-red mb24" style="padding:22px 26px;">
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+      <div style="width:56px;height:56px;border:2px solid var(--red);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--H);font-size:1.5rem;color:var(--red);flex-shrink:0;" id="av">?</div>
+      <div style="flex:1;min-width:150px;">
+        <div style="font-family:var(--H);font-size:1.15rem;color:var(--txt);" id="p-name">Loading...</div>
+        <div class="mono td mt4" style="font-size:.7rem;" id="p-email"></div>
+        <div class="mt8 strike-row" id="strike-bar"></div>
+      </div>
+      <div style="text-align:right;">
+        <span class="badge" id="p-rank">—</span>
+        <div style="font-family:var(--H);font-size:1.5rem;color:var(--red);text-shadow:0 0 16px rgba(225,29,72,.4);margin-top:8px;" id="p-pts">0 PTS</div>
+        <div class="mono td mt4" style="font-size:.68rem;" id="p-lvl">Level 1</div>
+      </div>
+    </div>
+    <div class="pbar mt16"><div class="fill" id="p-bar" style="width:0%"></div></div>
+    <div class="mono td mt8" style="font-size:.66rem;" id="p-prog"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="g4 mb28">
+    <div class="stat"><span class="n" id="d-lvl">1</span><div class="l">Current Level</div></div>
+    <div class="stat"><span class="n" id="d-rank">#—</span><div class="l">Global Rank</div></div>
+    <div class="stat"><span class="n" id="d-streak">0</span><div class="l">Day Streak</div></div>
+    <div class="stat"><span class="n" id="d-att">0</span><div class="l">Days Present</div></div>
+  </div>
+
+  <!-- DAILY CHECK-IN -->
+  <div class="stitle mb16">Daily Check-In</div>
+  <div class="card-red mb28" style="text-align:center;padding:28px;">
+    <div style="font-size:2.2rem;margin-bottom:10px;">🛡</div>
+    <div class="mono td mb16" id="ci-date" style="font-size:.74rem;letter-spacing:2px;"></div>
+    <button class="btn" id="ci-btn" onclick="doCheckIn()">Check In — Earn Points</button>
+    <div class="mono ts mt12" id="ci-done" style="display:none;font-size:.82rem;">✓ Checked in today. Keep the streak going!</div>
+  </div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div class="stitle mb16">Announcements</div>
+  <div id="ann-list" class="mb28"></div>
+
+  <!-- CURRENT LEVEL -->
+  <div class="stitle mb16">
+    Continue Where You Left Off
+    <a href="levels.html" class="btn btn-sm btn-dark" style="margin-left:auto;">All Levels →</a>
+  </div>
+  <div id="current-level-box" class="mb28"></div>
+
+  <!-- UPCOMING CTF -->
+  <div class="stitle mb16">
+    Weekly CTF — Every Sunday
+    <a href="ctf.html" class="btn btn-sm btn-dark" style="margin-left:auto;">View CTF →</a>
+  </div>
+  <div id="ctf-box" class="mb28"></div>
+
+  <!-- QUICK LINKS -->
+  <div class="g3 mb16">
+    <a href="leaderboard.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
+      <div style="font-size:1.7rem;margin-bottom:8px;">🏆</div>
+      <div class="tr mono" style="font-size:.74rem;letter-spacing:1px;">LEADERBOARD</div>
+    </a>
+    <a href="exams.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
+      <div style="font-size:1.7rem;margin-bottom:8px;">📝</div>
+      <div class="tr mono" style="font-size:.74px;letter-spacing:1px;">EXAMS</div>
+    </a>
+    <a href="resources.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
+      <div style="font-size:1.7rem;margin-bottom:8px;">📚</div>
+      <div class="tr mono" style="font-size:.74rem;letter-spacing:1px;">RESOURCES</div>
+    </a>
+  </div>
+</div>
+
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+
+  document.getElementById('av').textContent=prof.username[0].toUpperCase();
+  document.getElementById('p-name').textContent=prof.username;
+  document.getElementById('p-email').textContent=me.email;
+  document.getElementById('p-pts').textContent=(prof.points||0)+' PTS';
+  document.getElementById('p-lvl').textContent='Level '+(prof.current_level||1);
+  document.getElementById('d-lvl').textContent=prof.current_level||1;
+  document.getElementById('d-streak').textContent=prof.streak||0;
+  document.getElementById('d-att').textContent=prof.attendance_days||0;
+
+  const rank=getRank(prof.points||0);
+  const rb=document.getElementById('p-rank');
+  rb.textContent=rank.name;rb.className='badge '+rank.cls;
+  const prog=getRankProgress(prof.points||0);
+  document.getElementById('p-bar').style.width=prog.pct+'%';
+  document.getElementById('p-prog').textContent=prog.label;
+
+  // strikes
+  const sb2=document.getElementById('strike-bar');
+  for(let i=0;i<3;i++){const d=document.createElement('div');d.className='sdot'+(i<(prof.strikes||0)?' on':'');sb2.appendChild(d);}
+  if(prof.strikes>0){const sp=document.createElement('span');sp.className='mono tr';sp.style.fontSize='.7rem';sp.textContent=' '+(prof.strikes)+'/3 Strikes';sb2.appendChild(sp);}
+
+  // global rank
+  try{const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).gt('points',prof.points||0);document.getElementById('d-rank').textContent='#'+((count||0)+1);}catch(e){}
+
+  // check-in
+  document.getElementById('ci-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  try{const{data:ci}=await sb.from('attendance').select('id').eq('user_id',me.id).eq('date',today()).maybeSingle();if(ci){document.getElementById('ci-btn').style.display='none';document.getElementById('ci-done').style.display='block';}}catch(e){}
+
+  loadAnnouncements();
+  loadCurrentLevel();
+  loadCTF();
+}
+
+async function doCheckIn(){
+  const btn=document.getElementById('ci-btn');btn.disabled=true;
+  const h=new Date().getHours();const late=h>=20;const pts=late?1:2;
+  try{
+    const{error}=await sb.from('attendance').insert({user_id:me.id,username:prof.username,date:today(),status:late?'late':'present',points_awarded:pts});
+    if(error){toast(error.message,'');btn.disabled=false;return;}
+    await sb.from('profiles').update({points:(prof.points||0)+pts,attendance_days:(prof.attendance_days||0)+1,streak:(prof.streak||0)+1}).eq('id',me.id);
+    btn.style.display='none';document.getElementById('ci-done').style.display='block';
+    toast('✓ Checked in! +'+pts+' pts'+(late?' (late)':''),'ok');
+  }catch(e){toast('Error. Try again.','');btn.disabled=false;}
+}
+
+async function loadAnnouncements(){
+  const box=document.getElementById('ann-list');
+  try{
+    const{data}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(3);
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No announcements yet.</div>';return;}
+    box.innerHTML=data.map(a=>`
+      <div class="card mb10" style="padding:14px 18px;">
+        <div class="flex-between mb8">
+          <div class="fw" style="color:${a.urgent?'var(--red)':'var(--txt)'};font-size:.9rem;">${a.urgent?'🚨 ':''}${esc(a.title)}</div>
+          <div class="mono td" style="font-size:.65rem;">${fmtDate(a.created_at)}</div>
+        </div>
+        <div class="td fs">${esc(a.body||'')}</div>
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box">Could not load announcements.</div>';}
+}
+
+async function loadCurrentLevel(){
+  const box=document.getElementById('current-level-box');
+  const lvl=prof.current_level||1;
+  box.innerHTML=`
+    <div class="lcard active" onclick="location.href='levels.html'">
+      <div class="lc-num">${lvl}</div>
+      <div class="lc-inf">
+        <div class="lc-title">Level ${lvl} — Continue Training</div>
+        <div class="lc-meta mono">Click to view all levels and continue where you left off</div>
+      </div>
+      <a href="levels.html" class="btn btn-sm" onclick="event.stopPropagation()">Open →</a>
+    </div>`;
+}
+
+async function loadCTF(){
+  const box=document.getElementById('ctf-box');
+  try{
+    const now=new Date().toISOString();
+    const{data}=await sb.from('ctf_public').select('*').eq('active',true).order('created_at',{ascending:false}).limit(3);
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No CTF challenges this week yet. Check back on Sunday.</div>';return;}
+    box.innerHTML=data.map(c=>`
+      <div class="chcard mb10" onclick="location.href='ctf.html'">
+        <div class="ci">${esc(c.icon)}</div>
+        <div class="cf"><div class="ct">${esc(c.title)}</div><div class="cm"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.solver_count||0} solvers</div></div>
+        <div class="cp">${c.points} PTS<small>OPEN</small></div>
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box">Could not load CTF challenges.</div>';}
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

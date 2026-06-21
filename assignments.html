@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Assignments // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html">Levels</a>
+      <a href="assignments.html" class="on">Assignments</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb8">My Assignments</div>
+  <div class="term mb24">
+    <div class="p">Each level has an assignment. Complete it and submit here.</div>
+    <div class="c">Admin reviews and scores each submission. You will see your score and feedback here.</div>
+    <div class="c">To submit from inside a lesson, click Submit Assignment at the bottom of the lesson page.</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="g3 mb28">
+    <div class="stat"><span class="n" id="a-total">0</span><div class="l">Submitted</div></div>
+    <div class="stat"><span class="n" id="a-passed">0</span><div class="l">Passed</div></div>
+    <div class="stat"><span class="n" id="a-pending">0</span><div class="l">Pending Review</div></div>
+  </div>
+
+  <!-- SUBMIT FORM -->
+  <div class="card-red mb28">
+    <div class="card-hd">Submit Assignment</div>
+    <div id="sa-alert" class="alert"></div>
+    <div class="g2">
+      <div class="field">
+        <label>Level</label>
+        <select id="sa-level">
+          <option value="">Select level...</option>
+          ${Array.from({length:30},(_,i)=>`<option value="${i+1}">Level ${i+1}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Level Title (optional)</label>
+        <input type="text" id="sa-title" placeholder="e.g. Setting Up Your Arsenal">
+      </div>
+    </div>
+    <div class="field">
+      <label>Your Work — What You Did and What You Found</label>
+      <textarea id="sa-content" style="min-height:140px;" placeholder="Describe what you did step by step. Paste any commands you ran. Explain your findings. The more detail you give, the better your score."></textarea>
+    </div>
+    <button class="btn" onclick="submitAssignment()">Submit to Admin</button>
+  </div>
+
+  <!-- ASSIGNMENTS LIST -->
+  <div class="stitle mb16">All Submissions</div>
+  <div id="assign-list"></div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+  loadAssignments();
+}
+
+async function submitAssignment(){
+  const level=parseInt(document.getElementById('sa-level').value);
+  const title=document.getElementById('sa-title').value.trim();
+  const content=document.getElementById('sa-content').value.trim();
+  if(!level)return showAlert('sa-alert','Select a level.','err');
+  if(!content||content.length<20)return showAlert('sa-alert','Write more detail about your work (at least 20 characters).','err');
+  try{
+    const{error}=await sb.from('assignments').insert({user_id:me.id,username:prof.username,level_num:level,level_title:title||'Level '+level,content});
+    if(error)return showAlert('sa-alert',error.message,'err');
+    showAlert('sa-alert','Assignment submitted! Admin will review and score it soon.','ok');
+    document.getElementById('sa-level').value='';
+    document.getElementById('sa-title').value='';
+    document.getElementById('sa-content').value='';
+    loadAssignments();
+  }catch(e){showAlert('sa-alert','Error submitting. Try again.','err');}
+}
+
+async function loadAssignments(){
+  const box=document.getElementById('assign-list');
+  try{
+    const{data}=await sb.from('assignments').select('*').eq('user_id',me.id).order('submitted_at',{ascending:false});
+    const total=data?.length||0;
+    const passed=(data||[]).filter(a=>a.status==='passed').length;
+    const pending=(data||[]).filter(a=>a.status==='pending').length;
+    document.getElementById('a-total').textContent=total;
+    document.getElementById('a-passed').textContent=passed;
+    document.getElementById('a-pending').textContent=pending;
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No assignments submitted yet. Complete a level and submit its assignment.</div>';return;}
+    box.innerHTML=data.map(a=>`
+      <div class="card mb12" style="padding:18px 20px;">
+        <div class="flex-between mb12">
+          <div>
+            <div style="font-weight:600;color:var(--txt);font-size:.92rem;">Level ${a.level_num}: ${esc(a.level_title||'')}</div>
+            <div class="mono td" style="font-size:.68rem;">${fmtDate(a.submitted_at)} ${fmtTime(a.submitted_at)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${a.score!==null?`<span class="badge ${a.score>=60?'bgreen':'bz'}">${a.score}/100</span>`:''}
+            <span class="badge ${a.status==='passed'?'bgreen':a.status==='failed'?'':a.status==='reviewed'?'bs':'bz'}">${a.status.toUpperCase()}</span>
+          </div>
+        </div>
+        <div class="td" style="font-size:.85rem;line-height:1.65;background:var(--bg2);padding:12px;border:1px solid var(--line);max-height:100px;overflow:hidden;">${esc(a.content.substring(0,300))}${a.content.length>300?'...':''}</div>
+        ${a.admin_feedback?`<div class="info-box mt12"><strong class="ts">Admin Feedback:</strong><br>${esc(a.admin_feedback)}</div>`:a.status==='pending'?'<div class="mono td mt10" style="font-size:.72rem;">⏳ Waiting for admin review...</div>':''}
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box warn">Could not load assignments.</div>';}
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

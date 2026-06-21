@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lesson // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html">All Levels</a>
+      <a href="help.html">🆘 Help</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-bg" id="quiz-modal">
+  <div class="modal" style="max-width:680px;">
+    <span class="modal-x" onclick="closeQuiz()">✕</span>
+    <div style="font-family:var(--H);color:var(--red);font-size:1rem;letter-spacing:2px;margin-bottom:20px;">Level Quiz</div>
+    <div id="quiz-body"></div>
+    <div class="mt20 flex-center" id="quiz-footer">
+      <button class="btn" onclick="submitQuiz()">Submit Answers</button>
+      <div class="mono td" style="font-size:.72rem;" id="q-progress">0/0 answered</div>
+    </div>
+    <div id="quiz-result" style="display:none;text-align:center;padding:24px;">
+      <div style="font-size:3rem;margin-bottom:12px;" id="qr-icon">📊</div>
+      <div style="font-family:var(--H);font-size:2.5rem;color:var(--red);margin-bottom:8px;" id="qr-score">—</div>
+      <div class="mono td mb16" id="qr-msg"></div>
+      <button class="btn" id="qr-btn" onclick="closeQuiz()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="assign-modal">
+  <div class="modal">
+    <span class="modal-x" onclick="document.getElementById('assign-modal').classList.remove('open')">✕</span>
+    <div style="font-family:var(--H);color:var(--red);font-size:1rem;letter-spacing:2px;margin-bottom:20px;">Submit Assignment</div>
+    <div id="assign-task-list" class="mb16"></div>
+    <div class="field"><label>Your Work</label><textarea id="assign-text" placeholder="Describe what you did, paste commands you ran, explain your findings..."></textarea></div>
+    <div id="assign-alert" class="alert"></div>
+    <button class="btn btn-block" onclick="submitAssignment()">Submit to Admin</button>
+    <p class="tc mt12 mono td" style="font-size:.72rem;">Admin will review and score your submission.</p>
+  </div>
+</div>
+
+<div class="wrap-md" style="padding-top:28px;padding-bottom:80px;" id="lesson-wrap">
+  <div class="tc" style="padding:60px;"><div class="mono td">Loading lesson...</div></div>
+</div>
+
+<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,8,0.96);border-top:1px solid var(--rbdr);padding:12px 22px;z-index:50;backdrop-filter:blur(10px);">
+  <div style="max-width:780px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div class="flex-center">
+      <div class="mono td" style="font-size:.7rem;">TIME SPENT: <span class="tr" id="timer-disp">00:00</span></div>
+      <div class="mono td" style="font-size:.7rem;margin-left:16px;">HINTS USED: <span class="tr" id="hints-used">0</span></div>
+    </div>
+    <div class="flex-center gap8">
+      <button class="btn btn-dark btn-sm" onclick="document.getElementById('assign-modal').classList.add('open')">Submit Assignment</button>
+      <button class="btn btn-sm" onclick="openQuiz()">Take Quiz →</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:20px;"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<script src="app.js"></script>
+<script src="lessons-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null,lesson=null,startTime=Date.now(),timerRef=null,quizAnswers={},hintsUsed=0;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+
+  const params=new URLSearchParams(location.search);
+  const id=parseInt(params.get('id'))||1;
+  lesson=getLessonById(id);
+  if(!lesson){document.getElementById('lesson-wrap').innerHTML='<div class="info-box warn">Lesson not found. <a href="levels.html" style="color:var(--red);">Go back</a></div>';return;}
+
+  // Check if locked
+  if(id>1&&id>(prof.current_level||1)){
+    document.getElementById('lesson-wrap').innerHTML=`<div class="card-red" style="text-align:center;padding:48px;"><div style="font-size:2.5rem;margin-bottom:14px;">🔒</div><div class="tr mono" style="letter-spacing:2px;">LEVEL ${id} LOCKED</div><div class="td mono mt8">Complete Level ${id-1} first.</div><a href="levels.html" class="btn mt20">Back to Levels</a></div>`;
+    return;
+  }
+
+  renderLesson();
+  startTimer();
+
+  // Mark in progress
+  try{
+    await sb.from('level_progress').upsert({user_id:me.id,level_num:id,status:'in_progress',started_at:new Date().toISOString()},{onConflict:'user_id,level_num'});
+  }catch(e){}
+}
+
+function renderLesson(){
+  const l=lesson;
+  let html=`
+    <div class="flex-between mb8">
+      <a href="levels.html" class="mono td" style="font-size:.72rem;text-decoration:none;">← All Levels</a>
+      <div class="flex-center gap8">
+        <span class="badge ${l.type==='web'?'bweb':'bsys'}">${l.type.toUpperCase()}</span>
+        <span class="mono td" style="font-size:.7rem;">⏱ ${l.duration_mins} min</span>
+        <span class="mono tr" style="font-size:.7rem;">${l.points} pts</span>
+      </div>
+    </div>
+
+    <div class="card-red mb24" style="padding:22px 26px;">
+      <div class="mono td mb8" style="font-size:.7rem;letter-spacing:3px;">LEVEL ${l.id} OF 30 · PHASE ${l.phase}</div>
+      <h1 style="font-family:var(--H);font-size:1.6rem;color:var(--txt);margin-bottom:6px;">${l.emoji} ${esc(l.title)}</h1>
+      <div class="td mb16" style="font-size:.9rem;">${esc(l.subtitle)}</div>
+      <div class="info-box">${esc(l.intro)}</div>
+    </div>
+
+    <div class="stitle mb16">What You Will Learn</div>
+    <div class="card mb24">
+      ${l.objectives.map(o=>`<div class="flex-center mb8"><span class="tr" style="font-size:.8rem;margin-right:8px;">▸</span><span class="td" style="font-size:.9rem;">${esc(o)}</span></div>`).join('')}
+    </div>`;
+
+  // Sections
+  l.sections.forEach((s,i)=>{
+    html+=`
+      <div class="stitle mb16" id="section-${i}">${esc(s.title)}</div>
+      <div class="card mb8">${s.content?`<p class="td mb16" style="font-size:.9rem;line-height:1.75;">${esc(s.content)}</p>`:''}`;
+
+    if(s.steps){
+      html+=`<div class="mb16">${s.steps.map((st,j)=>`<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;"><div style="width:22px;height:22px;border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--M);font-size:.66rem;color:var(--red);flex-shrink:0;">${j+1}</div><div class="td" style="font-size:.88rem;padding-top:2px;">${esc(st)}</div></div>`).join('')}</div>`;
+    }
+
+    if(s.cmd&&s.cmd.length){
+      html+=`<div class="tdemo mb12"><div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Terminal</div></div><div class="tdemo-body">`;
+      s.cmd.forEach(c=>{
+        if(c.t==='c')  html+=`<div class="tc"># ${esc(c.v)}</div>`;
+        else if(c.t==='cmd') html+=`<div class="cmd">${esc(c.v)}</div>`;
+        else if(c.t==='out') html+=`<div class="out">${esc(c.v).replace(/\n/g,'<br>')}</div>`;
+        else if(c.t==='ok')  html+=`<div class="ok">${esc(c.v)}</div>`;
+        else if(c.t==='er')  html+=`<div class="er">${esc(c.v)}</div>`;
+        else if(c.t==='p')   html+=`<div class="p">${esc(c.v)}</div>`;
+      });
+      html+=`</div></div>`;
+    }
+
+    if(s.warning) html+=`<div class="info-box warn mb8">⚠ ${esc(s.warning)}</div>`;
+
+    if(s.troubleshoot){
+      html+=`<div class="mt12"><div class="mono td mb8" style="font-size:.68rem;letter-spacing:2px;">TROUBLESHOOTING</div>`;
+      s.troubleshoot.forEach(t=>{
+        html+=`<div style="background:var(--bg2);border-left:3px solid var(--muted);padding:10px 14px;margin-bottom:8px;"><div class="mono tr" style="font-size:.74rem;margin-bottom:4px;">Problem: ${esc(t.prob)}</div><div class="mono ts" style="font-size:.74rem;">Fix: ${esc(t.fix)}</div></div>`;
+      });
+      html+=`</div>`;
+    }
+
+    html+=`</div>`;
+  });
+
+  // Hints
+  html+=`<div class="stitle mb16">Hints</div><div class="card mb24">
+    <div class="info-box warn mb12">Each hint costs 2 points from your score.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn btn-sm btn-dark" onclick="useHint(0)">Hint 1 (−2 pts)</button>
+      <button class="btn btn-sm btn-dark" onclick="useHint(1)">Hint 2 (−2 pts)</button>
+    </div>
+    <div class="hint-box" id="hint-0"></div>
+    <div class="hint-box" id="hint-1"></div>
+  </div>`;
+
+  // Assignment box
+  html+=`<div class="stitle mb16">Assignment</div>
+    <div class="card-red mb32">
+      <div class="card-hd">${esc(l.assignment.title)}</div>
+      <div class="mb16">${l.assignment.tasks.map((t,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;"><span class="tr mono" style="font-size:.8rem;">${i+1}.</span><span class="td" style="font-size:.88rem;">${esc(t)}</span></div>`).join('')}</div>
+      <div class="info-box mb16"><strong>What to submit:</strong> ${esc(l.assignment.submit)}</div>
+      <button class="btn" onclick="document.getElementById('assign-modal').classList.add('open')">Submit Assignment</button>
+    </div>
+    <div class="tc mb24" style="padding-bottom:80px;">
+      <button class="btn btn-lg" onclick="openQuiz()">Take Level Quiz →</button>
+    </div>`;
+
+  document.getElementById('lesson-wrap').innerHTML=html;
+
+  // Fill assignment modal tasks
+  document.getElementById('assign-task-list').innerHTML=`
+    <div class="card-hd mb8">${esc(l.assignment.title)}</div>
+    ${l.assignment.tasks.map((t,i)=>`<div class="mono td mb8" style="font-size:.78rem;">${i+1}. ${esc(t)}</div>`).join('')}`;
+}
+
+async function useHint(idx){
+  const box=document.getElementById('hint-'+idx);
+  if(box.classList.contains('show'))return;
+  if((prof.points||0)<2){toast('Not enough points for a hint.','');return;}
+
+  const hintText=lesson.hints[idx];
+  if(!hintText){toast('No hint available.','');return;}
+
+  try{
+    await sb.from('hint_usage').insert({user_id:me.id,challenge_id:lesson.id+'_level',challenge_type:'level',hint_key:'hint'+idx,cost:2});
+    await sb.from('profiles').update({points:(prof.points||0)-2}).eq('id',me.id);
+    prof.points=(prof.points||0)-2;
+    hintsUsed++;
+    document.getElementById('hints-used').textContent=hintsUsed;
+    box.textContent='💡 '+hintText;
+    box.classList.add('show');
+    toast('Hint unlocked. −2 pts.','');
+  }catch(e){toast('Error unlocking hint.','');}
+}
+
+function openQuiz(){
+  const l=lesson;
+  quizAnswers={};
+  let html=l.quiz.map((q,i)=>`
+    <div class="q-wrap">
+      <div class="q-num">QUESTION ${i+1} OF ${l.quiz.length}</div>
+      <div class="q-text">${esc(q.q)}</div>
+      <div class="q-opts">${q.opts.map((o,j)=>`
+        <button class="q-opt" onclick="selectQ(${i},${j},this)" data-q="${i}">
+          <span class="q-ltr">${String.fromCharCode(65+j)}.</span> ${esc(o)}
+        </button>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('quiz-body').innerHTML=html;
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('quiz-body').style.display='block';
+  document.getElementById('quiz-footer').style.display='flex';
+  updateQProgress();
+  document.getElementById('quiz-modal').classList.add('open');
+}
+
+function selectQ(qi,ans,el){
+  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  quizAnswers[qi]=ans;
+  updateQProgress();
+}
+
+function updateQProgress(){
+  const total=lesson.quiz.length;
+  document.getElementById('q-progress').textContent=Object.keys(quizAnswers).length+'/'+total+' answered';
+}
+
+async function submitQuiz(){
+  const l=lesson;
+  let correct=0;
+  l.quiz.forEach((q,i)=>{
+    const userAns=quizAnswers[i];
+    const btn=document.querySelector(`[data-q="${i}"].sel`);
+    if(btn) btn.classList.remove('sel');
+    document.querySelectorAll(`[data-q="${i}"]`).forEach((b,j)=>{
+      if(j===q.a) b.classList.add('cor');
+      if(j===quizAnswers[i]&&j!==q.a) b.classList.add('wrg');
+    });
+    if(userAns===q.a) correct++;
+  });
+
+  const pct=Math.round((correct/l.quiz.length)*100);
+  const passed=pct>=60;
+
+  document.getElementById('quiz-footer').style.display='none';
+
+  setTimeout(()=>{
+    document.getElementById('quiz-body').style.display='none';
+    document.getElementById('quiz-result').style.display='block';
+    document.getElementById('qr-icon').textContent=passed?'🏆':'📋';
+    document.getElementById('qr-score').textContent=pct+'%';
+    document.getElementById('qr-msg').textContent=`${correct}/${l.quiz.length} correct — ${passed?'PASSED! Level complete.':'Not passed. Score 60% to complete.'}`;
+    document.getElementById('qr-btn').textContent=passed?'Continue →':'Try Again';
+    document.getElementById('qr-btn').onclick=passed?()=>{closeQuiz();markComplete(pct);}:()=>{openQuiz();};
+  },1000);
+}
+
+async function markComplete(score){
+  const l=lesson;
+  const timeSpent=Math.floor((Date.now()-startTime)/1000);
+
+  try{
+    await sb.from('level_progress').upsert({
+      user_id:me.id,level_num:l.id,
+      status:'completed',
+      completed_at:new Date().toISOString(),
+      time_spent_seconds:timeSpent,
+      quiz_score:score,
+      hints_used:hintsUsed
+    },{onConflict:'user_id,level_num'});
+
+    const newPts=(prof.points||0)+l.points;
+    const newLevel=Math.max((prof.current_level||1),l.id+1);
+    const newPhase=getPhase(newLevel);
+    await sb.from('profiles').update({points:newPts,current_level:newLevel,phase:newPhase}).eq('id',me.id);
+
+    toast('✓ Level '+l.id+' complete! +'+l.points+' pts','ok');
+    setTimeout(()=>{
+      if(l.id<30) window.location='lesson.html?id='+(l.id+1);
+      else window.location='levels.html';
+    },1800);
+  }catch(e){toast('Error saving progress.','');}
+}
+
+async function submitAssignment(){
+  const text=document.getElementById('assign-text').value.trim();
+  if(!text)return showAlert('assign-alert','Write about your work before submitting.','err');
+
+  try{
+    const{error}=await sb.from('assignments').insert({
+      user_id:me.id,username:prof.username,
+      level_num:lesson.id,level_title:lesson.title,
+      content:text,status:'pending'
+    });
+    if(error)return showAlert('assign-alert',error.message,'err');
+    showAlert('assign-alert','Assignment submitted! Admin will review and score it.','ok');
+    document.getElementById('assign-text').value='';
+    setTimeout(()=>document.getElementById('assign-modal').classList.remove('open'),2000);
+  }catch(e){showAlert('assign-alert','Error. Try again.','err');}
+}
+
+function closeQuiz(){document.getElementById('quiz-modal').classList.remove('open');}
+
+function startTimer(){
+  timerRef=setInterval(()=>{
+    const elapsed=Math.floor((Date.now()-startTime)/1000);
+    const m=String(Math.floor(elapsed/60)).padStart(2,'0');
+    const s=String(elapsed%60).padStart(2,'0');
+    document.getElementById('timer-disp').textContent=m+':'+s;
+  },1000);
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

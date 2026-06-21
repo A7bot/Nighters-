@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CTF // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<div class="modal-bg" id="ch-modal">
+  <div class="modal">
+    <span class="modal-x" onclick="closeModal()">✕</span>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html">Levels</a>
+      <a href="ctf.html" class="on">CTF</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb8">Weekly CTF Challenges</div>
+  <div class="term mb24">
+    <div class="p">New challenges every Sunday. Submit the correct flag to earn points.</div>
+    <div class="c">Flag format: FLAG{your_answer_here}</div>
+    <div class="c">First solver: +20 bonus. Second: +10. Third: +5. Hints cost −2 pts each.</div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="g4 mb24">
+    <div class="stat"><span class="n" id="c-total">0</span><div class="l">Challenges</div></div>
+    <div class="stat"><span class="n" id="c-solved">0</span><div class="l">You Solved</div></div>
+    <div class="stat"><span class="n" id="c-pts">0</span><div class="l">Your Points</div></div>
+    <div class="stat"><span class="n" id="c-flags">0</span><div class="l">Total Flags</div></div>
+  </div>
+
+  <!-- FILTER -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+    <button class="btn btn-sm" onclick="filterCat('all',this)">All</button>
+    <button class="btn btn-sm btn-dark" onclick="filterCat('web',this)">Web</button>
+    <button class="btn btn-sm btn-dark" onclick="filterCat('system',this)">System</button>
+    <button class="btn btn-sm btn-dark" onclick="filterCat('recon',this)">Recon</button>
+    <button class="btn btn-sm btn-dark" onclick="filterCat('crypto',this)">Crypto</button>
+    <button class="btn btn-sm btn-dark" onclick="filterCat('forensics',this)">Forensics</button>
+  </div>
+
+  <div id="ch-list"><div class="term"><div class="c">Loading challenges...</div></div></div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null,challenges=[],solvedSet=new Set(),activeCat='all';
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+  document.getElementById('c-pts').textContent=prof.points||0;
+
+  const{data:sv}=await sb.from('ctf_submissions').select('challenge_id').eq('user_id',me.id).eq('correct',true);
+  solvedSet=new Set((sv||[]).map(s=>s.challenge_id));
+  document.getElementById('c-solved').textContent=solvedSet.size;
+
+  const{count:totalFlags}=await sb.from('ctf_submissions').select('*',{count:'exact',head:true}).eq('correct',true);
+  document.getElementById('c-flags').textContent=totalFlags||0;
+
+  await loadChallenges();
+}
+
+async function loadChallenges(){
+  let q=sb.from('ctf_public').select('*').eq('active',true).order('difficulty');
+  if(activeCat!=='all') q=q.eq('category',activeCat);
+  const{data}=await q;
+  challenges=data||[];
+  document.getElementById('c-total').textContent=challenges.length;
+  render();
+}
+
+function filterCat(cat,btn){
+  activeCat=cat;
+  document.querySelectorAll('.wrap .btn').forEach(b=>{if(b.onclick&&b.onclick.toString().includes('filterCat'))b.className='btn btn-sm btn-dark';});
+  btn.className='btn btn-sm';
+  loadChallenges();
+}
+
+function render(){
+  const box=document.getElementById('ch-list');
+  if(!challenges.length){box.innerHTML='<div class="term"><div class="c">No challenges yet. Check back on Sunday!</div></div>';return;}
+  box.innerHTML=challenges.map(c=>{
+    const solved=solvedSet.has(c.id);
+    return `<div class="chcard mb10${solved?' solved':''}" onclick="${solved?'':("openChallenge('"+c.id+"')")}">
+      <div class="ci">${esc(c.icon)}</div>
+      <div class="cf">
+        <div class="ct">${esc(c.title)}</div>
+        <div class="cm">
+          <span class="diff d${c.difficulty[0]}">${c.difficulty}</span>
+          ${esc(c.category)}
+          ${c.first_blood?`<span class="tr mono" style="font-size:.62rem;margin-left:8px;">🩸 ${esc(c.first_blood)}</span>`:''}
+          <span class="mono td" style="font-size:.63rem;margin-left:8px;">${c.solver_count||0} solvers</span>
+        </div>
+      </div>
+      <div class="cp">${c.points} PTS<small>${solved?'✓ SOLVED':'OPEN'}</small></div>
+    </div>`;
+  }).join('');
+}
+
+async function openChallenge(id){
+  const c=challenges.find(x=>x.id===id);if(!c)return;
+
+  let h1unlocked=false,h2unlocked=false;
+  try{
+    const{data:hu}=await sb.from('hint_usage').select('hint_key').eq('user_id',me.id).eq('challenge_id',id);
+    (hu||[]).forEach(h=>{if(h.hint_key==='hint1')h1unlocked=true;if(h.hint_key==='hint2')h2unlocked=true;});
+  }catch(e){}
+
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-family:var(--H);color:var(--red);font-size:1rem;letter-spacing:2px;margin-bottom:14px;">${esc(c.title)}</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <span class="diff d${c.difficulty[0]}">${c.difficulty}</span>
+      <span class="badge" style="color:var(--dim);border-color:var(--muted);">${esc(c.category)}</span>
+      <span class="mono td" style="font-size:.68rem;">${c.points} pts · ${c.solver_count||0} solvers</span>
+    </div>
+    <div class="td mb20" style="font-size:.9rem;line-height:1.75;white-space:pre-wrap;">${esc(c.description||'')}</div>
+
+    <div class="mb20">
+      <div class="mono tr mb10" style="font-size:.68rem;letter-spacing:2px;">HINTS (cost −2 pts each)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="btn btn-sm btn-dark" id="h1-btn" onclick="useHint('${id}','hint1',${c.hint1_cost||2},'${esc(c.hint1||'')}')">Hint 1 (${h1unlocked?'Unlocked':'−'+(c.hint1_cost||2)+' pts'})</button>
+        <button class="btn btn-sm btn-dark" id="h2-btn" onclick="useHint('${id}','hint2',${c.hint2_cost||5},'${esc(c.hint2||'')}')">Hint 2 (${h2unlocked?'Unlocked':'−'+(c.hint2_cost||5)+' pts'})</button>
+      </div>
+      <div class="hint-box${h1unlocked?' show':''}" id="h1-box">${h1unlocked&&c.hint1?'💡 '+esc(c.hint1):''}</div>
+      <div class="hint-box${h2unlocked?' show':''}" id="h2-box">${h2unlocked&&c.hint2?'💡 '+esc(c.hint2):''}</div>
+    </div>
+
+    <div class="field">
+      <label>Submit Flag</label>
+      <input type="text" id="flag-in" placeholder="FLAG{your_answer}" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')submitFlag('${id}')">
+    </div>
+    <div id="flag-alert" class="alert"></div>
+    <button class="btn btn-block" onclick="submitFlag('${id}')">Submit Flag</button>`;
+
+  if(h1unlocked)document.getElementById('h1-btn').disabled=true;
+  if(h2unlocked)document.getElementById('h2-btn').disabled=true;
+  document.getElementById('ch-modal').classList.add('open');
+  setTimeout(()=>{const el=document.getElementById('flag-in');if(el)el.focus();},100);
+}
+
+async function useHint(chId,key,cost,text){
+  const box=document.getElementById(key==='hint1'?'h1-box':'h2-box');
+  const btn=document.getElementById(key==='hint1'?'h1-btn':'h2-btn');
+  if(box.classList.contains('show'))return;
+  if(!text){toast('No hint available.','');return;}
+  if((prof.points||0)<cost){toast('Not enough points for this hint.','');return;}
+  try{
+    await sb.from('hint_usage').insert({user_id:me.id,challenge_id:chId,challenge_type:'ctf',hint_key:key,cost});
+    await sb.from('profiles').update({points:(prof.points||0)-cost}).eq('id',me.id);
+    prof.points=(prof.points||0)-cost;
+    document.getElementById('c-pts').textContent=prof.points;
+    box.textContent='💡 '+text;box.classList.add('show');
+    btn.disabled=true;
+    toast('Hint unlocked. −'+cost+' pts.','');
+  }catch(e){toast('Error unlocking hint.','');}
+}
+
+async function submitFlag(chId){
+  const input=document.getElementById('flag-in').value.trim();
+  if(!input)return showAlert('flag-alert','Enter a flag before submitting.','err');
+  const fp=fingerprint();
+  const flagHash=await sha256(input.toLowerCase().trim());
+  try{
+    const{data,error}=await sb.rpc('check_ctf_flag',{p_challenge_id:chId,p_flag_hash:flagHash,p_user_id:me.id,p_username:prof.username,p_fingerprint:fp});
+    if(error)return showAlert('flag-alert',error.message,'err');
+    if(!data.ok){
+      if(data.msg==='Already solved')return showAlert('flag-alert','You already solved this!','warn');
+      return showAlert('flag-alert','Wrong flag. Try again.','err');
+    }
+    const total=(data.pts||0)+(data.bonus||0);
+    prof.points=(prof.points||0)+total;
+    solvedSet.add(chId);
+    document.getElementById('c-pts').textContent=prof.points;
+    document.getElementById('c-solved').textContent=solvedSet.size;
+    let msg='✓ Correct! +'+data.pts+' pts';
+    if(data.bonus)msg+=' +'+data.bonus+' bonus!';
+    if(data.first_blood)msg+=' 🩸 FIRST BLOOD!';
+    showAlert('flag-alert',msg,'ok');
+    toast(msg,'ok');
+    setTimeout(()=>{closeModal();render();},1800);
+  }catch(e){showAlert('flag-alert','Error. Try again.','err');}
+}
+
+function closeModal(){document.getElementById('ch-modal').classList.remove('open');}
+document.getElementById('ch-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

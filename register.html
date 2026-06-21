@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enlist // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<canvas id="bg-canvas"></canvas>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links"><a href="login.html">Login</a></div>
+  </div>
+</nav>
+<div class="wrap-sm" style="padding-top:50px;padding-bottom:60px;">
+  <div class="stitle mb12">Create Account</div>
+  <div class="term mb24">
+    <div class="p">Opening secure registration channel...</div>
+    <div class="c">Your callsign is permanent. Choose carefully.</div>
+    <div class="c">Use a real email — you need it to login.</div>
+  </div>
+  <div class="card-red">
+    <div id="ra" class="alert"></div>
+    <div class="field"><label>Callsign (Username)</label><input type="text" id="uname" placeholder="e.g. ghost_zero" maxlength="20" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="operative@domain.com" autocomplete="off"></div>
+    <div class="field"><label>Password</label><input type="password" id="pw" placeholder="Minimum 8 characters"></div>
+    <div class="field"><label>Confirm Password</label><input type="password" id="pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doReg()"></div>
+    <div class="info-box mb16">By enlisting you agree to the <a href="rules.html" style="color:var(--red);">Rules of Engagement</a>. Cheating leads to permanent removal.</div>
+    <button class="btn btn-block" id="reg-btn" onclick="doReg()">Create Account</button>
+    <p class="tc mt16 mono td" style="font-size:.72rem;">Already have an account? <a href="login.html" style="color:var(--red);">Login →</a></p>
+  </div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Authorized Training Platform</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+(async()=>{try{const{data:{user}}=await sb.auth.getUser();if(user)window.location='dashboard.html';}catch(e){}})();
+async function doReg(){
+  const uname=document.getElementById('uname').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const pw=document.getElementById('pw').value;
+  const pw2=document.getElementById('pw2').value;
+  const btn=document.getElementById('reg-btn');
+  if(!uname||!email||!pw||!pw2)return showAlert('ra','All fields are required.','err');
+  if(!/^[a-z0-9_]{3,20}$/i.test(uname))return showAlert('ra','Callsign: 3–20 characters, letters/numbers/underscore only.','err');
+  if(pw.length<8)return showAlert('ra','Password must be at least 8 characters.','err');
+  if(pw!==pw2)return showAlert('ra','Passwords do not match.','err');
+  btn.disabled=true;btn.textContent='Creating account...';
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:pw});
+    if(error){showAlert('ra',error.message,'err');btn.disabled=false;btn.textContent='Create Account';return;}
+    if(data&&data.user){
+      try{await sb.from('profiles').insert({id:data.user.id,username:uname,email,points:0,current_level:1,phase:1,strikes:0,completed_challenges:0,attendance_days:0,streak:0});}
+      catch(e){console.warn('Profile insert:',e);}
+    }
+    showAlert('ra','Account created! Redirecting to login...','ok');
+    setTimeout(()=>window.location='login.html',2000);
+  }catch(e){showAlert('ra','Connection error. Check your Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Create Account';}
+}
+</script>
+</body>
+</html>

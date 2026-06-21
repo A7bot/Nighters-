@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Setup Guide // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="setup.html" class="on">Setup Guide</a>
+      <a href="login.html">Login</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap-md" style="padding-top:40px;padding-bottom:60px;">
+  <div class="stitle mb8">Setup Guide</div>
+  <p class="td fs mb32">Follow these steps before starting Level 1. This is the most important thing you will do. A bad setup breaks everything after it.</p>
+
+  <!-- STEP 1 -->
+  <div class="card-red mb16">
+    <div class="card-hd">Step 1 — Install Termux from F-Droid</div>
+    <div class="info-box warn mb16">⚠ Do NOT use Termux from Play Store. It is old and broken. Use F-Droid only.</div>
+    <ol style="color:var(--dim);font-size:.9rem;line-height:2.2;padding-left:20px;">
+      <li>Open your phone browser</li>
+      <li>Go to <strong style="color:var(--red);">f-droid.org</strong></li>
+      <li>Download the F-Droid app and install it</li>
+      <li>Open F-Droid → search <strong style="color:var(--txt);">Termux</strong></li>
+      <li>Install Termux from F-Droid</li>
+      <li>Open Termux → tap Allow when it asks for storage</li>
+    </ol>
+    <div class="tdemo mt16">
+      <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Termux — First commands</div></div>
+      <div class="tdemo-body">
+        <div class="tc"># First thing after opening Termux</div>
+        <div class="cmd">pkg update && pkg upgrade -y</div>
+        <div class="ok">All packages are up to date.</div>
+      </div>
+    </div>
+    <div class="info-box mt16"><strong>If pkg update fails:</strong> Make sure WiFi or mobile data is ON. Try again. If still failing, run: <code style="color:var(--red);">termux-setup-storage</code> first.</div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card-red mb16">
+    <div class="card-hd">Step 2 — Install Debian Inside Termux</div>
+    <p class="td fs mb16">Debian is a full Linux system. We run it inside Termux using proot-distro. This gives us access to all the security tools we need.</p>
+    <div class="tdemo">
+      <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Installing Debian</div></div>
+      <div class="tdemo-body">
+        <div class="tc"># Install proot-distro (the tool that manages Linux systems)</div>
+        <div class="cmd">pkg install proot-distro -y</div>
+        <div class="ok">Installed proot-distro.</div>
+        <div class="tc"># Install Debian (takes 5–10 minutes first time)</div>
+        <div class="cmd">proot-distro install debian</div>
+        <div class="out">Downloading Debian rootfs...<br>Extracting... this takes a while<br>Installation complete.</div>
+        <div class="tc"># Login to Debian</div>
+        <div class="cmd">proot-distro login debian</div>
+        <div class="p">root@localhost:~#</div>
+        <div class="tc"># You are now inside Debian. Update it.</div>
+        <div class="cmd">apt update && apt upgrade -y</div>
+        <div class="ok">All packages upgraded.</div>
+      </div>
+    </div>
+    <div class="info-box mt16"><strong>If download stops halfway:</strong> Run the same command again. It will continue from where it stopped.</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card-red mb16">
+    <div class="card-hd">Step 3 — Install All Tools for Month 1</div>
+    <div class="info-box warn mb16">⚠ Only install what is listed here. Do NOT install Metasploit or PostgreSQL — they are too heavy for phone and you do not need them in Month 1.</div>
+    <div class="tdemo">
+      <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Debian — Tool Installation</div></div>
+      <div class="tdemo-body">
+        <div class="tc"># Make sure you are inside Debian first</div>
+        <div class="cmd">apt install -y curl wget git nmap whois dnsutils net-tools python3 python3-pip</div>
+        <div class="ok">Done. All tools installed.</div>
+        <div class="tc"># Verify tools are ready</div>
+        <div class="cmd">which nmap curl wget git python3</div>
+        <div class="out">/usr/bin/nmap<br>/usr/bin/curl<br>/usr/bin/wget<br>/usr/bin/git<br>/usr/bin/python3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="card-red mb16">
+    <div class="card-hd">Step 4 — Create a Shortcut to Enter Debian</div>
+    <p class="td fs mb16">Every time you open Termux, you need to type proot-distro login debian. Make a shortcut so you only type one word.</p>
+    <div class="tdemo">
+      <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Termux — Create shortcut</div></div>
+      <div class="tdemo-body">
+        <div class="tc"># Exit Debian back to Termux first</div>
+        <div class="cmd">exit</div>
+        <div class="tc"># Create a shortcut file</div>
+        <div class="cmd">echo 'proot-distro login debian' > ~/deb.sh && chmod +x ~/deb.sh</div>
+        <div class="tc"># Now to enter Debian just type:</div>
+        <div class="cmd">bash ~/deb.sh</div>
+        <div class="p">root@localhost:~#</div>
+        <div class="ok">You are in Debian. Type 'exit' to go back to Termux.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT TERMUX CAN/CANNOT DO -->
+  <div class="stitle mb16">What Termux + Debian Can and Cannot Do</div>
+  <div class="g2 mb32">
+    <div class="card">
+      <div class="card-hd ts">✓ What You CAN Do</div>
+      <div class="term" style="font-size:.76rem;">
+        <div class="ok">Run full Linux commands (nmap, curl, dig)</div>
+        <div class="ok">Write and run bash scripts</div>
+        <div class="ok">Scan networks (with permission only)</div>
+        <div class="ok">Test web applications</div>
+        <div class="ok">Use Git and download tools from GitHub</div>
+        <div class="ok">Run Python scripts and tools</div>
+        <div class="ok">Practice all Month 1 and most Month 2 content</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd tr">✗ What You CANNOT Do</div>
+      <div class="term" style="font-size:.76rem;">
+        <div class="er">Run Metasploit (too heavy, needs laptop)</div>
+        <div class="er">Use WiFi injection adapters (need special hardware)</div>
+        <div class="er">Run GUI tools like Burp Suite (no desktop)</div>
+        <div class="er">Run VirtualBox (needs laptop)</div>
+        <div class="er">Attack real systems without permission (this is illegal)</div>
+        <div class="er">Run heavy database tools (PostgreSQL will freeze your phone)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TROUBLESHOOTING -->
+  <div class="stitle mb16">Common Problems &amp; Fixes</div>
+  <div class="card mb32">
+    <table class="dtable">
+      <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>pkg update gives error</td><td>Turn on WiFi/data. Try again.</td></tr>
+        <tr><td>Permission denied in Termux</td><td>Do not use sudo in base Termux. Just run the command directly.</td></tr>
+        <tr><td>Not enough space</td><td>Free up 2GB on phone. Delete unused apps and files.</td></tr>
+        <tr><td>Debian download stops halfway</td><td>Run proot-distro install debian again. It continues.</td></tr>
+        <tr><td>proot-distro: command not found</td><td>Run: pkg install proot-distro first</td></tr>
+        <tr><td>apt command not found in Debian</td><td>You are in Termux, not Debian. Run: proot-distro login debian</td></tr>
+        <tr><td>E: Unable to locate package</td><td>Run: apt update first, then try installing again</td></tr>
+        <tr><td>Phone slows down</td><td>Exit Debian (type exit). Do not run too many tools at once.</td></tr>
+        <tr><td>Termux session lost</td><td>Open Termux again. Run: bash ~/deb.sh to re-enter Debian.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tc">
+    <a href="register.html" class="btn btn-lg">Setup Done → Create Account</a>
+  </div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+</body>
+</html>

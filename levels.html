@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Levels // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html" class="on">Levels</a>
+      <a href="ctf.html">CTF</a>
+      <a href="exams.html">Exams</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="help.html">🆘 Help</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" style="padding-top:28px;padding-bottom:60px;">
+  <div class="stitle mb8">Training Levels</div>
+  <p class="td fs mb24">30 levels over 3 months. Each level must be completed before the next one unlocks. Complete the level quiz to earn points and move forward.</p>
+
+  <!-- PHASE TABS -->
+  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+    <button class="btn btn-sm" id="tab1" onclick="showPhase(1)">Month 1 — Foundation</button>
+    <button class="btn btn-sm btn-dark" id="tab2" onclick="showPhase(2)">Month 2 — Recon</button>
+    <button class="btn btn-sm btn-dark" id="tab3" onclick="showPhase(3)">Month 3 — Red Team</button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="card-red mb24" style="padding:16px 20px;">
+    <div class="flex-between mb8">
+      <div class="mono td" style="font-size:.72rem;">YOUR PROGRESS</div>
+      <div class="mono tr" style="font-size:.72rem;" id="prog-txt">0 / 30 levels</div>
+    </div>
+    <div class="pbar"><div class="fill" id="prog-bar" style="width:0%"></div></div>
+  </div>
+
+  <!-- LEVEL LIST -->
+  <div id="level-list"></div>
+</div>
+
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="lessons-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null,progress={},activePhase=1;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+
+  // Load level progress
+  try{
+    const{data:lp}=await sb.from('level_progress').select('*').eq('user_id',me.id);
+    if(lp)lp.forEach(r=>progress[r.level_num]=r);
+  }catch(e){}
+
+  // Progress bar
+  const done=Object.values(progress).filter(r=>r.status==='completed').length;
+  document.getElementById('prog-txt').textContent=done+' / 30 levels';
+  document.getElementById('prog-bar').style.width=(done/30*100)+'%';
+
+  showPhase(1);
+}
+
+function showPhase(n){
+  activePhase=n;
+  [1,2,3].forEach(i=>{
+    document.getElementById('tab'+i).className=i===n?'btn btn-sm':'btn btn-sm btn-dark';
+  });
+  renderLevels(n);
+}
+
+function renderLevels(phase){
+  const box=document.getElementById('level-list');
+  const levels=LESSONS.filter(l=>l.phase===phase);
+  const userPhase=prof.phase||1;
+  const userLevel=prof.current_level||1;
+
+  if(phase>userPhase){
+    box.innerHTML=`
+      <div class="card-red" style="text-align:center;padding:48px 24px;">
+        <div style="font-size:2.8rem;margin-bottom:14px;">🔒</div>
+        <div class="tr mono" style="font-size:.82rem;letter-spacing:2px;">PHASE ${phase} LOCKED</div>
+        <div class="td mono mt8" style="font-size:.74rem;">Complete Phase ${phase-1} final exam to unlock.</div>
+      </div>`;
+    return;
+  }
+
+  box.innerHTML=levels.map(l=>{
+    const lp=progress[l.id];
+    const status=lp?lp.status:(l.id===1?'unlocked':'locked');
+    const isLocked=l.id>userLevel&&!lp;
+    const isDone=status==='completed';
+    const isActive=l.id===userLevel;
+
+    return `<div class="lcard${isDone?' done':isActive?' active':isLocked?' locked':''} mb10"
+      onclick="${isLocked?`toast('Complete Level ${l.id-1} first.','')`:``}"
+      ${isLocked?'':''}
+      style="cursor:${isLocked?'not-allowed':'pointer'}"
+      onclick="${isLocked?`toast('Complete Level ${l.id-1} first.','')`:`location.href='lesson.html?id=${l.id}'`}">
+      <div class="lc-num">${l.id}</div>
+      <div class="lc-inf">
+        <div class="lc-title">${l.emoji} ${esc(l.title)}</div>
+        <div class="lc-meta">
+          <span class="badge ${l.type==='web'?'bweb':'bsys'}" style="margin-right:6px;">${l.type.toUpperCase()}</span>
+          ${esc(l.subtitle)} · ⏱ ${l.duration_mins} min
+          ${lp&&lp.quiz_score!==null?`<span class="ts" style="margin-left:8px;">Quiz: ${lp.quiz_score}%</span>`:''}
+        </div>
+      </div>
+      <div class="lc-pts">${l.points} PTS<small>${isDone?'DONE':isActive?'IN PROGRESS':isLocked?'LOCKED':'OPEN'}</small></div>
+    </div>`;
+  }).join('');
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

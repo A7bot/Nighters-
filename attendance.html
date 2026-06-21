@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Attendance // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html">Levels</a>
+      <a href="attendance.html" class="on">Attendance</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb16">Daily Attendance</div>
+
+  <!-- CHECK IN CARD -->
+  <div class="card-red mb28" style="text-align:center;padding:36px 24px;">
+    <div style="font-size:2.4rem;margin-bottom:10px;">🛡</div>
+    <div class="mono td mb16" id="today-date" style="font-size:.74rem;letter-spacing:2px;"></div>
+    <div class="g3 mb20" style="max-width:360px;margin:0 auto 20px;">
+      <div class="stat"><span class="n" id="att-days">0</span><div class="l">Days Present</div></div>
+      <div class="stat"><span class="n" id="att-streak">0</span><div class="l">Streak</div></div>
+      <div class="stat"><span class="n" id="att-pts">0</span><div class="l">Att. Points</div></div>
+    </div>
+    <button class="btn btn-lg" id="ci-btn" onclick="doCheckIn()">Check In — +2 Points</button>
+    <div class="mono ts mt16" id="ci-done" style="display:none;font-size:.85rem;">✓ Checked in today. See you tomorrow!</div>
+    <div class="mono tw mt8" style="font-size:.72rem;">After 8 PM = Late check-in (+1 pt only)</div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="stitle mb16">This Month</div>
+  <div class="card mb28">
+    <div class="flex-between mb16">
+      <div class="mono tr" style="font-size:.82rem;" id="cal-month"></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <span class="mono ts" style="font-size:.68rem;">■ Present</span>
+        <span class="mono tw" style="font-size:.68rem;">■ Late</span>
+        <span class="mono tr" style="font-size:.68rem;">□ Today</span>
+      </div>
+    </div>
+    <div class="cal" style="margin-bottom:6px;">
+      <div class="cal-hd">SUN</div><div class="cal-hd">MON</div><div class="cal-hd">TUE</div>
+      <div class="cal-hd">WED</div><div class="cal-hd">THU</div><div class="cal-hd">FRI</div><div class="cal-hd">SAT</div>
+    </div>
+    <div class="cal" id="cal-grid"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="stitle mb16">Attendance History</div>
+  <div class="card" style="padding:0;overflow:auto;">
+    <table class="dtable">
+      <thead><tr><th>Date</th><th>Day</th><th>Time</th><th>Status</th><th>Points</th></tr></thead>
+      <tbody id="att-tbody"><tr><td colspan="5" class="tc mono td" style="padding:24px;">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null,records=[];
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+
+  document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  document.getElementById('att-streak').textContent=prof.streak||0;
+
+  const{data:att}=await sb.from('attendance').select('*').eq('user_id',me.id).order('date',{ascending:false});
+  records=att||[];
+
+  const days=records.length;
+  const pts=records.reduce((a,r)=>a+(r.points_awarded||0),0);
+  document.getElementById('att-days').textContent=days;
+  document.getElementById('att-pts').textContent=pts;
+
+  const todayRec=records.find(r=>r.date===today());
+  if(todayRec){document.getElementById('ci-btn').style.display='none';document.getElementById('ci-done').style.display='block';}
+
+  buildCalendar();buildTable();
+}
+
+async function doCheckIn(){
+  const btn=document.getElementById('ci-btn');btn.disabled=true;btn.textContent='Checking in...';
+  const h=new Date().getHours();const late=h>=20;const pts=late?1:2;
+  try{
+    const{error}=await sb.from('attendance').insert({user_id:me.id,username:prof.username,date:today(),status:late?'late':'present',points_awarded:pts});
+    if(error){toast(error.code==='23505'?'Already checked in today.':error.message,'');btn.disabled=false;btn.textContent='Check In — +2 Points';return;}
+    await sb.from('profiles').update({points:(prof.points||0)+pts,attendance_days:(prof.attendance_days||0)+1,streak:(prof.streak||0)+1,last_checkin:today()}).eq('id',me.id);
+    btn.style.display='none';document.getElementById('ci-done').style.display='block';
+    toast('✓ Checked in! +'+pts+' pts'+(late?' (late)':''),'ok');
+    const{data:att}=await sb.from('attendance').select('*').eq('user_id',me.id).order('date',{ascending:false});
+    records=att||[];
+    document.getElementById('att-days').textContent=records.length;
+    document.getElementById('att-pts').textContent=records.reduce((a,r)=>a+(r.points_awarded||0),0);
+    buildCalendar();buildTable();
+  }catch(e){toast('Error. Try again.','');btn.disabled=false;btn.textContent='Check In — +2 Points';}
+}
+
+function buildCalendar(){
+  const now=new Date(),year=now.getFullYear(),month=now.getMonth(),todayD=now.getDate();
+  document.getElementById('cal-month').textContent=now.toLocaleDateString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const attMap={};
+  records.forEach(r=>{const d=new Date(r.date);if(d.getMonth()===month&&d.getFullYear()===year)attMap[d.getDate()]=r.status;});
+  let html='';
+  for(let i=0;i<firstDay;i++)html+=`<div class="cal-day"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    let cls='cal-day';
+    if(attMap[d]==='present')cls+=' present';
+    else if(attMap[d]==='late')cls+=' late';
+    if(d===todayD)cls+=' today';
+    html+=`<div class="${cls}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+
+function buildTable(){
+  const tbody=document.getElementById('att-tbody');
+  if(!records.length){tbody.innerHTML='<tr><td colspan="5" class="tc mono td" style="padding:24px;">No records yet.</td></tr>';return;}
+  tbody.innerHTML=records.slice(0,60).map(r=>`<tr>
+    <td>${fmtDate(r.date)}</td>
+    <td class="mono td">${new Date(r.date).toLocaleDateString('en-GB',{weekday:'short'})}</td>
+    <td class="mono td">${fmtTime(r.checked_in_at)}</td>
+    <td><span class="badge ${r.status==='present'?'bgreen':'bz'}">${r.status.toUpperCase()}</span></td>
+    <td class="tr mono">+${r.points_awarded}</td>
+  </tr>`).join('');
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+init();
+</script>
+</body>
+</html>

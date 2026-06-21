@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Hall of Fame // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="hall-of-fame.html" class="on">Hall of Fame</a>
+      <a href="login.html">Login</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap" style="padding-top:40px;padding-bottom:60px;">
+  <div class="stitle mb8">Hall of Fame</div>
+  <p class="td fs mb32">Operatives who reached Red Agent rank or above. The elite of Nighters Cyber Academy.</p>
+
+  <div id="hof-grid" class="g3 mb40"></div>
+
+  <div class="stitle mb16">First Blood Champions</div>
+  <div class="card" style="padding:0;">
+    <div class="card-hd" style="padding:14px 20px;">FIRST BLOODS — CTF Challenges</div>
+    <div id="fb-list"><div style="padding:32px;text-align:center;" class="mono td">Loading...</div></div>
+  </div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+async function init(){
+  try{
+    const{data:elite}=await sb.from('profiles')
+      .select('username,points,phase,current_level,completed_challenges,created_at')
+      .gte('points',2000).order('points',{ascending:false}).limit(12);
+    const box=document.getElementById('hof-grid');
+    if(!elite||!elite.length){
+      box.innerHTML='<div class="card-red tc" style="padding:40px;grid-column:1/-1;"><div class="mono td">No elite operatives yet. Be the first to reach Red Agent rank (2000+ pts).</div></div>';
+    } else {
+      box.innerHTML=elite.map((p,i)=>{
+        const rank=getRank(p.points||0);
+        return `<div class="hof">
+          ${i<3?`<div style="position:absolute;top:10px;right:12px;font-size:1.1rem;">${i===0?'🥇':i===1?'🥈':'🥉'}</div>`:''}
+          <div class="hof-av">${p.username[0].toUpperCase()}</div>
+          <div class="hof-name">${esc(p.username)}</div>
+          <div class="mt6"><span class="badge ${rank.cls}">${rank.name}</span></div>
+          <div class="hof-pts">${p.points||0} PTS</div>
+          <div class="mono td mt8" style="font-size:.68rem;">${p.current_level||1} levels · Phase ${p.phase||1}</div>
+        </div>`;
+      }).join('');
+    }
+
+    const{data:fb}=await sb.from('ctf_public').select('title,category,first_blood,points').not('first_blood','is',null).order('created_at');
+    const fb2=document.getElementById('fb-list');
+    if(!fb||!fb.length){fb2.innerHTML='<div style="padding:28px;" class="mono td tc">No first bloods yet. Solve CTF challenges on Sunday to claim them!</div>';return;}
+    fb2.innerHTML=fb.map(c=>`
+      <div class="lb-row">
+        <div class="lb-av">🩸</div>
+        <div class="lb-inf"><strong>${esc(c.title)}</strong><small>${esc(c.category)}</small></div>
+        <div style="font-family:var(--M);font-size:.8rem;color:var(--red);">🩸 ${esc(c.first_blood)}</div>
+        <div class="lb-pts">${c.points} PTS</div>
+      </div>`).join('');
+  }catch(e){console.error(e);}
+}
+init();
+</script>
+</body>
+</html>
