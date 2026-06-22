@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Help // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="levels.html">Levels</a>
+      <a href="help.html" class="on">🆘 Help</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap-md" style="padding-top:32px;padding-bottom:60px;">
+  <div class="stitle mb8">Help Desk</div>
+  <div class="term mb24">
+    <div class="p">Stuck on a level? Submit a ticket. Admin will reply directly.</div>
+    <div class="c">For urgent help, WhatsApp: +2349013555055</div>
+  </div>
+
+  <!-- SUBMIT TICKET -->
+  <div class="card-red mb28">
+    <div class="card-hd">Submit a New Ticket</div>
+    <div id="t-alert" class="alert"></div>
+    <div class="field">
+      <label>Which Level Are You On?</label>
+    <select id="t-level"></select>
+    <div class="field" id="custom-level-box" style="display:none;">
+  <label>Enter Your Level</label>
+  <input type="text" id="custom-level" placeholder="Example: Level 5">
+</div>
+    </div>
+    <div class="field" id="custom-level-box" style="display:none;">
+  <label>Enter Your Level</label>
+  <input type="text" id="custom-level" placeholder="Example: Level 31">
+</div>
+    <div class="field">
+      <label>Describe Your Problem</label>
+      <textarea id="t-problem" placeholder="Tell us exactly what you tried, what command you ran, and what error or problem you got. The more detail you give, the faster we can help." style="min-height:120px;"></textarea>
+    </div>
+    <button class="btn btn-block" onclick="submitTicket()">Submit Help Request</button>
+  </div>
+
+  <!-- MY TICKETS -->
+  <div class="stitle mb16">Your Tickets</div>
+  <div id="tickets-list"></div>
+</div>
+<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let me=null,prof=null;
+
+async function init(){
+  me=await requireAuth(sb);if(!me)return;
+  const{data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+  if(!p){window.location='login.html';return;}
+  prof=p;
+  loadTickets();
+}
+
+async function submitTicket(){
+  const level=document.getElementById('t-level').value;
+  const problem=document.getElementById('t-problem').value.trim();
+  if(!problem)return showAlert('t-alert','Please describe your problem.','err');
+  try{
+   const customLevel =
+  document.getElementById('custom-level')?.value || '';
+
+const customLevel =
+document.getElementById('custom-level').value.trim();
+
+const{error}=await sb.from('help_tickets').insert({
+  user_id: me.id,
+  username: prof.username,
+  email: me.email,
+  level_num:
+    level && level !== 'custom'
+      ? parseInt(level)
+      : null,
+  custom_level:
+    level === 'custom'
+      ? customLevel
+      : null,
+  problem
+});
+    if(error)return showAlert('t-alert',error.message,'err');
+    showAlert('t-alert','Ticket submitted! Admin will reply soon.','ok');
+    document.getElementById('t-problem').value='';
+    document.getElementById('t-level').value='';
+    loadTickets();
+  }catch(e){showAlert('t-alert','Error. Try again.','err');}
+}
+
+async function loadTickets(){
+  const box=document.getElementById('tickets-list');
+  try{
+    const{data}=await sb.from('help_tickets').select('*').eq('user_id',me.id).order('created_at',{ascending:false});
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No tickets yet. Submit one above if you need help.</div>';return;}
+    box.innerHTML=data.map(t=>`
+      <div class="ticket ${t.status} mb10">
+        <div class="ticket-hd">
+          <div>
+            <div class="ticket-title">${t.level_num?'Level '+t.level_num+' — ':''} Help Request</div>
+            <div class="ticket-meta">${fmtDate(t.created_at)} ${fmtTime(t.created_at)}</div>
+          </div>
+          <span class="badge ${t.status==='answered'?'bgreen':t.status==='closed'?'bs':'bz'}">${t.status.toUpperCase()}</span>
+        </div>
+        <div class="ticket-body">${esc(t.problem)}</div>
+        ${t.admin_reply?`<div class="ticket-reply">💬 Admin: ${esc(t.admin_reply)}</div>`:'<div class="mono td" style="font-size:.72rem;">Waiting for admin reply...</div>'}
+      </div>`).join('');
+  }catch(e){box.innerHTML='<div class="info-box warn">Could not load tickets.</div>';}
+}
+
+async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+document.getElementById('t-level').addEventListener('change', function () {
+  const box = document.getElementById('custom-level-box');
+
+  if (this.value === 'custom') {
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+const levelSelect = document.getElementById('t-level');
+
+levelSelect.innerHTML =
+  '<option value="">Select level...</option>';
+
+for(let i=1;i<=30;i++){
+  levelSelect.innerHTML +=
+    `<option value="${i}">Level ${i}</option>`;
+}
+
+levelSelect.innerHTML +=
+  '<option value="custom">My level is not listed</option>';
+
+levelSelect.innerHTML +=
+  '<option value="0">General Help</option>';
+
+levelSelect.addEventListener('change',()=>{
+  document.getElementById('custom-level-box').style.display =
+    levelSelect.value === 'custom'
+      ? 'block'
+      : 'none';
+});init();
+</script>
+</body>
+</html>
