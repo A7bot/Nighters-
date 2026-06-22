@@ -120,11 +120,18 @@ function renderLesson(){
       <div class="td mb16" style="font-size:.9rem;">${esc(l.subtitle)}</div>
       <div class="info-box">${esc(l.intro)}</div>
     </div>
-
-    <div class="stitle mb16">What You Will Learn</div>
-    <div class="card mb24">
-      ${l.objectives.map(o=>`<div class="flex-center mb8"><span class="tr" style="font-size:.8rem;margin-right:8px;">▸</span><span class="td" style="font-size:.9rem;">${esc(o)}</span></div>`).join('')}
-    </div>`;
+if (l.objectives && l.objectives.length) {
+  html += `
+  <div class="stitle mb16">What You Will Learn</div>
+  <div class="card mb24">
+    ${l.objectives.map(o=>`
+      <div class="flex-center mb8">
+        <span class="tr">▸</span>
+        <span class="td">${esc(o)}</span>
+      </div>
+    `).join('')}
+  </div>`;
+}
 
   // Sections
   l.sections.forEach((s,i)=>{
@@ -336,4 +343,3 @@ init();
 </script>
 </body>
 </html>
-
