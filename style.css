@@ -250,3 +250,78 @@ body {
   .stat .n { font-size: 1.8rem; }
            }
    
+/* Custom Properties for Web3 Glows */
+:root {
+  --glow-red: rgba(225, 29, 72, 0.35);
+  --glow-grn: rgba(34, 197, 94, 0.35);
+  --glass-bg: rgba(14, 14, 14, 0.75);
+}
+
+/* Glassmorphism Cards with Smooth Borders */
+.card-red, .card, .chcard, .lcard {
+  border-radius: 16px !important;
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--rbdr) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Modern Hover Effects */
+.chcard:hover, .lcard:hover {
+  transform: translateY(-3px);
+  border-color: var(--red) !important;
+  box-shadow: 0 10px 25px -5px var(--glow-red);
+}
+
+/* Web3 Premium Buttons with Kinetic Micro-Animations */
+.btn {
+  border-radius: 12px !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+/* Press down animation */
+.btn:active {
+  transform: scale(0.96);
+}
+
+/* Shiny Hover Animation */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: all 0.6s ease;
+  z-index: -1;
+}
+
+.btn:hover::after {
+  left: 100%;
+}
+
+.btn:hover {
+  box-shadow: 0 0 15px var(--glow-red);
+  border-color: var(--red2);
+}
+
+/* Status Badges with Subtle Glows */
+.badge {
+  border-radius: 8px !important;
+  padding: 4px 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+.badge.bgreen {
+  box-shadow: 0 0 8px var(--glow-grn);
+   }
