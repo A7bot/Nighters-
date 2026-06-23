@@ -42,15 +42,18 @@ body {
 }
 
 /* Subtle red grid background */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(225,29,72,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(225,29,72,0.03) 1px, transparent 1px);
-  background-size: 44px 44px;
-  z-index: 0;
-  pointer-events: none;
+body{
+  background:
+    radial-gradient(circle at top left,#2a0d14 0%,transparent 35%),
+    radial-gradient(circle at bottom right,#13070a 0%,transparent 40%),
+    linear-gradient(
+      180deg,
+      #050505,
+      #090909,
+      #0d0d0d
+    );
+
+  color:var(--txt);
 }
 
 /* Matrix canvas — auth pages only */
@@ -441,20 +444,32 @@ body::before {
 .chcard .cp small { display:block; font-family:var(--M); font-size:.58rem; color:var(--muted); }
 
 /* ── TOAST ─────────────────────────────────────────────── */
-#toast-wrap { position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
-.toast {
-  background:var(--bg2); border:1px solid var(--rbdr);
-  border-left:3px solid var(--red);
-  padding:11px 15px; font-family:var(--M); font-size:.72rem; color:var(--txt);
-  min-width:230px; max-width:320px;
-  display:flex; justify-content:space-between; gap:10px;
-  animation:sli .24s ease;
+#toast-wrap{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:99999;
 }
-.toast.t-ok  { border-left-color:var(--grn); }
-.toast.t-warn{ border-left-color:var(--warn); }
-.toast .tx   { cursor:pointer; color:var(--muted); font-size:1rem; line-height:1; }
-@keyframes sli { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
 
+.toast{
+  background:#111;
+  border:1px solid rgba(255,255,255,.08);
+
+  border-left:4px solid var(--red);
+
+  border-radius:14px;
+
+  min-width:300px;
+
+  padding:14px 18px;
+
+  margin-bottom:10px;
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.45);
+
+  backdrop-filter:blur(20px);
+}
 /* ── MODAL ─────────────────────────────────────────────── */
 .modal-bg {
   position:fixed; inset:0;
