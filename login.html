@@ -253,7 +253,7 @@
       <button class="matrix-btn" id="login-btn" onclick="doLogin()">Initiate Session</button>
       
       <div class="matrix-links">
-        <a href="register.html">Enlist New Operative →</a>
+        <a href="register.html">Register New Operative →</a>
         <a href="reset.html">Forgot Password?</a>
       </div>
     </main>
@@ -309,13 +309,13 @@
 </div>
 
 <footer class="portal-footer">
-  Authorized Personnel Only. Log all attempts.
+  For Educational Purpose Only.
 </footer>
 
-<script src="app.js"></script>[cite: 2]
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>[cite: 2]
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);[cite: 2]
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 (async()=>{try{const{data:{user}}=await sb.auth.getUser();if(user)window.location=ADMIN_EMAILS.includes(user.email)?'admin.html':'dashboard.html';}catch(e){}})();[cite: 2]
 
 function showAlert(id, msg, type) {
@@ -336,19 +336,19 @@ async function doLogin(){
       let msg=error.message;[cite: 2]
       if(msg.includes('Invalid login'))msg='Wrong email or password.';[cite: 2]
       if(msg.includes('Email not confirmed'))msg='Please confirm your email first. Or ask admin to disable email confirmation in Supabase.';[cite: 2]
-      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Initiate Session';return;[cite: 2]
+      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Initiate Session';return;
     }
     const user=data.user;[cite: 2]
     try{
-      const{data:prof}=await sb.from('profiles').select('id').eq('id',user.id).maybeSingle();[cite: 2]
+      const{data:prof}=await sb.from('profiles').select('id').eq('id',user.id).maybeSingle();
       if(!prof){
         const uname=user.user_metadata?.username||email.split('@')[0];[cite: 2]
         await sb.from('profiles').insert({id:user.id,username:uname,email,points:0,current_level:1,phase:1,strikes:0,completed_challenges:0,attendance_days:0,streak:0});[cite: 2]
       }
     }catch(e){}
-    try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}[cite: 2]
+    try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}
     showAlert('la','Access granted.','ok');[cite: 2]
-    setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',700);[cite: 2]
+    setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',700);
   }catch(e){showAlert('la','Connection error. Check Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Initiate Session';}[cite: 2]
 }
 </script>
