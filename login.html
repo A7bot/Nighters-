@@ -5,38 +5,302 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Login // Nighters Cyber Academy</title>
 <link rel="stylesheet" href="style.css">
+<!-- Monospace fonts for the authentic hacker aesthetic -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Overriding standard styles to mirror the exact UI design in Gemini_Generated_Image_135fb6135fb6135f.png */
+  body.matrix-portal {
+    background-color: #050a05 !important;
+    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0));
+    background-size: 100% 4px, 6px 100%;
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #39ff14 !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .portal-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 900px) {
+    .portal-container {
+      grid-template-columns: 1fr;
+    }
+    .portal-graphic {
+      display: none;
+    }
+  }
+
+  .portal-header {
+    margin-bottom: 40px;
+  }
+
+  .portal-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #39ff14;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .portal-subtitle {
+    font-size: 1rem;
+    color: #20c20e;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .portal-form-title {
+    font-size: 1.8rem;
+    color: #39ff14;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  /* Target field inputs to mirror image glow borders */
+  .matrix-field {
+    margin-bottom: 24px;
+  }
+
+  .matrix-field label {
+    display: block;
+    color: #39ff14 !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .matrix-field input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6) !important;
+    color: #39ff14 !important;
+    border: 2px solid #20c20e !important;
+    border-radius: 6px !important;
+    padding: 14px 16px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.1rem;
+    outline: none;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .matrix-field input:focus {
+    border-color: #39ff14 !important;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.5) !important;
+  }
+
+  .matrix-field input::placeholder {
+    color: rgba(57, 255, 20, 0.3) !important;
+  }
+
+  /* Glow button to replicate the 'INITIATE SESSION' call-to-action */
+  .matrix-btn {
+    width: 100%;
+    background: #39ff14 !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 16px 20px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+    transition: all 0.2s ease;
+  }
+
+  .matrix-btn:hover {
+    background: #20c20e !important;
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.8);
+    transform: translateY(-1px);
+  }
+
+  .matrix-btn:disabled {
+    background: #124d07 !important;
+    color: #666 !important;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* SVGs used to construct the network web and anonymous graphic from the file image */
+  .portal-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    opacity: 0.75;
+  }
+
+  .portal-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 0.75rem;
+    color: rgba(57, 255, 20, 0.5);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .matrix-links a {
+    color: #20c20e !important;
+    text-decoration: none;
+    font-size: 0.8rem;
+  }
+  .matrix-links a:hover {
+    color: #39ff14 !important;
+    text-decoration: underline;
+  }
+  
+  .matrix-alert {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .matrix-alert.err {
+    display: block;
+    background: rgba(220, 38, 38, 0.2);
+    border: 1px solid #dc2626;
+    color: #fca5a5;
+  }
+  .matrix-alert.ok {
+    display: block;
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    color: #bbf7d0;
+  }
+</style>
 </head>
-<body class="page">
-<canvas id="bg-canvas"></canvas>
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links"><a href="register.html">Enlist</a></div>
+<body class="matrix-portal">
+
+<div class="portal-container">
+  <!-- Left Side: Login Form Elements -->
+  <div class="portal-form-wrapper">
+    <header class="portal-header">
+      <div class="portal-title">Nighters Cyber Academy</div>
+      <div class="portal-subtitle">Offensive Security Pathway</div>
+    </header>
+
+    <main>
+      <div class="portal-form-title">Secure Access Portal</div>
+      
+      <div id="la" class="matrix-alert"></div>
+      
+      <div class="matrix-field">
+        <label for="email">Username</label>
+        <input type="email" id="email" placeholder="SYSTEM_ID" autocomplete="off">
+      </div>
+      
+      <div class="matrix-field">
+        <label for="pw">Password</label>
+        <input type="password" id="pw" placeholder="****************" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      
+      <button class="matrix-btn" id="login-btn" onclick="doLogin()">Initiate Session</button>
+      
+      <div style="display: flex; justify-content: space-between; margin-top: 20px;" class="matrix-links">
+        <a href="register.html">Enlist New Operative →</a>
+        <a href="reset.html">Forgot Password?</a>
+      </div>
+    </main>
   </div>
-</nav>
-<div class="wrap-sm" style="padding-top:60px;padding-bottom:60px;">
-  <div class="stitle mb12">Access Terminal</div>
-  <div class="term mb24">
-    <div class="p">Authenticating credentials...</div>
-    <div class="c">All login attempts are logged and monitored.</div>
-  </div>
-  <div class="card-red">
-    <div id="la" class="alert"></div>
-    <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="operative@domain.com" autocomplete="off"></div>
-    <div class="field"><label>Password</label><input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <button class="btn btn-block" id="login-btn" onclick="doLogin()">Login</button>
-    <div class="flex-between mt16">
-      <p class="mono td" style="font-size:.72rem;">No account? <a href="register.html" style="color:var(--red);">Enlist →</a></p>
-      <a href="reset.html" class="mono" style="font-size:.7rem;color:var(--muted);">Forgot password?</a>
-    </div>
+
+  <!-- Right Side: Node Network Graphic matching Gemini_Generated_Image_135fb6135fb6135f.png -->
+  <div class="portal-graphic">
+    <svg width="450" height="450" viewBox="0 0 100 100" style="stroke: #20c20e; stroke-width: 0.3; fill: none;">
+      <!-- Connections / Lines -->
+      <line x1="10" y1="30" x2="30" y2="10" opacity="0.3"/>
+      <line x1="30" y1="10" x2="60" y2="15" />
+      <line x1="60" y1="15" x2="80" y2="35" stroke-width="0.6" style="stroke: #39ff14;" />
+      <line x1="80" y1="35" x2="90" y2="65" />
+      <line x1="90" y1="65" x2="70" y2="85" />
+      <line x1="70" y1="85" x2="40" y2="80" />
+      <line x1="40" y1="80" x2="15" y2="55" opacity="0.4"/>
+      <line x1="15" y1="55" x2="10" y2="30" />
+      
+      <line x1="30" y1="10" x2="50" y2="45" opacity="0.5"/>
+      <line x1="60" y1="15" x2="50" y2="45" />
+      <line x1="80" y1="35" x2="50" y2="45" stroke-width="0.5" />
+      <line x1="90" y1="65" x2="75" y2="55" />
+      <line x1="75" y1="55" x2="50" y2="45" />
+      <line x1="70" y1="85" x2="50" y2="45" />
+      
+      <line x1="60" y1="15" x2="75" y2="55" />
+      <line x1="80" y1="35" x2="90" y2="65" />
+      
+      <!-- Nodes / Points -->
+      <circle cx="30" cy="10" r="1.5" fill="#20c20e" />
+      <circle cx="60" cy="15" r="2.5" fill="#39ff14" style="filter: drop-shadow(0 0 3px #39ff14);" />
+      <circle cx="80" cy="35" r="2" fill="#20c20e" />
+      <circle cx="90" cy="65" r="3" fill="#39ff14" style="filter: drop-shadow(0 0 4px #39ff14);" />
+      <circle cx="70" cy="85" r="2" fill="#20c20e" />
+      <circle cx="40" cy="80" r="1.5" fill="#124d07" />
+      <circle cx="15" cy="55" r="1.5" fill="#20c20e" />
+      <circle cx="10" cy="30" r="2" fill="#124d07" />
+      <circle cx="75" cy="55" r="2" fill="#39ff14" />
+      
+      <!-- Mask Guy Icon Concept Center Right Component -->
+      <g transform="translate(42, 38) scale(0.25)" stroke="#39ff14" stroke-width="1.2" fill="none">
+        <!-- Mask Contour -->
+        <path d="M10,20 Q10,5 30,5 Q50,5 50,20 Q50,40 30,50 Q10,40 10,20 Z" />
+        <!-- Eyes -->
+        <path d="M18,18 Q23,13 26,18 Q23,20 18,18 Z" fill="#39ff14" />
+        <path d="M42,18 Q37,13 34,18 Q37,20 42,18 Z" fill="#39ff14" />
+        <!-- Mustache/Smile -->
+        <path d="M20,32 Q30,42 40,32" />
+        <path d="M16,30 Q22,32 30,28 Q38,32 44,30" />
+        <!-- Beard lines -->
+        <line x1="30" y1="42" x2="30" y2="48" />
+      </g>
+      
+      <!-- Crossed Swords Concept -->
+      <g transform="translate(45, 58) scale(0.18)" stroke="#20c20e" stroke-width="1.5">
+        <line x1="5" y1="5" x2="35" y2="35" />
+        <line x1="5" y1="35" x2="35" y2="5" />
+        <line x1="5" y1="35" x2="9" y2="31" stroke-width="3" />
+        <line x1="35" y1="35" x2="31" y2="31" stroke-width="3" />
+      </g>
+    </svg>
   </div>
 </div>
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Authorized Training Platform</footer>
+
+<footer class="portal-footer">
+  Authorized Personnel Only. Log all attempts.
+</footer>
+
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 (async()=>{try{const{data:{user}}=await sb.auth.getUser();if(user)window.location=ADMIN_EMAILS.includes(user.email)?'admin.html':'dashboard.html';}catch(e){}})();
+
+function showAlert(id, msg, type) {
+  const alertEl = document.getElementById(id);
+  alertEl.className = 'matrix-alert ' + type;
+  alertEl.textContent = msg;
+}
+
 async function doLogin(){
   const email=document.getElementById('email').value.trim();
   const pw=document.getElementById('pw').value;
@@ -49,7 +313,7 @@ async function doLogin(){
       let msg=error.message;
       if(msg.includes('Invalid login'))msg='Wrong email or password.';
       if(msg.includes('Email not confirmed'))msg='Please confirm your email first. Or ask admin to disable email confirmation in Supabase.';
-      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Login';return;
+      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Initiate Session';return;
     }
     const user=data.user;
     try{
@@ -62,7 +326,7 @@ async function doLogin(){
     try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}
     showAlert('la','Access granted.','ok');
     setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',700);
-  }catch(e){showAlert('la','Connection error. Check Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Login';}
+  }catch(e){showAlert('la','Connection error. Check Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Initiate Session';}
 }
 </script>
 </body>
