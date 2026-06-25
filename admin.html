@@ -2,29 +2,299 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Admin Panel // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden; /* Stops horizontal side-scrolling or layout wobbling on mobile phones */
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.20; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 24px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- COMMAND CENTER RESPONSIVE CONTAINER --- */
+  .wrap { 
+      width: 100%;
+      max-width: 1100px; 
+      margin: 120px auto 60px auto; 
+      padding: 0 16px; /* Edge defensive alignment */
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* --- CONSOLE TERMINAL MODULES --- */
+  .term {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+  }
+  .term .p { font-size: 0.8rem; line-height: 1.7; margin-bottom: 8px; color: var(--text-main); display: flex; align-items: flex-start; gap: 10px; word-break: break-word; }
+  .term .p::before { content: ">"; color: var(--accent-cyan); font-weight: bold; flex-shrink: 0; }
+  .term .c { font-size: 0.78rem; color: var(--text-muted); padding-top: 6px; padding-left: 18px; line-height: 1.5; word-break: break-word; }
+
+  /* --- STATISTICAL DASHBOARD COUNTERS --- */
+  .g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%; }
+  .stat {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .stat .n { font-size: 1.8rem; font-weight: 700; color: var(--accent-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.2); }
+  .stat .l { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+
+  /* --- SUB-NAVIGATION TAB CONTROLS --- */
+  .tab-bar {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+  }
+
+  /* --- CARD INTERFACES --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .card-hd {
+      font-size: 0.95rem; font-weight: 700; color: #fff; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-top: 3px solid var(--accent-purple);
+  }
+
+  /* Grid System Architecture */
+  .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; }
+  
+  /* --- INPUT FIELDS & FORM STYLES --- */
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; width: 100%; }
+  .field label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+  .field input, .field select, .field textarea {
+      background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main);
+      padding: 12px; border-radius: 6px; font-family: var(--font); font-size: 0.85rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.15);
+  }
+  .field textarea { height: 110px; resize: vertical; }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.1); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.25); }
+  .btn-sm { padding: 8px 16px; font-size: 0.75rem; border-radius: 4px; }
+  .btn-dark { border-color: var(--border); color: var(--text-main); background: rgba(30, 41, 59, 0.2); }
+  .btn-dark:hover { border-color: var(--text-muted); background: rgba(30, 41, 59, 0.5); box-shadow: none; }
+
+  /* --- DYNAMIC DATA TABLES SYSTEM --- */
+  .table-responsive-wrapper { width: 100%; overflow-x: auto; background: var(--bg-surface); border-radius: 8px; }
+  .dtable { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+  .dtable th, .dtable td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .dtable th { background: rgba(3, 5, 10, 0.4); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--accent-cyan); }
+  .dtable tbody tr:hover { background: rgba(30, 41, 59, 0.15); }
+
+  /* --- HELP TICKETS COMPONENTS --- */
+  .ticket { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .ticket.open { border-left: 3px solid var(--text-red); }
+  .ticket.answered { border-left: 3px solid #10b981; }
+  .ticket.closed { border-left: 3px solid var(--text-muted); opacity: 0.7; }
+  .ticket-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .ticket-title { font-weight: 700; color: #fff; font-size: 0.9rem; }
+  .ticket-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+  .ticket-body { background: var(--bg-input); padding: 14px; border-radius: 6px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 12px; border: 1px solid rgba(30,41,59,0.5); }
+  .ticket-reply { font-size: 0.8rem; color: #10b981; margin-bottom: 12px; padding-left: 6px; border-left: 2px solid #10b981; }
+  .reply-form { display: flex; gap: 10px; align-items: center; width: 100%; flex-wrap: wrap; }
+  .reply-form input { flex: 1; min-width: 200px; background: var(--bg-input); border: 1px solid var(--border); padding: 10px 14px; color: #fff; border-radius: 4px; font-family: var(--font); font-size: 0.8rem; outline: none; }
+
+  /* --- SYSTEM ALERTS & BADGES --- */
+  .alert { padding: 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 16px; display: none; border: 1px solid transparent; }
+  .alert.err { background: rgba(239, 68, 68, 0.1); border-color: var(--text-red); color: #fca5a5; display: block; }
+  .alert.ok { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #a7f3d0; display: block; }
+
+  .badge { display: inline-block; padding: 4px 8px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; border-radius: 4px; letter-spacing: 0.5px; }
+  .badge.bz { background: rgba(239, 68, 68, 0.15); color: var(--text-red); border: 1px solid var(--text-red); }
+  .badge.bgreen { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+  .badge.bs { background: rgba(157, 78, 221, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+  .badge.bsys { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+
+  .diff { font-weight: bold; text-transform: uppercase; font-size: 0.7rem; padding-right: 4px; }
+  .diff.de { color: #10b981; }
+  .diff.dm { color: #f59e0b; }
+  .diff.dh { color: var(--text-red); }
+
+  .info-box {
+      background: rgba(3, 5, 10, 0.6); border: 1px solid var(--border); border-radius: 6px;
+      padding: 20px; font-size: 0.8rem; line-height: 1.7; color: var(--text-muted); text-align: center; width: 100%;
+  }
+
+  /* --- FOOTER REGION --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10;
+  }
+
+  /* Structural Helpers */
+  .mb8 { margin-bottom: 8px; }
+  .mb12 { margin-bottom: 12px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb24 { margin-bottom: 24px; }
+  .mb28 { margin-bottom: 28px; }
+  .mb32 { margin-bottom: 32px; }
+  .mt12 { margin-top: 12px; }
+  .td { color: var(--text-muted); line-height: 1.6; }
+  .tc { text-align: center; }
+  .tr { text-align: right; }
+  .mono { font-family: var(--font); }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .gap8 { gap: 8px; }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE PORT SCREEN SYSTEM MATRIX OVERRIDES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      
+      .wrap { margin-top: 100px; padding-left: 14px; padding-right: 14px; }
+      .g4 { grid-template-columns: repeat(2, 1fr); gap: 12px; } /* Clean square statistics layouts */
+      .g2 { grid-template-columns: 1fr !important; gap: 16px; }
+      
+      .tab-bar { gap: 6px; }
+      .btn-sm { padding: 10px 14px; flex-grow: 1; text-align: center; justify-content: center; }
+      
+      /* Make submission buttons span screen width for touch performance */
+      .card .btn, .card-red .btn { width: 100%; justify-content: center; padding: 14px; }
+      .reply-form input { width: 100%; flex: none; }
+      .reply-form .btn { width: 100%; }
+
+      /* Convert rigid student tables to stacked blocks for safe structural wrapping */
+      #student-table, #student-table thead, #student-table tbody, #student-table tr, #student-table td { display: block; width: 100%; text-align: left !important; }
+      #student-table tr { border-bottom: 2px solid var(--border); padding: 14px 10px; }
+      #student-table td { padding: 6px 0; border: none; display: flex; justify-content: space-between; }
+      #student-table td::before { content: attr(data-label); font-weight: bold; color: var(--accent-cyan); text-transform: uppercase; font-size: 0.7rem; }
+  }
+
+  @media (max-width: 480px) {
+      .g4 { grid-template-columns: 1fr; } /* Complete phone line collapse */
+  }
+</style>
 </head>
 <body class="page">
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- System Navigation Bar Deck -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// ADMIN PANEL</small></a>
-    <div class="nav-links">
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Navigation Menu">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
       <a href="dashboard.html">Dashboard</a>
       <a href="admin.html" class="on">Admin</a>
-      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+      <a href="#" onclick="doLogout()" style="color:var(--text-muted);">Logout</a>
     </div>
   </div>
 </nav>
-<div class="wrap" style="padding-top:28px;padding-bottom:60px;">
+
+<!-- Main Interface Configuration Center -->
+<div class="wrap">
   <div class="stitle mb8">Admin Command Center</div>
   <div class="term mb24">
     <div class="p">ELEVATED PRIVILEGES ACTIVE — All actions logged.</div>
-    <div class="c">Only authorized admins can access this panel.</div>
+    <div class="c">// Only authorized administrators are permitted inside this control layer.</div>
   </div>
 
-  <!-- STATS -->
+  <!-- Operational Core Statistics Core Grid Counters -->
   <div class="g4 mb28">
     <div class="stat"><span class="n" id="a-ops">—</span><div class="l">Students</div></div>
     <div class="stat"><span class="n" id="a-tickets">—</span><div class="l">Open Tickets</div></div>
@@ -32,8 +302,8 @@
     <div class="stat"><span class="n" id="a-att">—</span><div class="l">Check-ins Today</div></div>
   </div>
 
-  <!-- TABS -->
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--rbdr);">
+  <!-- Matrix Action Interface Modules Sub-Tabs System -->
+  <div class="tab-bar">
     <button class="btn btn-sm" id="tb-tickets" onclick="showTab('tickets',this)">Help Tickets</button>
     <button class="btn btn-sm btn-dark" id="tb-assignments" onclick="showTab('assignments',this)">Assignments</button>
     <button class="btn btn-sm btn-dark" id="tb-students" onclick="showTab('students',this)">Students</button>
@@ -43,30 +313,42 @@
     <button class="btn btn-sm btn-dark" id="tb-points" onclick="showTab('points',this)">Points &amp; Strikes</button>
   </div>
 
-  <!-- ─── HELP TICKETS ─── -->
+  <!-- ─── TAB NODE BLOCK: HELP TICKETS ─── -->
   <div id="tab-tickets">
     <div class="stitle mb16">Open Help Tickets</div>
     <div id="ticket-list"></div>
   </div>
 
-  <!-- ─── ASSIGNMENTS ─── -->
+  <!-- ─── TAB NODE BLOCK: ASSIGNMENTS ─── -->
   <div id="tab-assignments" style="display:none;">
     <div class="stitle mb16">Pending Assignment Reviews</div>
     <div id="assign-review-list"></div>
   </div>
 
-  <!-- ─── STUDENTS ─── -->
+  <!-- ─── TAB NODE BLOCK: STUDENTS ─── -->
   <div id="tab-students" style="display:none;">
-    <div class="stitle mb16">All Students</div>
-    <div class="card" style="padding:0;overflow:auto;">
+    <div class="stitle mb16">All Registered Academy Trainees</div>
+    <div class="table-responsive-wrapper">
       <table class="dtable" id="student-table">
-        <thead><tr><th>Username</th><th>Points</th><th>Level</th><th>Phase</th><th>Challenges</th><th>Strikes</th><th>Joined</th></tr></thead>
-        <tbody id="student-tbody"><tr><td colspan="7" class="tc mono td" style="padding:24px;">Loading...</td></tr></tbody>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th class="tr">Points</th>
+            <th>Level</th>
+            <th>Phase</th>
+            <th>Challenges</th>
+            <th>Strikes</th>
+            <th>Joined At</th>
+          </tr>
+        </thead>
+        <tbody id="student-tbody">
+          <tr><td colspan="7" class="tc mono td" style="padding:24px;">Initialising data matrices...</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ─── CTF CHALLENGES ─── -->
+  <!-- ─── TAB NODE BLOCK: CTF CHALLENGES ─── -->
   <div id="tab-ctf" style="display:none;">
     <div class="stitle mb16">Create CTF Challenge</div>
     <div class="card-red mb24">
@@ -79,98 +361,98 @@
         <div class="field"><label>Difficulty</label>
           <select id="ch-diff"><option value="easy">Easy (+10 pts)</option><option value="medium">Medium (+20 pts)</option><option value="hard">Hard (+50 pts)</option></select>
         </div>
-        <div class="field"><label>Points</label><input type="number" id="ch-pts" value="10"></div>
-        <div class="field"><label>Icon (emoji)</label><input type="text" id="ch-icon" value="🚩" maxlength="4"></div>
-        <div class="field"><label>Week Date (optional)</label><input type="date" id="ch-date"></div>
+        <div class="field"><label>Points Value</label><input type="number" id="ch-pts" value="10"></div>
+        <div class="field"><label>Icon Signature (emoji)</label><input type="text" id="ch-icon" value="🚩" maxlength="4"></div>
+        <div class="field"><label>Week Deployment Date (optional)</label><input type="date" id="ch-date"></div>
       </div>
-      <div class="field"><label>Description</label><textarea id="ch-desc" placeholder="Describe the challenge..."></textarea></div>
+      <div class="field"><label>Description Vector Parameter</label><textarea id="ch-desc" placeholder="Describe deployment constraints and objective details..."></textarea></div>
       <div class="g2">
-        <div class="field"><label>Flag (plaintext — stored as SHA-256 hash)</label><input type="text" id="ch-flag" placeholder="FLAG{example_flag}" autocomplete="off" spellcheck="false"></div>
-        <div class="field"><label>Hint 1 Text</label><input type="text" id="ch-h1" placeholder="First hint..."></div>
-        <div class="field"><label>Hint 2 Text</label><input type="text" id="ch-h2" placeholder="Second hint..."></div>
+        <div class="field"><label>Flag Value (Plaintext — Stored secure as SHA-256 Hash String)</label><input type="text" id="ch-flag" placeholder="FLAG{example_flag}" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label>Hint Vector Node 1</label><input type="text" id="ch-h1" placeholder="Primary hint statement..."></div>
+        <div class="field"><label>Hint Vector Node 2</label><input type="text" id="ch-h2" placeholder="Secondary hint statement..."></div>
       </div>
       <button class="btn" onclick="createCTF()">Deploy Challenge</button>
     </div>
-    <div class="stitle mb16">Existing CTF Challenges</div>
+    <div class="stitle mb16">Active Operational CTF Targets</div>
     <div id="ctf-list"></div>
   </div>
 
-  <!-- ─── EXAMS ─── -->
+  <!-- ─── TAB NODE BLOCK: EXAMS ─── -->
   <div id="tab-exams" style="display:none;">
-    <div class="stitle mb16">Create Exam</div>
+    <div class="stitle mb16">Create Exam Matrix</div>
     <div class="card-red mb24">
       <div id="ex-alert" class="alert"></div>
       <div class="g2">
         <div class="field"><label>Exam Title</label><input type="text" id="ex-title" placeholder="Month 1 Exam — Foundations"></div>
-        <div class="field"><label>Phase</label><select id="ex-phase"><option value="1">Phase 1</option><option value="2">Phase 2</option><option value="3">Phase 3</option></select></div>
-        <div class="field"><label>Opens At</label><input type="datetime-local" id="ex-open"></div>
-        <div class="field"><label>Closes At</label><input type="datetime-local" id="ex-close"></div>
-        <div class="field"><label>Duration (minutes)</label><input type="number" id="ex-dur" placeholder="60 (blank=unlimited)"></div>
+        <div class="field"><label>Phase Node</label><select id="ex-phase"><option value="1">Phase 1</option><option value="2">Phase 2</option><option value="3">Phase 3</option></select></div>
+        <div class="field"><label>Opens At (Timestamp)</label><input type="datetime-local" id="ex-open"></div>
+        <div class="field"><label>Closes At (Timestamp)</label><input type="datetime-local" id="ex-close"></div>
+        <div class="field"><label>Duration Window (minutes)</label><input type="number" id="ex-dur" placeholder="60 (Leave blank for infinite)"></div>
         <div class="field"><label>Pass % Required</label><input type="number" id="ex-pass" value="60"></div>
       </div>
       <button class="btn" onclick="createExam()">Create Exam</button>
     </div>
 
-    <div class="stitle mb16">Add Question to Exam</div>
+    <div class="stitle mb16">Inject Question Parameter to Exam</div>
     <div class="card-red mb24">
       <div id="q-alert" class="alert"></div>
       <div class="g2">
-        <div class="field"><label>Exam</label><select id="q-exam"><option value="">Loading...</option></select></div>
-        <div class="field"><label>Type</label><select id="q-type" onchange="toggleQType()"><option value="mcq">Multiple Choice</option><option value="short">Short Answer</option></select></div>
+        <div class="field"><label>Target Exam</label><select id="q-exam"><option value="">Awaiting initialisation...</option></select></div>
+        <div class="field"><label>Structural Type</label><select id="q-type" onchange="toggleQType()"><option value="mcq">Multiple Choice (MCQ)</option><option value="short">Short Answer String</option></select></div>
       </div>
-      <div class="field"><label>Question</label><textarea id="q-text" placeholder="What command lists all files?"></textarea></div>
+      <div class="field"><label>Question Text Context</label><textarea id="q-text" placeholder="What command lists all files inside a directory context?"></textarea></div>
       <div id="mcq-area">
         <div class="g2">
-          <div class="field"><label>Option A</label><input type="text" id="q-a"></div>
-          <div class="field"><label>Option B</label><input type="text" id="q-b"></div>
-          <div class="field"><label>Option C</label><input type="text" id="q-c"></div>
-          <div class="field"><label>Option D</label><input type="text" id="q-d"></div>
+          <div class="field"><label>Option Node A</label><input type="text" id="q-a"></div>
+          <div class="field"><label>Option Node B</label><input type="text" id="q-b"></div>
+          <div class="field"><label>Option Node C</label><input type="text" id="q-c"></div>
+          <div class="field"><label>Option Node D</label><input type="text" id="q-d"></div>
         </div>
-        <div class="field"><label>Correct Answer</label><select id="q-correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+        <div class="field"><label>Designated Correct Target Selection</label><select id="q-correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
       </div>
       <div id="short-area" style="display:none;">
-        <div class="field"><label>Correct Answer (exact match)</label><input type="text" id="q-short-ans" placeholder="ls"></div>
+        <div class="field"><label>Correct Answer Expression (Exact plain text match string matching rules)</label><input type="text" id="q-short-ans" placeholder="ls"></div>
       </div>
-      <div class="field"><label>Points</label><input type="number" id="q-pts" value="1"></div>
+      <div class="field"><label>Point Allocation Weight</label><input type="number" id="q-pts" value="1"></div>
       <button class="btn" onclick="addQuestion()">Add Question</button>
     </div>
-    <div class="stitle mb16">Existing Exams</div>
+    <div class="stitle mb16">Existing Evaluative Exams</div>
     <div id="exam-list"></div>
   </div>
 
-  <!-- ─── ANNOUNCEMENTS ─── -->
+  <!-- ─── TAB NODE BLOCK: ANNOUNCEMENTS ─── -->
   <div id="tab-announce" style="display:none;">
-    <div class="stitle mb16">Post Announcement</div>
+    <div class="stitle mb16">Publish Secure Announcement</div>
     <div class="card-red mb24">
       <div id="ann-alert" class="alert"></div>
-      <div class="field"><label>Title</label><input type="text" id="ann-title" placeholder="Announcement title..."></div>
-      <div class="field"><label>Body</label><textarea id="ann-body" placeholder="Announcement content..."></textarea></div>
-      <div class="field"><label>Urgent?</label><select id="ann-urgent"><option value="false">No</option><option value="true">Yes — show in red</option></select></div>
+      <div class="field"><label>Broadcast Title</label><input type="text" id="ann-title" placeholder="Announcement title entry..."></div>
+      <div class="field"><label>Message Core Body</label><textarea id="ann-body" placeholder="Type data stream payload text here..."></textarea></div>
+      <div class="field"><label>Urgency Level State Override</label><select id="ann-urgent"><option value="false">Standard Notice Priority</option><option value="true">CRITICAL PRIORITY // Crimson Warning Banner Trigger</option></select></div>
       <button class="btn" onclick="postAnnouncement()">Post Announcement</button>
     </div>
-    <div class="stitle mb16">Recent Announcements</div>
+    <div class="stitle mb16">Historical Operations Log Streams</div>
     <div id="ann-list"></div>
   </div>
 
-  <!-- ─── POINTS & STRIKES ─── -->
+  <!-- ─── TAB NODE BLOCK: POINTS & STRIKES ─── -->
   <div id="tab-points" style="display:none;">
     <div class="g2">
       <div>
-        <div class="stitle mb16">Award / Deduct Points</div>
+        <div class="stitle mb16">Award / Deduct Score Points Matrix</div>
         <div class="card-red mb16">
           <div id="pts-alert" class="alert"></div>
-          <div class="field"><label>Username</label><input type="text" id="pts-user" placeholder="username" autocomplete="off"></div>
-          <div class="field"><label>Points (use − to deduct)</label><input type="number" id="pts-amount" placeholder="50 or -20"></div>
-          <div class="field"><label>Reason</label><input type="text" id="pts-reason" placeholder="e.g. Bonus for excellent work"></div>
-          <button class="btn" onclick="awardPoints()">Apply Points</button>
+          <div class="field"><label>Trainee Identifier Username</label><input type="text" id="pts-user" placeholder="username" autocomplete="off"></div>
+          <div class="field"><label>Points Modifer (Prefix standard negative value symbol "-" to subtract)</label><input type="number" id="pts-amount" placeholder="50 or -20"></div>
+          <div class="field"><label>Justification Log Reason</label><input type="text" id="pts-reason" placeholder="e.g. Exceptional optimization code breakdown contribution"></div>
+          <button class="btn" onclick="awardPoints()">Apply Points Modification</button>
         </div>
       </div>
       <div>
-        <div class="stitle mb16">Issue Strike</div>
+        <div class="stitle mb16">Enforce Account Infraction Strike</div>
         <div class="card-red mb16">
           <div id="str-alert" class="alert"></div>
-          <div class="field"><label>Username</label><input type="text" id="str-user" placeholder="username" autocomplete="off"></div>
-          <div class="field"><label>Reason</label>
+          <div class="field"><label>Trainee Identifier Username</label><input type="text" id="str-user" placeholder="username" autocomplete="off"></div>
+          <div class="field"><label>Infraction Clause Justification Reason</label>
             <select id="str-reason">
               <option value="Cheating on challenge">Cheating on challenge</option>
               <option value="Sharing flags or answers">Sharing flags or answers</option>
@@ -179,14 +461,19 @@
               <option value="Unauthorized activity">Unauthorized activity</option>
             </select>
           </div>
-          <button class="btn btn-dark" onclick="issueStrike()">Issue Strike</button>
+          <button class="btn btn-dark" onclick="issueStrike()">Issue Strike Enforcement</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Admin Panel — Restricted Access</footer>
+<!-- Bottom Navigation Deck -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Admin Control Matrix — Secure Terminal Domain Active
+</footer>
+
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -196,14 +483,27 @@ let me=null;
 async function init(){
   me=await requireAdmin(sb);if(!me)return;
   loadStats();loadTickets();
+  setupMobileMenu();
+}
+
+function setupMobileMenu(){
+  const menuToggle = document.getElementById('menu-toggle');
+  const navMenu = document.getElementById('nav-menu');
+  if(menuToggle && navMenu){
+      menuToggle.addEventListener('click', () => {
+          navMenu.classList.toggle('active');
+      });
+  }
 }
 
 function showTab(name,btn){
   ['tickets','assignments','students','ctf','exams','announce','points'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display='none';
+    const section = document.getElementById('tab-'+t);
+    if(section) section.style.display='none';
     const b=document.getElementById('tb-'+t);if(b)b.className='btn btn-sm btn-dark';
   });
-  document.getElementById('tab-'+name).style.display='block';
+  const targetSection = document.getElementById('tab-'+name);
+  if(targetSection) targetSection.style.display='block';
   btn.className='btn btn-sm';
   if(name==='students')   loadStudents();
   if(name==='assignments')loadAssignmentReviews();
@@ -232,7 +532,7 @@ async function loadTickets(){
   const box=document.getElementById('ticket-list');
   try{
     const{data}=await sb.from('help_tickets').select('*').order('created_at',{ascending:false}).limit(50);
-    if(!data||!data.length){box.innerHTML='<div class="info-box">No tickets yet.</div>';return;}
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No active configuration tickets present within database clusters.</div>';return;}
     box.innerHTML=data.map(t=>`
       <div class="ticket ${t.status} mb12">
         <div class="ticket-hd">
@@ -244,13 +544,13 @@ async function loadTickets(){
         </div>
         <div class="ticket-body">${esc(t.problem)}</div>
         ${t.admin_reply?`<div class="ticket-reply">Your reply: ${esc(t.admin_reply)}</div>`:''}
-        <div class="flex-center gap8 mt12">
-          <input type="text" placeholder="Type your reply..." style="flex:1;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="reply-${t.id}">
+        <div class="reply-form mt12">
+          <input type="text" placeholder="Type your response instructions string..." id="reply-${t.id}">
           <button class="btn btn-sm" onclick="replyTicket('${t.id}')">Reply</button>
           <button class="btn btn-sm btn-dark" onclick="closeTicket('${t.id}')">Close</button>
         </div>
       </div>`).join('');
-  }catch(e){box.innerHTML='<div class="info-box warn">Failed to load.</div>';}
+  }catch(e){box.innerHTML='<div class="info-box warn">Failed to establish secure reading stream connection with tables.</div>';}
 }
 
 async function replyTicket(id){
@@ -270,34 +570,34 @@ async function loadAssignmentReviews(){
   const box=document.getElementById('assign-review-list');
   try{
     const{data}=await sb.from('assignments').select('*').order('submitted_at').limit(50);
-    if(!data||!data.length){box.innerHTML='<div class="info-box">No assignments to review.</div>';return;}
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No submissions waiting evaluative parsing. Cluster clean.</div>';return;}
     box.innerHTML=data.map(a=>`
       <div class="card mb12" style="padding:18px 20px;">
         <div class="flex-between mb10">
-          <div><div style="font-weight:600;color:var(--txt);">${esc(a.username)} — Level ${a.level_num}: ${esc(a.level_title||'')}</div>
-          <div class="mono td" style="font-size:.68rem;">${fmtDate(a.submitted_at)}</div></div>
+          <div><div style="font-weight:600;color:#fff;">${esc(a.username)} — Level ${a.level_num}: ${esc(a.level_title||'')}</div>
+          <div class="mono td" style="font-size:.68rem;">Sub: ${fmtDate(a.submitted_at)}</div></div>
           <span class="badge ${a.status==='passed'?'bgreen':a.status==='failed'?'':a.status==='reviewed'?'bs':'bz'}">${a.status.toUpperCase()}</span>
         </div>
-        <div class="td mb12" style="font-size:.84rem;line-height:1.65;background:var(--bg2);padding:12px;border:1px solid var(--line);">${esc(a.content)}</div>
-        <div class="flex-center gap8">
-          <input type="number" min="0" max="100" placeholder="Score /100" style="width:100px;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="sc-${a.id}" value="${a.score||''}">
-          <input type="text" placeholder="Feedback..." style="flex:1;background:#050505;border:1px solid var(--line);color:var(--txt);font-family:var(--M);font-size:.8rem;padding:8px 12px;outline:none;" id="fb-${a.id}" value="${a.admin_feedback||''}">
+        <div class="td mb12" style="font-size:.84rem;line-height:1.65;background:var(--bg-input);padding:12px;border:1px solid var(--border);border-radius:4px; word-break: break-all;">${esc(a.content)}</div>
+        <div class="reply-form">
+          <input type="number" min="0" max="100" placeholder="Score /100" style="max-width:110px;" id="sc-${a.id}" value="${a.score||''}">
+          <input type="text" placeholder="Provide evaluation feedback metadata..." id="fb-${a.id}" value="${a.admin_feedback||''}">
           <button class="btn btn-sm btn-dark" onclick="markAssignment('${a.id}','passed')">Pass</button>
-          <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="markAssignment('${a.id}','failed')">Fail</button>
+          <button class="btn btn-sm" style="border-color:var(--text-red);color:var(--text-red);" onclick="markAssignment('${a.id}','failed')">Fail</button>
         </div>
       </div>`).join('');
-  }catch(e){box.innerHTML='<div class="info-box warn">Failed to load.</div>';}
+  }catch(e){box.innerHTML='<div class="info-box warn">Failed to interface cleanly with remote assignment stacks.</div>';}
 }
 
 async function markAssignment(id,status){
   const score=parseInt(document.getElementById('sc-'+id)?.value)||null;
   const feedback=document.getElementById('fb-'+id)?.value.trim()||null;
   await sb.from('assignments').update({status,score,admin_feedback:feedback,reviewed_at:new Date().toISOString()}).eq('id',id);
-  if(score){
+  if(score && status==='passed'){
     const{data:a}=await sb.from('assignments').select('user_id').eq('id',id).single();
     if(a)await sb.from('profiles').update({points:sb.rpc('increment')}).eq('id',a.user_id).catch(()=>{});
   }
-  toast(status==='passed'?'Assignment passed.':'Assignment failed.','ok');
+  toast(status==='passed'?'Assignment state passed.':'Assignment state failed.','ok');
   loadAssignmentReviews();loadStats();
 }
 
@@ -305,19 +605,20 @@ async function markAssignment(id,status){
 async function loadStudents(){
   const{data}=await sb.from('profiles').select('*').order('points',{ascending:false});
   const tbody=document.getElementById('student-tbody');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="7" class="tc mono td" style="padding:24px;">No students yet.</td></tr>';return;}
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="7" class="tc mono td" style="padding:24px;">No student records inside database segments.</td></tr>';return;}
+  
   tbody.innerHTML=data.map(p=>`<tr>
-    <td style="font-weight:600;color:var(--txt);">${esc(p.username)}</td>
-    <td class="tr mono">${p.points||0}</td>
-    <td>${p.current_level||1}</td>
-    <td><span class="badge bsys">Phase ${p.phase||1}</span></td>
-    <td class="mono td">${p.completed_challenges||0}</td>
-    <td class="mono ${p.strikes>0?'tr':''}">${p.strikes||0}/3</td>
-    <td class="mono td" style="font-size:.7rem;">${fmtDate(p.created_at)}</td>
+    <td data-label="Username" style="font-weight:600;color:#fff;">${esc(p.username)}</td>
+    <td data-label="Points" class="tr mono color-cyan" style="color:var(--accent-cyan);">${p.points||0}</td>
+    <td data-label="Level">${p.current_level||1}</td>
+    <td data-label="Phase"><span class="badge bsys">Phase ${p.phase||1}</span></td>
+    <td data-label="Challenges" class="mono td">${p.completed_challenges||0}</td>
+    <td data-label="Strikes" class="mono ${p.strikes>0?'text-red':''}" style="${p.strikes>0?'color:var(--text-red);':''}">${p.strikes||0}/3</td>
+    <td data-label="Joined At" class="mono td" style="font-size:.7rem;">${fmtDate(p.created_at)}</td>
   </tr>`).join('');
 }
 
-/* ── CTF ── */
+/* ── CTF CHALLENGES ── */
 async function createCTF(){
   const title=document.getElementById('ch-title').value.trim();
   const cat=document.getElementById('ch-cat').value;
@@ -329,11 +630,11 @@ async function createCTF(){
   const flag=document.getElementById('ch-flag').value.trim();
   const h1=document.getElementById('ch-h1').value.trim();
   const h2=document.getElementById('ch-h2').value.trim();
-  if(!title||!desc||!flag)return showAlert('ctf-alert','Title, description and flag are required.','err');
+  if(!title||!desc||!flag)return showAlert('ctf-alert','Title, description and cipher flag parameters are required.','err');
   const flagHash=await sha256(flag.toLowerCase().trim());
   const{error}=await sb.from('ctf_challenges').insert({title,category:cat,difficulty:diff,points:pts,flag_hash:flagHash,hint1:h1||null,hint2:h2||null,icon,description:desc,week_date:date,active:true});
   if(error)return showAlert('ctf-alert',error.message,'err');
-  showAlert('ctf-alert','Challenge deployed!','ok');
+  showAlert('ctf-alert','Target system challenge deployed successfully!','ok');
   ['ch-title','ch-desc','ch-flag','ch-h1','ch-h2'].forEach(id=>document.getElementById(id).value='');
   loadCTFList();loadStats();
 }
@@ -341,21 +642,23 @@ async function createCTF(){
 async function loadCTFList(){
   const{data}=await sb.from('ctf_public').select('*').order('created_at',{ascending:false}).limit(20);
   const box=document.getElementById('ctf-list');
-  if(!data||!data.length){box.innerHTML='<div class="info-box">No challenges yet.</div>';return;}
+  if(!data||!data.length){box.innerHTML='<div class="info-box">No active operational targets created.</div>';return;}
   box.innerHTML=data.map(c=>`
-    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="font-size:1.3rem;">${esc(c.icon)}</div>
-      <div style="flex:1;"><div style="font-weight:600;color:var(--txt);">${esc(c.title)}</div>
-      <div class="mono td" style="font-size:.7rem;"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.points} pts · ${c.solver_count||0} solvers${c.first_blood?' · 🩸 '+esc(c.first_blood):''}</div></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm btn-dark" onclick="toggleCTF('${c.id}',${!c.active})">${c.active?'Deactivate':'Activate'}</button>
-        <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="deleteCTF('${c.id}','${esc(c.title)}')">Delete</button>
+    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1;">
+        <div style="font-size:1.3rem; flex-shrink:0;">${esc(c.icon)}</div>
+        <div style="min-width:0;"><div style="font-weight:600;color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(c.title)}</div>
+        <div class="mono td" style="font-size:.7rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.points} pts · ${c.solver_count||0} solvers${c.first_blood?' · 🩸 '+esc(c.first_blood):''}</div></div>
+      </div>
+      <div style="display:flex;gap:8px; flex-shrink:0; width:100%; margin-top:10px;" class="mobile-full-width">
+        <button class="btn btn-sm btn-dark" style="flex:1;" onclick="toggleCTF('${c.id}',${!c.active})">${c.active?'Deactivate':'Activate'}</button>
+        <button class="btn btn-sm" style="border-color:var(--text-red);color:var(--text-red); flex:1;" onclick="deleteCTF('${c.id}','${esc(c.title)}')">Delete</button>
       </div>
     </div>`).join('');
 }
 
 async function toggleCTF(id,val){await sb.from('ctf_challenges').update({active:val}).eq('id',id);loadCTFList();toast(val?'Activated.':'Deactivated.','ok');}
-async function deleteCTF(id,title){if(!confirm('Delete "'+title+'"?'))return;await sb.from('ctf_challenges').delete().eq('id',id);loadCTFList();toast('Deleted.','');}
+async function deleteCTF(id,title){if(!confirm('Purge challenge structural data for "'+title+'"?'))return;await sb.from('ctf_challenges').delete().eq('id',id);loadCTFList();toast('Target purged.','');}
 
 /* ── EXAMS ── */
 async function createExam(){
@@ -365,10 +668,10 @@ async function createExam(){
   const closes=document.getElementById('ex-close').value;
   const dur=parseInt(document.getElementById('ex-dur').value)||null;
   const pass=parseInt(document.getElementById('ex-pass').value)||60;
-  if(!title||!opens||!closes)return showAlert('ex-alert','Title, open and close times required.','err');
+  if(!title||!opens||!closes)return showAlert('ex-alert','Title, open and closure scheduling limits required.','err');
   const{error}=await sb.from('exams').insert({title,phase,opens_at:new Date(opens).toISOString(),closes_at:new Date(closes).toISOString(),duration_minutes:dur,pass_percentage:pass});
   if(error)return showAlert('ex-alert',error.message,'err');
-  showAlert('ex-alert','Exam created!','ok');
+  showAlert('ex-alert','Evaluation module matrix created!','ok');
   document.getElementById('ex-title').value='';
   populateExamSelect();loadExamList();
 }
@@ -390,24 +693,24 @@ async function addQuestion(){
   const type=document.getElementById('q-type').value;
   const question=document.getElementById('q-text').value.trim();
   const pts=parseInt(document.getElementById('q-pts').value)||1;
-  if(!examId||!question)return showAlert('q-alert','Select exam and enter question.','err');
+  if(!examId||!question)return showAlert('q-alert','Select structural exam and map question value context.','err');
   let options=null,correct='';
   if(type==='mcq'){
     const a=document.getElementById('q-a').value.trim();
     const b=document.getElementById('q-b').value.trim();
     const c=document.getElementById('q-c').value.trim();
     const d=document.getElementById('q-d').value.trim();
-    if(!a||!b)return showAlert('q-alert','Need at least A and B options.','err');
+    if(!a||!b)return showAlert('q-alert','MCQ bounds require minimum Node option value options A and B.','err');
     options=JSON.stringify([a,b,c,d].filter(Boolean));
     correct=document.getElementById('q-correct').value;
   } else {
     correct=document.getElementById('q-short-ans').value.trim();
-    if(!correct)return showAlert('q-alert','Enter the correct answer.','err');
+    if(!correct)return showAlert('q-alert','Specify objective string for system verification matching.','err');
   }
   const{count}=await sb.from('exam_questions').select('*',{count:'exact',head:true}).eq('exam_id',examId);
   const{error}=await sb.from('exam_questions').insert({exam_id:examId,type,question,options,correct_answer:correct,points:pts,order_num:count||0});
   if(error)return showAlert('q-alert',error.message,'err');
-  showAlert('q-alert','Question added!','ok');
+  showAlert('q-alert','Question index element added to block!','ok');
   document.getElementById('q-text').value='';
   ['q-a','q-b','q-c','q-d','q-short-ans'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
@@ -415,21 +718,21 @@ async function addQuestion(){
 async function loadExamList(){
   const{data}=await sb.from('exams').select('*').order('opens_at',{ascending:false}).limit(20);
   const box=document.getElementById('exam-list');
-  if(!data||!data.length){box.innerHTML='<div class="info-box">No exams yet.</div>';return;}
+  if(!data||!data.length){box.innerHTML='<div class="info-box">No exams generated inside system memory pools.</div>';return;}
   box.innerHTML=data.map(e=>`
-    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="flex:1;"><div style="font-weight:600;color:var(--txt);">📝 ${esc(e.title)}</div>
-      <div class="mono td" style="font-size:.7rem;">Phase ${e.phase} · ${fmtDate(e.opens_at)} → ${fmtDate(e.closes_at)} · Pass: ${e.pass_percentage}%${e.duration_minutes?' · '+e.duration_minutes+' min':''}</div></div>
-      <button class="btn btn-sm" style="border-color:var(--muted);color:var(--muted);" onclick="deleteExam('${e.id}')">Delete</button>
+    <div class="card mb8" style="padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap; justify-content:space-between;">
+      <div style="flex:1; min-width:0;"><div style="font-weight:600;color:#fff;">📝 ${esc(e.title)}</div>
+      <div class="mono td" style="font-size:.7rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Phase ${e.phase} · ${fmtDate(e.opens_at)} → ${fmtDate(e.closes_at)} · Pass: ${e.pass_percentage}%${e.duration_minutes?' · '+e.duration_minutes+' min':''}</div></div>
+      <button class="btn btn-sm mobile-full-width" style="border-color:var(--text-red);color:var(--text-red); margin-top:8px;" onclick="deleteExam('${e.id}')">Delete</button>
     </div>`).join('');
 }
 
 async function deleteExam(id){
-  if(!confirm('Delete exam? Questions and results will be lost.'))return;
+  if(!confirm('Execute absolute destruction drop parameter on exam sequence? All historical parameters will drop.'))return;
   await sb.from('exam_questions').delete().eq('exam_id',id);
   await sb.from('exam_results').delete().eq('exam_id',id);
   await sb.from('exams').delete().eq('id',id);
-  loadExamList();toast('Exam deleted.','');
+  loadExamList();toast('Exam array wiped.','');
 }
 
 /* ── ANNOUNCEMENTS ── */
@@ -437,10 +740,10 @@ async function postAnnouncement(){
   const title=document.getElementById('ann-title').value.trim();
   const body=document.getElementById('ann-body').value.trim();
   const urgent=document.getElementById('ann-urgent').value==='true';
-  if(!title||!body)return showAlert('ann-alert','Title and body required.','err');
+  if(!title||!body)return showAlert('ann-alert','Title validation parameters and stream values required.','err');
   const{error}=await sb.from('announcements').insert({title,body,urgent});
   if(error)return showAlert('ann-alert',error.message,'err');
-  showAlert('ann-alert','Announcement posted!','ok');
+  showAlert('ann-alert','Secure broadcast payload delivered to logs!','ok');
   document.getElementById('ann-title').value='';
   document.getElementById('ann-body').value='';
   loadAnnouncements();
@@ -449,43 +752,68 @@ async function postAnnouncement(){
 async function loadAnnouncements(){
   const{data}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(10);
   const box=document.getElementById('ann-list');
-  if(!data||!data.length){box.innerHTML='<div class="info-box">No announcements yet.</div>';return;}
+  if(!data||!data.length){box.innerHTML='<div class="info-box">System informational network channels clear. No reports.</div>';return;}
   box.innerHTML=data.map(a=>`
-    <div class="card mb8" style="padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div style="flex:1;"><div style="font-weight:600;color:${a.urgent?'var(--red)':'var(--txt)'};">${a.urgent?'🚨 ':''}${esc(a.title)}</div><div class="td fs">${esc(a.body)}</div></div>
-      <button class="btn btn-sm btn-dark" onclick="deleteAnn('${a.id}')">Delete</button>
+    <div class="card mb8" style="padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap; justify-content:space-between;">
+      <div style="flex:1; min-width:0;"><div style="font-weight:600;color:${a.urgent?'var(--text-red)':'var(--text-main)'};">${a.urgent?'🚨 ':''}${esc(a.title)}</div><div class="td" style="font-size:0.8rem; margin-top:4px; word-break:break-word;">${esc(a.body)}</div></div>
+      <button class="btn btn-sm btn-dark mobile-full-width" style="margin-top:8px;" onclick="deleteAnn('${a.id}')">Delete</button>
     </div>`).join('');
 }
 
-async function deleteAnn(id){await sb.from('announcements').delete().eq('id',id);loadAnnouncements();toast('Deleted.','');}
+async function deleteAnn(id){await sb.from('announcements').delete().eq('id',id);loadAnnouncements();toast('Notice unlinked.','');}
 
 /* ── POINTS & STRIKES ── */
 async function awardPoints(){
   const uname=document.getElementById('pts-user').value.trim();
   const amount=parseInt(document.getElementById('pts-amount').value);
-  if(!uname||isNaN(amount))return showAlert('pts-alert','Username and points required.','err');
+  if(!uname||isNaN(amount))return showAlert('pts-alert','Trainee signature handle and quantitative values required.','err');
   const{data:p}=await sb.from('profiles').select('id,points').eq('username',uname).maybeSingle();
-  if(!p)return showAlert('pts-alert','Student "'+uname+'" not found.','err');
+  if(!p)return showAlert('pts-alert',' Tying exception error: Trainee pointer match "'+uname+'" not registered.','err');
   const newPts=Math.max(0,(p.points||0)+amount);
   await sb.from('profiles').update({points:newPts}).eq('id',p.id);
-  showAlert('pts-alert',(amount>0?'+'+amount:amount)+' pts applied to '+uname+'. New total: '+newPts,'ok');
+  showAlert('pts-alert',(amount>0?'+'+amount:amount)+' operational modification applied to '+uname+'. Complete state value: '+newPts,'ok');
   document.getElementById('pts-user').value='';document.getElementById('pts-amount').value='';
 }
 
 async function issueStrike(){
   const uname=document.getElementById('str-user').value.trim();
   const reason=document.getElementById('str-reason').value;
-  if(!uname)return showAlert('str-alert','Username required.','err');
+  if(!uname)return showAlert('str-alert','Target user pointer entry parameter missing.','err');
   const{data:p}=await sb.from('profiles').select('id,strikes').eq('username',uname).maybeSingle();
-  if(!p)return showAlert('str-alert','Student "'+uname+'" not found.','err');
+  if(!p)return showAlert('str-alert','Tying exception error: Trainee pointer match "'+uname+'" not registered.','err');
   const newStrikes=(p.strikes||0)+1;
   await sb.from('profiles').update({strikes:newStrikes}).eq('id',p.id);
   await sb.from('strike_log').insert({user_id:p.id,username:uname,reason});
-  showAlert('str-alert','Strike '+newStrikes+'/3 issued to '+uname+(newStrikes>=3?' — THIRD STRIKE! Consider disabling their account.':'.'),'ok');
+  showAlert('str-alert','System enforcement clause structural execution '+newStrikes+'/3 mapped to user '+uname+(newStrikes>=3?' — MAX INFRACTION BREACH RECORDED! Account isolation required immediately.':'.'),'ok');
   document.getElementById('str-user').value='';
 }
 
 async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+
+// Background Animated Connected Graph Particle Network Engine
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(35, window.innerWidth / 40);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+
 init();
 </script>
 </body>
