@@ -1,213 +1,525 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nighters Cyber Academy // RED TEAM OPS</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nighters Cyber Academy // RED TEAM OPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.25; pointer-events: none;
+  }
+
+  /* --- PROFESSIONAL NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 24px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- HERO SECTION --- */
+  .hero {
+      max-width: 900px; margin: 140px auto 40px auto; padding: 0 24px; text-align: center;
+      position: relative; z-index: 10;
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  .hero-badge {
+      display: inline-block; background: rgba(0, 240, 255, 0.06); border: 1px solid rgba(0,240,255,0.2);
+      color: var(--accent-cyan); font-size: 0.75rem; padding: 6px 14px; border-radius: 20px;
+      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.8rem); font-weight: 700; line-height: 1.1; letter-spacing: 2px; margin-bottom: 12px;
+  }
+  .hero h1 span { color: transparent; -webkit-text-stroke: 1px var(--accent-cyan); text-shadow: 0 0 20px rgba(0,240,255,0.1); }
+  .hero-sub { color: var(--accent-purple); font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; }
+  .hero-lead { max-width: 680px; margin: 0 auto 30px auto; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+  
+  /* Live Terminal Typewriter Output Box */
+  .hero-tw {
+      min-height: 45px; background: var(--bg-input); border: 1px solid var(--border);
+      max-width: 500px; margin: 0 auto 35px auto; border-radius: 6px; padding: 12px;
+      font-size: 0.85rem; color: #fff; display: flex; align-items: center; justify-content: center;
+      border-left: 3px solid var(--accent-cyan); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+  }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.1); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.25); }
+  .btn-dark { border-color: var(--border); color: var(--text-main); background: rgba(30, 41, 59, 0.2); }
+  .btn-dark:hover { border-color: var(--text-muted); background: rgba(30, 41, 59, 0.5); box-shadow: none; }
+  .btn-sm { padding: 6px 14px; font-size: 0.75rem; border-radius: 4px; }
+  .btn-lg { padding: 15px 32px; font-size: 0.9rem; }
+
+  /* --- GRID AND CONTENT WRAPPERS --- */
+  .wrap { max-width: 1200px; margin: 40px auto; padding: 0 24px; position: relative; z-index: 10; }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 16px; margin-top: 45px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* Responsive Grid Configurations */
+  .g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb32 { margin-bottom: 32px; }
+  .mb40 { margin-bottom: 40px; }
+
+  /* Live Async Counter Statistics Cards */
+  .stat {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: relative; overflow: hidden;
+  }
+  .stat::before { content: ''; position: absolute; top:0; left:0; width:100%; height:2px; background: var(--border); }
+  .stat:hover::before { background: var(--accent-purple); }
+  .stat .n { display: block; font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .stat .l { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Mission Brief Console */
+  .term {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+  }
+  .term .p { font-size: 0.85rem; line-height: 1.7; margin-bottom: 10px; color: var(--text-main); display: flex; align-items: flex-start; gap: 10px; }
+  .term .p::before { content: ">"; color: var(--accent-cyan); font-weight: bold; }
+  .term .c { font-size: 0.8rem; color: var(--text-red); padding-top: 10px; border-top: 1px dashed var(--border); margin-top: 15px; }
+
+  /* --- GENERAL CARDS & MODULES --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(0,240,255,0.3); }
+  .card-hd {
+      font-size: 0.95rem; font-weight: 700; color: #fff; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  
+  /* Specialty Highlight Paths */
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-top: 3px solid var(--accent-purple);
+      transition: transform 0.25s ease;
+  }
+  .card-red:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(157, 78, 221, 0.15); }
+  .td { color: var(--text-muted); line-height: 1.6; }
+  .fs { font-size: 0.85rem; }
+
+  /* Custom Badging Components */
+  .badge {
+      display: inline-block; font-size: 0.65rem; padding: 4px 8px; border-radius: 4px;
+      font-weight: bold; text-transform: uppercase; margin-right: 6px; margin-top: 6px;
+  }
+  .bz { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border: 1px solid rgba(100, 116, 139, 0.3); }
+  .bsys { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); border: 1px solid rgba(0, 240, 255, 0.2); }
+  .bs { background: rgba(157, 78, 221, 0.15); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.3); }
+  .br { background: rgba(239, 68, 68, 0.15); color: var(--text-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .bweb { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .bg { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .be { background: linear-gradient(45deg, #ef4444, #9d4edd); color: #fff; }
+
+  /* Dynamic Tables */
+  .dtable { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .dtable td { padding: 10px 0; border-bottom: 1px dashed var(--border); color: var(--text-muted); }
+  .dtable tr:last-child td { border: none; }
+  .tr { text-align: right; }
+  .fw { font-weight: bold; color: var(--accent-cyan) !important; }
+  .tw { font-weight: bold; color: var(--text-red) !important; }
+
+  /* Leaderboard Rows styling */
+  .lb-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .lb-row:last-child { border: none; }
+  .lb-inf { display: flex; flex-direction: column; }
+  .lb-inf strong { font-size: 0.85rem; color: #fff; }
+  .lb-inf small { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* --- FOOTER SYSTEM --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; line-height: 1.8; margin-top: auto; z-index: 10;
+  }
+  .footer a { color: var(--text-red); text-decoration: none; font-weight: bold; }
+  .footer a:hover { text-decoration: underline; }
+
+  .tc { text-align: center; }
+
+  /* --- KEYFRAME ANIMATIONS --- */
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      .hero { margin-top: 110px; }
+      .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body class="page">
 
-    <nav class="nav">
-        <div class="nav-inner">
-            <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-            <div class="nav-links">
-                <a href="leaderboard.html">Leaderboard</a>
-                <a href="about.html">About</a>
-                <a href="rules.html">Rules</a>
-                <a href="resources.html">Resources</a>
-                <a href="login.html">Login</a>
-                <a href="register.html" class="btn btn-sm">Enlist</a>
-            </div>
-        </div>
-    </nav>
+<canvas id="bg-canvas"></canvas>
 
-    <div class="hero">
-        <div class="hero-badge">// Authorized Red Team Training Platform</div>
-        <h1><span>NIGHTERS</span><br>CYBER ACADEMY</h1>
-        <p class="hero-sub">// Learn. Practice. Hack. Defend.</p>
-        <p class="hero-lead">A structured 3-month red team training program. 30 levels. Real tools. Real skills. From zero to professional security analyst.</p>
-        
-        <div class="hero-tw" id="tw"></div>
-        
-        <div class="btn-group">
-            <a href="register.html" class="btn btn-lg">Enlist Now</a>
-            <a href="login.html" class="btn btn-dark btn-lg">Login</a>
-            <a href="setup.html" class="btn btn-dark btn-lg">Setup Guide</a>
+<!-- Top Fixed Header -->
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
+        <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Navigation Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="about.html">About</a>
+            <a href="rules.html">Rules</a>
+            <a href="resources.html">Resources</a>
+            <a href="login.html">Login</a>
+            <a href="register.html" class="btn btn-sm">Enlist</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Segment -->
+<div class="hero">
+    <div class="hero-badge">// Authorized Red Team Training Platform</div>
+    <h1><span>NIGHTERS</span><br>CYBER ACADEMY</h1>
+    <p class="hero-sub">// Learn. Practice. Hack. Defend.</p>
+    <p class="hero-lead">A structured 3-month red team training program. 30 levels. Real tools. Real skills. From zero to professional security analyst.</p>
+    
+    <!-- Typing Machine Target Outputs -->
+    <div class="hero-tw" id="tw"></div>
+    
+    <div class="btn-group">
+        <a href="register.html" class="btn btn-lg">Enlist Now</a>
+        <a href="login.html" class="btn btn-dark btn-lg">Login</a>
+        <a href="setup.html" class="btn btn-dark btn-lg">Setup Guide</a>
+    </div>
+</div>
+
+<!-- Grid Workstation -->
+<div class="wrap">
+    
+    <!-- Live Profile Metrics -->
+    <div class="g4 mb32">
+        <div class="stat">
+            <span class="n" id="s-ops">—</span>
+            <div class="l">Operatives Enlisted</div>
+        </div>
+        <div class="stat">
+            <span class="n">30</span>
+            <div class="l">Active Levels</div>
+        </div>
+        <div class="stat">
+            <span class="n">3</span>
+            <div class="l">Months Duration</div>
+        </div>
+        <div class="stat">
+            <span class="n">50/50</span>
+            <div class="l">Web &amp; System Split</div>
         </div>
     </div>
 
-    <div class="wrap">
-        
-        <div class="g4 mb32">
-            <div class="stat">
-                <span class="n" id="s-ops">—</span>
-                <div class="l">Operatives</div>
-            </div>
-            <div class="stat">
-                <span class="n">30</span>
-                <div class="l">Levels</div>
-            </div>
-            <div class="stat">
-                <span class="n">3</span>
-                <div class="l">Months</div>
-            </div>
-            <div class="stat">
-                <span class="n">50/50</span>
-                <div class="l">Web &amp; System</div>
+    <!-- Mission Brief -->
+    <div class="stitle mb16">Mission Brief</div>
+    <div class="term mb32">
+        <div class="p">Nighters Cyber Academy is a structured Red Team training program.</div>
+        <div class="p">3 months. 30 levels. 50% web hacking. 50% system hacking.</div>
+        <div class="p">Tools: Termux + Debian on your phone. No expensive laptop needed for Phase 1.</div>
+        <div class="c">All training is on authorized systems only. Read the rules before starting.</div>
+    </div>
+
+    <!-- Syllabus Track -->
+    <div class="stitle mb16">3-Month Training Path</div>
+    <div class="g3 mb32">
+        <div class="card-red">
+            <div class="card-hd">📱 Month 1 — Foundation</div>
+            <p class="td fs mb16">Linux basics · Networking · Bash scripting · OSINT · Google Dorking. Works on phone (Termux + Debian).</p>
+            <div style="margin-top: auto;">
+                <span class="badge bz">June 25 – July 24</span> 
+                <span class="badge bsys">Levels 1–10</span>
             </div>
         </div>
-
-        <div class="stitle mb16">Mission Brief</div>
-        <div class="term mb32">
-            <div class="p">Nighters Cyber Academy is a structured Red Team training program.</div>
-            <div class="p">3 months. 30 levels. 50% web hacking. 50% system hacking.</div>
-            <div class="p">Tools: Termux + Debian on your phone. No expensive laptop needed for Phase 1.</div>
-            <div class="c">All training is on authorized systems only. Read the rules before starting.</div>
-        </div>
-
-        <div class="stitle mb16">3-Month Training Path</div>
-        <div class="g3 mb32">
-            <div class="card-red">
-                <div class="card-hd">📱 Month 1 — Foundation</div>
-                <p class="td fs mb16">Linux basics · Networking · Bash scripting · OSINT · Google Dorking. Works on phone (Termux + Debian).</p>
-                <div class="mt4">
-                    <span class="badge bz">June 25 – July 24</span> 
-                    <span class="badge bsys">Levels 1–10</span>
-                </div>
-            </div>
-            <div class="card-red">
-                <div class="card-hd">💻 Month 2 — Reconnaissance</div>
-                <p class="td fs mb16">Nmap · Subdomain enumeration · Web fingerprinting · Dirb/Gobuster · Nikto · Manual web testing.</p>
-                <div class="mt4">
-                    <span class="badge bs">July 25 – Aug 24</span> 
-                    <span class="badge bsys">Levels 11–20</span>
-                </div>
-            </div>
-            <div class="card-red">
-                <div class="card-hd">🔴 Month 3 — Red Team Ops</div>
-                <p class="td fs mb16">SQL Injection · XSS · Brute force · File inclusion · Privilege escalation · Steganography · Reporting.</p>
-                <div class="mt4">
-                    <span class="badge br">Aug 25 – Sep 24</span> 
-                    <span class="badge bweb">Levels 21–30</span>
-                </div>
+        <div class="card-red">
+            <div class="card-hd">💻 Month 2 — Reconnaissance</div>
+            <p class="td fs mb16">Nmap · Subdomain enumeration · Web fingerprinting · Dirb/Gobuster · Nikto · Manual web testing.</p>
+            <div style="margin-top: auto;">
+                <span class="badge bs">July 25 – Aug 24</span> 
+                <span class="badge bsys">Levels 11–20</span>
             </div>
         </div>
-
-        <div class="stitle mb16">Scoring System</div>
-        <div class="g2 mb32">
-            <div class="card">
-                <div class="card-hd">Points You Earn</div>
-                <table class="dtable">
-                    <tbody>
-                        <tr><td>Complete a level</td><td class="tr fw">+50–100 pts</td></tr>
-                        <tr><td>Daily check-in (on time)</td><td class="tr fw">+2 pts</td></tr>
-                        <tr><td>Late check-in</td><td class="tw fw">+1 pt</td></tr>
-                        <tr><td>CTF challenge (easy)</td><td class="tr fw">+10 pts</td></tr>
-                        <tr><td>CTF challenge (medium)</td><td class="tr fw">+20 pts</td></tr>
-                        <tr><td>CTF challenge (hard)</td><td class="tr fw">+50 pts</td></tr>
-                        <tr><td>First blood bonus</td><td class="tr fw">+20 pts</td></tr>
-                        <tr><td>Monthly exam</td><td class="tr fw">0–100 pts</td></tr>
-                        <tr><td>Using a hint</td><td class="tw fw">–2 pts each</td></tr>
-                    </tbody>
-                </table>
+        <div class="card-red">
+            <div class="card-hd">🔴 Month 3 — Red Team Ops</div>
+            <p class="td fs mb16">SQL Injection · XSS · Brute force · File inclusion · Privilege escalation · Steganography · Reporting.</p>
+            <div style="margin-top: auto;">
+                <span class="badge br">Aug 25 – Sep 24</span> 
+                <span class="badge bweb">Levels 21–30</span>
             </div>
-            
-            <div class="card">
-                <div class="card-hd">Rank System</div>
-                <div class="lb-row">
-                    <div class="lb-inf"><strong>Recruit</strong><small>0 – 499 pts</small></div>
-                    <span class="badge bz">Recruit</span>
-                </div>
-                <div class="lb-row">
-                    <div class="lb-inf"><strong>Operative</strong><small>500 – 1,999 pts</small></div>
-                    <span class="badge bs">Operative</span>
-                </div>
-                <div class="lb-row">
-                    <div class="lb-inf"><strong>Red Agent</strong><small>2,000 – 4,999 pts</small></div>
-                    <span class="badge br">Red Agent</span>
-                </div>
-                <div class="lb-row">
-                    <div class="lb-inf"><strong>Senior Analyst</strong><small>5,000 – 9,999 pts</small></div>
-                    <span class="badge bg">Senior Analyst</span>
-                </div>
-                <div class="lb-row">
-                    <div class="lb-inf"><strong>Elite Red Teamer</strong><small>10,000+ pts</small></div>
-                    <span class="badge be">Elite Red Teamer</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="stitle mb16">Platform Features</div>
-        <div class="g3 mb40">
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">📚</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">30 Structured Levels</div>
-                <p class="td fs">Step-by-step lessons with real commands, terminal demos, and troubleshooting guides.</p>
-            </div>
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">🚩</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Weekly CTF — Every Sunday</div>
-                <p class="td fs">New CTF challenges every Sunday. First blood bonuses. Real flag submission.</p>
-            </div>
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">📝</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Monthly Exams — 15th</div>
-                <p class="td fs">Timed exams every 15th. Auto-scored. Results update the leaderboard.</p>
-            </div>
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">📅</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Daily Attendance</div>
-                <p class="td fs">Check in every day to earn points. Missed days break your streak.</p>
-            </div>
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">🏆</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Live Leaderboard</div>
-                <p class="td fs">See who is leading in real time. Ranks, points, completed levels.</p>
-            </div>
-            <div class="card" style="padding:20px;">
-                <div style="font-size:1.6rem;margin-bottom:8px;">🆘</div>
-                <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Help System</div>
-                <p class="td fs">Stuck? Submit a help ticket. Admin replies directly to your problem.</p>
-            </div>
-        </div>
-
-        <div class="tc mb40">
-            <a href="register.html" class="btn btn-lg">Start Your Training</a>
         </div>
     </div>
 
-    <footer class="footer">
-        <strong>NIGHTERS CYBER ACADEMY</strong>
-        Learn · Practice · Defend &nbsp;|&nbsp; Authorized Training Only &nbsp;|&nbsp; <a href="about.html" style="color:var(--red);">About the Instructor</a>
-    </footer>
-
-    <script src="app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Use global app configuration variables directly from your localized logic file
-        const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- Point matrix systems -->
+    <div class="g2 mb32">
+        <div class="card">
+            <div class="card-hd">Points You Earn</div>
+            <table class="dtable">
+                <tbody>
+                    <tr><td>Complete a level</td><td class="tr fw">+50–100 pts</td></tr>
+                    <tr><td>Daily check-in (on time)</td><td class="tr fw">+2 pts</td></tr>
+                    <tr><td>Late check-in</td><td class="tw fw">+1 pt</td></tr>
+                    <tr><td>CTF challenge (easy)</td><td class="tr fw">+10 pts</td></tr>
+                    <tr><td>CTF challenge (medium)</td><td class="tr fw">+20 pts</td></tr>
+                    <tr><td>CTF challenge (hard)</td><td class="tr fw">+50 pts</td></tr>
+                    <tr><td>First blood bonus</td><td class="tr fw">+20 pts</td></tr>
+                    <tr><td>Monthly exam</td><td class="tr fw">0–100 pts</td></tr>
+                    <tr><td>Using a hint</td><td class="tw fw">–2 pts each</td></tr>
+                </tbody>
+            </table>
+        </div>
         
-        // Execute dynamic terminal typewriter array sequencing smoothly
-        typewriter('tw',[
-            'Recon. Enumerate. Exploit. Report.',
-            'From Termux to full Red Team ops.',
-            '30 levels. 3 months. Real skills.',
-            'Learn SQL Injection. XSS. Privesc. Stego.',
-            'Be the threat. Then be the defense.'
-        ]);
+        <div class="card">
+            <div class="card-hd">Rank System</div>
+            <div class="lb-row">
+                <div class="lb-inf"><strong>Recruit</strong><small>0 – 499 pts</small></div>
+                <span class="badge bz">Recruit</span>
+            </div>
+            <div class="lb-row">
+                <div class="lb-inf"><strong>Operative</strong><small>500 – 1,999 pts</small></div>
+                <span class="badge bs">Operative</span>
+            </div>
+            <div class="lb-row">
+                <div class="lb-inf"><strong>Red Agent</strong><small>2,000 – 4,999 pts</small></div>
+                <span class="badge br">Red Agent</span>
+            </div>
+            <div class="lb-row">
+                <div class="lb-inf"><strong>Senior Analyst</strong><small>5,000 – 9,999 pts</small></div>
+                <span class="badge bg">Senior Analyst</span>
+            </div>
+            <div class="lb-row">
+                <div class="lb-inf"><strong>Elite Red Teamer</strong><small>10,000+ pts</small></div>
+                <span class="badge be">Elite Red Teamer</span>
+            </div>
+        </div>
+    </div>
 
-        // Secure Asynchronous Live Registration Aggregator Tracking Call
-        (async () => {
-            try {
-                const { count } = await _sb.from('profiles').select('*', { count: 'exact', head: true });
-                if (count !== null && count !== undefined) {
-                    document.getElementById('s-ops').textContent = count;
-                }
-            } catch (e) {
-                console.warn("Operational profile query log trace suppressed:", e);
+    <!-- System Highlights Modules -->
+    <div class="stitle mb16">Platform Features</div>
+    <div class="g3 mb40">
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">📚</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">30 Structured Levels</div>
+            <p class="td fs">Step-by-step lessons with real commands, terminal demos, and troubleshooting guides.</p>
+        </div>
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">🚩</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Weekly CTF — Every Sunday</div>
+            <p class="td fs">New CTF challenges every Sunday. First blood bonuses. Real flag submission.</p>
+        </div>
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">📝</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Monthly Exams — 15th</div>
+            <p class="td fs">Timed exams every 15th. Auto-scored. Results update the leaderboard.</p>
+        </div>
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">📅</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Daily Attendance</div>
+            <p class="td fs">Check in every day to earn points. Missed days break your streak.</p>
+        </div>
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">🏆</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Live Leaderboard</div>
+            <p class="td fs">See who is leading in real time. Ranks, points, completed levels.</p>
+        </div>
+        <div class="card">
+            <div style="font-size:1.6rem;margin-bottom:8px;">🆘</div>
+            <div class="card-hd" style="border:none;padding:0;margin-bottom:8px;">Help System</div>
+            <p class="td fs">Stuck? Submit a help ticket. Admin replies directly to your problem.</p>
+        </div>
+    </div>
+
+    <div class="tc mb40">
+        <a href="register.html" class="btn btn-lg">Start Your Training</a>
+    </div>
+</div>
+
+<!-- Bottom Navigation Deck -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend &nbsp;|&nbsp; Authorized Training Only &nbsp;|&nbsp; <a href="about.html">About the Instructor</a>
+</footer>
+
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Mobile responsive menu toggle controller
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    menuToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+    });
+
+    // Supabase Live Sync Initialization
+    const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Fallback typewriter engine if app.js global function is missing/renamed
+    function runTypewriter(elementId, phrases) {
+        let currentPhraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const targetElement = document.getElementById(elementId);
+        
+        function type() {
+            const currentFullText = phrases[currentPhraseIndex];
+            if (isDeleting) {
+                targetElement.textContent = currentFullText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                targetElement.textContent = currentFullText.substring(0, charIndex + 1);
+                charIndex++;
             }
-        })();
-    </script>
+
+            let typeSpeed = isDeleting ? 30 : 60;
+
+            if (!isDeleting && charIndex === currentFullText.length) {
+                typeSpeed = 2000; // Pause at end of sentence
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                typeSpeed = 500; // Pause before writing next line
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+        if(targetElement) type();
+    }
+
+    // Call dynamic terminal sequencing engine safely
+    const phrasesArray = [
+        'Recon. Enumerate. Exploit. Report.',
+        'From Termux to full Red Team ops.',
+        '30 levels. 3 months. Real skills.',
+        'Learn SQL Injection. XSS. Privesc. Stego.',
+        'Be the threat. Then be the defense.'
+    ];
+    
+    if (typeof typewriter === 'function') {
+        try { typewriter('tw', phrasesArray); } catch(e) { runTypewriter('tw', phrasesArray); }
+    } else {
+        runTypewriter('tw', phrasesArray);
+    }
+
+    // Dynamic Live Operator Registration Sync Metrics Call 
+    (async () => {
+        try {
+            const { count } = await _sb.from('profiles').select('*', { count: 'exact', head: true });
+            if (count !== null && count !== undefined) {
+                document.getElementById('s-ops').textContent = count;
+            }
+        } catch (e) {
+            console.warn("Operational profile query log trace suppressed:", e);
+            document.getElementById('s-ops').textContent = "0";
+        }
+    })();
+
+    // Background Animated Connected Graph Matrix Canvas Engine
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let points = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+    function initPoints() {
+      points = []; const count = Math.min(45, window.innerWidth / 30);
+      for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3 }); }
+    }
+    function drawGraph() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+      points.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+        for(let j=i+1; j<points.length; j++) {
+          const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+          if(distance < 160) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+        }
+      });
+      requestAnimationFrame(drawGraph);
+    }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+</script>
 </body>
 </html>
