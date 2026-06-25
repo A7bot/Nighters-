@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login Nighters Cyber Academy</title>
+<title>Login // Nighters Cyber Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  /* --- CODESPACE DEEP CYAN PALETTE SYSTEM --- */
+  /* --- PREMIUM DEEP CYAN CYAN/CYBER PALETTE SYSTEM --- */
   :root {
       --bg-deep: #060913;
       --bg-surface: #0d1321;
@@ -39,7 +39,7 @@
   body::before {
       content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.2;
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
   }
 
   #bg-canvas {
@@ -89,7 +89,7 @@
   .meta-text a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; }
   .meta-text a:hover { text-decoration: underline; }
 
-  /* --- LIVE TOAST STRUCTURES --- */
+  /* --- TOAST SYSTEM INTERFACES --- */
   #toast-wrap {
       position: fixed; bottom: 20px; right: 20px; z-index: 10000;
       display: flex; flex-direction: column; gap: 10px; max-width: 350px; width: calc(100% - 40px);
@@ -105,8 +105,7 @@
   .toast .tx:hover { color: var(--text-main); }
   @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
 
-  /* Fallback visibility layer if legacy backend elements call standard alert elements */
-  .alert { display: none; }
+  .alert { display: none !important; }
 
   .portal-graphic { flex: 1; display: flex; justify-content: center; align-items: center; max-width: 450px; }
   .portal-graphic svg { width: 100%; height: auto; max-height: 380px; }
@@ -134,8 +133,8 @@
 
     <main>
       <div class="form-group">
-        <label>Username / Email</label>
-        <input type="email" id="email" class="form-control" placeholder="malik@gmail.com" autocomplete="off">
+        <label>Username / Email </label>
+        <input type="email" id="email" class="form-control" placeholder="operative@domain.com" autocomplete="off">
       </div>
       
       <div class="form-group">
@@ -178,10 +177,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 <script>
-// LINKED TO APP.JS GLOBAL OBJECT ARCHITECTURE
+// This initializes the Supabase client using the global variables loaded directly from your app.js file
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Legacy bridge function so alerts automatically display within the new toast engine
+// Bridge old alert logic directly into your new toast component
 function showAlert(id, msg, type) {
   toast(msg, type);
 }
@@ -191,7 +190,7 @@ async function doLogin(){
   const pw=document.getElementById('pw').value;
   const btn=document.getElementById('login-btn');
   if(!email||!pw)return showAlert('la','Email and password required.','err');
-  btn.disabled=true; btn.textContent='Authenticating...';
+  btn.disabled=true;btn.textContent='Authenticating...';
   try{
     const{data,error}=await sb.auth.signInWithPassword({email,password:pw});
     if(error){
@@ -210,13 +209,13 @@ async function doLogin(){
     }catch(e){}
     try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}
     
-    // Toast notification requested trigger
+    // Welcome Toast Event trigger
     const username = user.user_metadata?.username || email.split('@')[0];
     toast(`Welcome back, ${username} // Access Granted`, 'ok');
     
     setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',1200);
   }catch(e){
-    showAlert('la','Infrastructure handshake mismatch.','err');
+    showAlert('la','Handshake connection error.','err');
     btn.disabled=false;btn.textContent='Initialize Link';
   }
 }
