@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login Nighters Cyber Academy</title>
+<title>Login // Nighters Cyber Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -137,19 +137,29 @@
   .meta-text a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .meta-text a:hover { color: #fff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
 
-  /* --- TOAST NOTIFICATIONS --- */
+  /* --- TOAST NOTIFICATIONS (FIXED TO TOP CENTER) --- */
   .toast-container {
-      position: fixed; bottom: 20px; right: 20px; z-index: 10000;
-      display: flex; flex-direction: column; gap: 10px; max-width: 350px; width: calc(100% - 40px);
+      position: fixed; 
+      top: 24px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      z-index: 10000;
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      max-width: 400px; 
+      width: calc(100% - 40px);
   }
   .toast {
       background: var(--bg-surface); border: 1px solid var(--border);
       color: var(--text-main); padding: 16px; border-radius: 8px; font-size: 0.85rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center;
-      gap: 12px; transform: translateY(20px); opacity: 0; animation: toastIn 0.3s cubic-bezier(0.1, 1, 0.1, 1) forwards;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center;
+      justify-content: center; text-align: center; gap: 12px;
+      transform: translateY(-20px); opacity: 0; 
+      animation: toastIn 0.3s cubic-bezier(0.1, 1, 0.1, 1) forwards;
   }
-  .toast.err { border-left: 4px solid var(--text-red); box-shadow: 0 0 15px rgba(239, 68, 110, 0.1); }
-  .toast.ok { border-left: 4px solid var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.1); }
+  .toast.err { border-top: 3px solid var(--text-red); box-shadow: 0 4px 20px rgba(239, 68, 110, 0.15); }
+  .toast.ok { border-top: 3px solid var(--accent-cyan); box-shadow: 0 4px 20px rgba(0, 240, 255, 0.15); }
   @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
 
   .portal-graphic {
@@ -244,7 +254,6 @@
 <script>
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Handle Session Check Persistence on Page Load
 (async () => {
   try {
     const { data: { user } } = await sb.auth.getUser();
@@ -282,27 +291,16 @@ async function doLogin(){
     
     const user = data.user;
     
-    // Auto-create Profile if it doesn't exist yet
     try {
       const { data: prof } = await sb.from('profiles').select('id').eq('id', user.id).maybeSingle();
       if(!prof) {
         const uname = user.user_metadata?.username || email.split('@')[0];
         await sb.from('profiles').insert({
-          id: user.id, 
-          username: uname, 
-          email, 
-          points: 0, 
-          current_level: 1, 
-          phase: 1, 
-          strikes: 0, 
-          completed_challenges: 0, 
-          attendance_days: 0, 
-          streak: 0
+          id: user.id, username: uname, email, points: 0, current_level: 1, phase: 1, strikes: 0, completed_challenges: 0, attendance_days: 0, streak: 0
         });
       }
     } catch(e) {}
 
-    // Security Logging
     try {
       const fp = typeof fingerprint === 'function' ? fingerprint() : 'unknown_fp';
       await sb.from('login_log').insert({ user_id: user.id, fingerprint: fp });
@@ -320,7 +318,6 @@ async function doLogin(){
   }
 }
 
-// Background vector matrix grid animation logic
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let points = [];
