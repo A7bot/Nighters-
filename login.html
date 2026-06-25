@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login // Nighters Cyber Academy</title>
+<title>Login  Nighters Cyber Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  /* --- PREMIUM DEEP CYAN CYAN/CYBER PALETTE SYSTEM --- */
+  /* --- CUSTOM CYBER ACCENT DESIGN SYSTEM --- */
   :root {
       --bg-deep: #060913;
       --bg-surface: #0d1321;
@@ -19,6 +19,7 @@
       --text-main: #f1f5f9;
       --text-muted: #64748b;
       --text-red: #ef4444;
+      --text-green: #22c55e;
       --font: 'JetBrains Mono', monospace;
   }
 
@@ -36,6 +37,7 @@
       background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
   }
 
+  /* Ambient CRT overlay effect */
   body::before {
       content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
@@ -66,15 +68,15 @@
   }
 
   .portal-header p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 25px; }
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;}
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;}
   
-  .form-control {
+  .field input {
       width: 100%; background: var(--bg-input); border: 1px solid var(--border);
       padding: 14px; color: #fff; font-family: var(--font); font-size: 0.95rem; outline: none;
       border-radius: 8px; transition: all 0.25s ease;
   }
-  .form-control:focus { border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.15); }
+  .field input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(0, 240, 255, 0.15); }
 
   .btn {
       width: 100%; background: transparent; border: 1px solid var(--accent-cyan);
@@ -85,27 +87,18 @@
   .btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 20px rgba(0,240,255,0.35); }
   .btn:disabled { border-color: var(--border); color: var(--text-muted); background: transparent; cursor: not-allowed; }
 
-  .meta-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 18px; text-align: center; }
-  .meta-text a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; }
-  .meta-text a:hover { text-decoration: underline; }
+  .meta-links { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 18px; }
+  .meta-links a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; }
+  .meta-links a:hover { text-decoration: underline; }
 
-  /* --- TOAST SYSTEM INTERFACES --- */
-  #toast-wrap {
-      position: fixed; bottom: 20px; right: 20px; z-index: 10000;
-      display: flex; flex-direction: column; gap: 10px; max-width: 350px; width: calc(100% - 40px);
+  /* --- BACKEND CORE ALERT MODULE DESIGN --- */
+  .alert {
+      padding: 12px; margin-bottom: 20px; border-radius: 6px; font-size: 0.85rem;
+      display: none; border: 1px solid transparent;
   }
-  .toast {
-      background: var(--bg-surface); border: 1px solid var(--border); border-left: 4px solid var(--text-red);
-      color: var(--text-main); padding: 16px; border-radius: 8px; font-size: 0.85rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; transform: translateY(20px); opacity: 0; animation: toastIn 0.3s cubic-bezier(0.1, 1, 0.1, 1) forwards;
-  }
-  .toast.t-ok { border-left-color: var(--accent-cyan); }
-  .toast .tx { cursor: pointer; color: var(--text-muted); font-size: 0.8rem; padding: 2px 6px; }
-  .toast .tx:hover { color: var(--text-main); }
-  @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
-
-  .alert { display: none !important; }
+  .alert.show { display: block; }
+  .alert-err { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--text-red); }
+  .alert-ok { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: var(--text-green); }
 
   .portal-graphic { flex: 1; display: flex; justify-content: center; align-items: center; max-width: 450px; }
   .portal-graphic svg { width: 100%; height: auto; max-height: 380px; }
@@ -121,31 +114,32 @@
 <body>
 
 <canvas id="bg-canvas"></canvas>
-<div id="toast-wrap"></div>
-<div id="la" class="alert"></div>
 
 <div class="portal-container">
   <div class="auth-box">
     <header class="portal-header">
-      <h2>System Login</h2>
-      <p>Nighters Cyber Academy Gateway</p>
+      <h2>Access Terminal</h2>
+      <p>Nighters Cyber Academy</p>
     </header>
 
     <main>
-      <div class="form-group">
-        <label>Username / Email </label>
-        <input type="email" id="email" class="form-control" placeholder="operative@domain.com" autocomplete="off">
+      <div id="la" class="alert"></div>
+
+      <div class="field">
+        <label>Email / Username</label>
+        <input type="email" id="email" placeholder="malik@gmail.com" autocomplete="off">
       </div>
       
-      <div class="form-group">
+      <div class="field">
         <label>Password</label>
-        <input type="password" id="pw" class="form-control" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        <input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       
-      <button class="btn" id="login-btn" onclick="doLogin()">Initialize Link</button>
+      <button class="btn" id="login-btn" onclick="doLogin()">Login</button>
       
-      <div class="meta-text">
-        New User? <a href="register.html">Click Here</a>
+      <div class="meta-links">
+        <span>New User? <a href="register.html">Click Here →</a></span>
+        <a href="reset.html" style="color: var(--text-muted);">Forgot password?</a>
       </div>
     </main>
   </div>
@@ -171,20 +165,14 @@
 </div>
 
 <footer class="portal-footer">
- For Educational Purpose Only!
+For Educational Purpose Only!!!
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// This initializes the Supabase client using the global variables loaded directly from your app.js file
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Bridge old alert logic directly into your new toast component
-function showAlert(id, msg, type) {
-  toast(msg, type);
-}
-
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+(async()=>{try{const{data:{user}}=await sb.auth.getUser();if(user)window.location=ADMIN_EMAILS.includes(user.email)?'admin.html':'dashboard.html';}catch(e){}})();
 async function doLogin(){
   const email=document.getElementById('email').value.trim();
   const pw=document.getElementById('pw').value;
@@ -197,7 +185,7 @@ async function doLogin(){
       let msg=error.message;
       if(msg.includes('Invalid login'))msg='Wrong email or password.';
       if(msg.includes('Email not confirmed'))msg='Please confirm your email first. Or ask admin to disable email confirmation in Supabase.';
-      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Initialize Link';return;
+      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Login';return;
     }
     const user=data.user;
     try{
@@ -208,16 +196,9 @@ async function doLogin(){
       }
     }catch(e){}
     try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}
-    
-    // Welcome Toast Event trigger
-    const username = user.user_metadata?.username || email.split('@')[0];
-    toast(`Welcome back, ${username} // Access Granted`, 'ok');
-    
-    setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',1200);
-  }catch(e){
-    showAlert('la','Handshake connection error.','err');
-    btn.disabled=false;btn.textContent='Initialize Link';
-  }
+    showAlert('la','Access granted.','ok');
+    setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',700);
+  }catch(e){showAlert('la','Connection error. Check Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Login';}
 }
 </script>
 </body>
