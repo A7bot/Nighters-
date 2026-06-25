@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login  Nighters Cyber Academy</title>
+<title>Login Nighters Cyber Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  /* --- CUSTOM CYBER ACCENT DESIGN SYSTEM --- */
+  /* --- PREMIUM DEEP CYAN SYSTEM --- */
   :root {
       --bg-deep: #060913;
       --bg-surface: #0d1321;
@@ -37,7 +37,6 @@
       background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
   }
 
-  /* Ambient CRT overlay effect */
   body::before {
       content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
@@ -91,14 +90,14 @@
   .meta-links a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; }
   .meta-links a:hover { text-decoration: underline; }
 
-  /* --- BACKEND CORE ALERT MODULE DESIGN --- */
+  /* --- ALERT DISPLAY MANAGEMENT --- */
   .alert {
       padding: 12px; margin-bottom: 20px; border-radius: 6px; font-size: 0.85rem;
-      display: none; border: 1px solid transparent;
+      display: none; border: 1px solid transparent; text-align: left; line-height: 1.4;
   }
-  .alert.show { display: block; }
-  .alert-err { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--text-red); }
-  .alert-ok { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: var(--text-green); }
+  /* Style flags connected directly to legacy app utilities */
+  .alert.err { display: block; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25); color: var(--text-red); }
+  .alert.ok { display: block; background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.25); color: var(--text-green); }
 
   .portal-graphic { flex: 1; display: flex; justify-content: center; align-items: center; max-width: 450px; }
   .portal-graphic svg { width: 100%; height: auto; max-height: 380px; }
@@ -118,15 +117,16 @@
 <div class="portal-container">
   <div class="auth-box">
     <header class="portal-header">
-      <h2>Access Terminal</h2>
-      <p>Nighters Cyber Academy</p>
+      <h2>SYSTEM LOGIN</h2>
+      <p>Nighters Cyber Adademy</p>
     </header>
 
     <main>
+      <!-- Target node bound to legacy code alert references -->
       <div id="la" class="alert"></div>
 
       <div class="field">
-        <label>Email / Username</label>
+        <label>username / Email</label>
         <input type="email" id="email" placeholder="malik@gmail.com" autocomplete="off">
       </div>
       
@@ -138,7 +138,7 @@
       <button class="btn" id="login-btn" onclick="doLogin()">Login</button>
       
       <div class="meta-links">
-        <span>New User? <a href="register.html">Click Here →</a></span>
+        <span>No account? <a href="register.html">Enlist →</a></span>
         <a href="reset.html" style="color: var(--text-muted);">Forgot password?</a>
       </div>
     </main>
@@ -165,9 +165,10 @@
 </div>
 
 <footer class="portal-footer">
-For Educational Purpose Only!!!
+  For Educational Purpose Only!
 </footer>
 
+<!-- FIXED LOGICAL SCRIPT DEPENDENCY SEQUENCE FROM YOUR ORIGINAL FILE -->
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
