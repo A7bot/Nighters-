@@ -2,15 +2,269 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dashboard // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden; /* Stops horizontal side-scrolling or layout wobbling on mobile phones */
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.20; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
+  .wrap { 
+      width: 100%;
+      max-width: 1100px; 
+      margin: 120px auto 60px auto; 
+      padding: 0 16px; 
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* --- CARD INTERFACES --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: block; text-decoration: none; color: inherit;
+  }
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-top: 3px solid var(--accent-purple);
+  }
+
+  /* --- USER SPECIFIC PROFILE HEADER ELEMENTS --- */
+  .avatar {
+      width: 56px; height: 56px; border: 2px solid var(--accent-purple); background: var(--bg-input);
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+      font-size: 1.5rem; color: var(--accent-purple); flex-shrink: 0; border-radius: 4px;
+  }
+  .strike-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .sdot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); border: 1px solid transparent; }
+  .sdot.on { background: var(--text-red); box-shadow: 0 0 8px var(--text-red); }
+
+  /* Progress Bar UI */
+  .pbar { background: var(--bg-input); height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .pbar .fill { background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); height: 100%; width: 0%; transition: width 0.4s ease; }
+
+  /* Grid Layouts */
+  .g4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%; }
+  .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; width: 100%; }
+
+  /* --- COUNTER & STATS BLOCKS --- */
+  .stat {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .stat .n { font-size: 1.8rem; font-weight: 700; color: var(--accent-cyan); text-shadow: 0 0 10px rgba(0,240,255,0.2); }
+  .stat .l { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; outline: none;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.1); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.25); }
+  .btn:disabled { border-color: var(--border); color: var(--text-muted); cursor: not-allowed; background: none; box-shadow: none; }
+  .btn-sm { padding: 6px 12px; font-size: 0.72rem; border-radius: 4px; letter-spacing: 0.5px; }
+  .btn-dark { border-color: var(--border); color: var(--text-main); background: rgba(30, 41, 59, 0.2); }
+  .btn-dark:hover { border-color: var(--text-muted); background: rgba(30, 41, 59, 0.5); box-shadow: none; }
+
+  /* --- DYNAMIC LOGS / ANNOUNCEMENTS / CARDS --- */
+  .info-box {
+      background: rgba(3, 5, 10, 0.6); border: 1px solid var(--border); border-radius: 6px;
+      padding: 20px; font-size: 0.8rem; line-height: 1.7; color: var(--text-muted); text-align: center; width: 100%;
+  }
+
+  /* Level Continuum Modules */
+  .lcard {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      display: flex; align-items: center; gap: 20px; cursor: pointer; transition: border-color 0.2s;
+  }
+  .lcard:hover { border-color: var(--accent-cyan); }
+  .lc-num { font-size: 1.8rem; font-weight: 700; color: var(--accent-cyan); background: var(--bg-input); width: 50px; height: 50px; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); flex-shrink: 0; }
+  .lc-inf { flex: 1; min-width: 0; }
+  .lc-title { font-weight: 700; color: #fff; font-size: 0.95rem; margin-bottom: 4px; }
+  .lc-meta { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* CTF Module Layout Targets */
+  .chcard {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px;
+      display: flex; align-items: center; gap: 16px; margin-bottom: 12px; cursor: pointer; transition: border-color 0.2s;
+  }
+  .chcard:hover { border-color: var(--accent-cyan); }
+  .ci { font-size: 1.5rem; flex-shrink: 0; }
+  .cf { flex: 1; min-width: 0; }
+  .ct { font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cm { font-size: 0.72rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp { text-align: right; font-weight: 700; color: var(--accent-cyan); font-size: 0.95rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+  .cp small { font-size: 0.58rem; color: #10b981; letter-spacing: 0.5px; }
+
+  /* --- SYSTEM ALERTS & BADGES --- */
+  .badge { display: inline-block; padding: 4px 8px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; border-radius: 4px; letter-spacing: 0.5px; }
+  .badge.bz { background: rgba(239, 68, 68, 0.15); color: var(--text-red); border: 1px solid var(--text-red); }
+  .badge.bgreen { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+  .badge.bs { background: rgba(157, 78, 221, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+  .badge.bsys { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+
+  .diff { font-weight: bold; text-transform: uppercase; font-size: 0.7rem; padding-right: 4px; }
+  .diff.de { color: #10b981; }
+  .diff.dm { color: #f59e0b; }
+  .diff.dh { color: var(--text-red); }
+
+  /* Structural Utility Modifiers */
+  .mb4 { margin-bottom: 4px; }
+  .mb8 { margin-bottom: 8px; }
+  .mb10 { margin-bottom: 10px; }
+  .mb12 { margin-bottom: 12px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb24 { margin-bottom: 24px; }
+  .mb28 { margin-bottom: 28px; }
+  .mt4 { margin-top: 4px; }
+  .mt8 { margin-top: 8px; }
+  .mt12 { margin-top: 12px; }
+  .mt16 { margin-top: 16px; }
+  .fw { font-weight: 700; }
+  .td { color: var(--text-muted); line-height: 1.6; }
+  .mono { font-family: var(--font); }
+  .tc { text-align: center; }
+  .tr { text-align: right; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  /* --- FOOTER LAYER --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE VIEWPORT TERMINAL MATRIX OVERRIDES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      
+      .wrap { margin-top: 100px; padding-left: 14px; padding-right: 14px; }
+      
+      /* Re-aligning layout metrics grid arrays */
+      .g4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .g3 { grid-template-columns: 1fr; gap: 12px; }
+      
+      .profile-header-layout { flex-direction: column; align-items: flex-start !important; gap: 16px !important; }
+      .profile-header-layout .tr { text-align: left !important; width: 100%; }
+      
+      .lcard { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .lcard .btn { width: 100%; }
+
+      .chcard { padding: 14px; }
+      
+      /* Make general buttons easily accessible on phone screens */
+      .card-red .btn { width: 100%; padding: 14px; }
+  }
+
+  @media (max-width: 480px) {
+      .g4 { grid-template-columns: 1fr; } /* Complete single list stacking on modern phone widths */
+  }
+</style>
 </head>
 <body class="page">
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Top Fixed Systems Bar -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links">
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Operations Link List">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
       <a href="dashboard.html" class="on">Dashboard</a>
       <a href="levels.html">Levels</a>
       <a href="ctf.html">CTF</a>
@@ -19,25 +273,26 @@
       <a href="leaderboard.html">Leaderboard</a>
       <a href="profile.html">Profile</a>
       <a href="help.html">🆘 Help</a>
-      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
+      <a href="#" onclick="doLogout()" style="color:var(--text-muted);">Logout</a>
     </div>
   </div>
 </nav>
 
-<div class="wrap" style="padding-top:28px;padding-bottom:60px;">
+<!-- Workspace Layout Structure -->
+<div class="wrap">
 
-  <!-- PROFILE HEADER -->
-  <div class="card-red mb24" style="padding:22px 26px;">
-    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-      <div style="width:56px;height:56px;border:2px solid var(--red);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--H);font-size:1.5rem;color:var(--red);flex-shrink:0;" id="av">?</div>
+  <!-- TRAINEE PROFILE SUMMARY COMPONENT -->
+  <div class="card-red mb24">
+    <div class="profile-header-layout" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+      <div class="avatar" id="av">?</div>
       <div style="flex:1;min-width:150px;">
-        <div style="font-family:var(--H);font-size:1.15rem;color:var(--txt);" id="p-name">Loading...</div>
+        <div style="font-weight:700;font-size:1.2rem;color:#fff;" id="p-name">Loading...</div>
         <div class="mono td mt4" style="font-size:.7rem;" id="p-email"></div>
         <div class="mt8 strike-row" id="strike-bar"></div>
       </div>
-      <div style="text-align:right;">
+      <div class="tr">
         <span class="badge" id="p-rank">—</span>
-        <div style="font-family:var(--H);font-size:1.5rem;color:var(--red);text-shadow:0 0 16px rgba(225,29,72,.4);margin-top:8px;" id="p-pts">0 PTS</div>
+        <div style="font-weight:700;font-size:1.6rem;color:var(--text-red);text-shadow:0 0 16px rgba(239,68,68,0.4);margin-top:6px;" id="p-pts">0 PTS</div>
         <div class="mono td mt4" style="font-size:.68rem;" id="p-lvl">Level 1</div>
       </div>
     </div>
@@ -45,7 +300,7 @@
     <div class="mono td mt8" style="font-size:.66rem;" id="p-prog"></div>
   </div>
 
-  <!-- STATS -->
+  <!-- OPERATIONAL COUNTER DATA MODULES -->
   <div class="g4 mb28">
     <div class="stat"><span class="n" id="d-lvl">1</span><div class="l">Current Level</div></div>
     <div class="stat"><span class="n" id="d-rank">#—</span><div class="l">Global Rank</div></div>
@@ -53,51 +308,56 @@
     <div class="stat"><span class="n" id="d-att">0</span><div class="l">Days Present</div></div>
   </div>
 
-  <!-- DAILY CHECK-IN -->
+  <!-- DAILY BEACON CHECK-IN BLOCK -->
   <div class="stitle mb16">Daily Check-In</div>
   <div class="card-red mb28" style="text-align:center;padding:28px;">
-    <div style="font-size:2.2rem;margin-bottom:10px;">🛡</div>
-    <div class="mono td mb16" id="ci-date" style="font-size:.74rem;letter-spacing:2px;"></div>
+    <div style="font-size:2.2rem;margin-bottom:12px;">🛡</div>
+    <div class="mono td mb16" id="ci-date" style="font-size:.74rem;letter-spacing:2px;color:var(--accent-cyan);"></div>
     <button class="btn" id="ci-btn" onclick="doCheckIn()">Check In — Earn Points</button>
-    <div class="mono ts mt12" id="ci-done" style="display:none;font-size:.82rem;">✓ Checked in today. Keep the streak going!</div>
+    <div class="mono mt12" id="ci-done" style="display:none;font-size:.82rem;color:#10b981;">✓ Checked in today. Keep the streak going!</div>
   </div>
 
-  <!-- ANNOUNCEMENTS -->
+  <!-- ANNOUNCEMENTS BROADCAST LOG FEED -->
   <div class="stitle mb16">Announcements</div>
   <div id="ann-list" class="mb28"></div>
 
-  <!-- CURRENT LEVEL -->
+  <!-- CURRENT CONTINUUM MODULE POINTER -->
   <div class="stitle mb16">
     Continue Where You Left Off
     <a href="levels.html" class="btn btn-sm btn-dark" style="margin-left:auto;">All Levels →</a>
   </div>
   <div id="current-level-box" class="mb28"></div>
 
-  <!-- UPCOMING CTF -->
+  <!-- ACTIVE CHALLENGE VECTORS POINTER -->
   <div class="stitle mb16">
     Weekly CTF — Every Sunday
     <a href="ctf.html" class="btn btn-sm btn-dark" style="margin-left:auto;">View CTF →</a>
   </div>
   <div id="ctf-box" class="mb28"></div>
 
-  <!-- QUICK LINKS -->
+  <!-- ACADEMY CONSOLE QUICK LINKS GRID -->
   <div class="g3 mb16">
-    <a href="leaderboard.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
-      <div style="font-size:1.7rem;margin-bottom:8px;">🏆</div>
-      <div class="tr mono" style="font-size:.74rem;letter-spacing:1px;">LEADERBOARD</div>
+    <a href="leaderboard.html" class="card">
+      <div style="font-size:1.7rem;margin-bottom:8px; text-align:center;">🏆</div>
+      <div class="mono tc" style="font-size:.74rem;letter-spacing:1px;color:var(--accent-cyan);">LEADERBOARD</div>
     </a>
-    <a href="exams.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
-      <div style="font-size:1.7rem;margin-bottom:8px;">📝</div>
-      <div class="tr mono" style="font-size:.74px;letter-spacing:1px;">EXAMS</div>
+    <a href="exams.html" class="card">
+      <div style="font-size:1.7rem;margin-bottom:8px; text-align:center;">📝</div>
+      <div class="mono tc" style="font-size:.74rem;letter-spacing:1px;color:var(--accent-cyan);">EXAMS</div>
     </a>
-    <a href="resources.html" class="card" style="text-decoration:none;text-align:center;padding:20px;">
-      <div style="font-size:1.7rem;margin-bottom:8px;">📚</div>
-      <div class="tr mono" style="font-size:.74rem;letter-spacing:1px;">RESOURCES</div>
+    <a href="resources.html" class="card">
+      <div style="font-size:1.7rem;margin-bottom:8px; text-align:center;">📚</div>
+      <div class="mono tc" style="font-size:.74rem;letter-spacing:1px;color:var(--accent-cyan);">RESOURCES</div>
     </a>
   </div>
 </div>
 
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+<!-- Bottom Structural Anchor Bar -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend — Secure Student Layer
+</footer>
+
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -110,6 +370,8 @@ async function init(){
   if(!p){window.location='login.html';return;}
   prof=p;
 
+  setupMobileMenu();
+
   document.getElementById('av').textContent=prof.username[0].toUpperCase();
   document.getElementById('p-name').textContent=prof.username;
   document.getElementById('p-email').textContent=me.email;
@@ -121,26 +383,42 @@ async function init(){
 
   const rank=getRank(prof.points||0);
   const rb=document.getElementById('p-rank');
-  rb.textContent=rank.name;rb.className='badge '+rank.cls;
+  if (rb) { rb.textContent=rank.name;rb.className='badge '+rank.cls; }
+  
   const prog=getRankProgress(prof.points||0);
-  document.getElementById('p-bar').style.width=prog.pct+'%';
-  document.getElementById('p-prog').textContent=prog.label;
+  const pBar = document.getElementById('p-bar');
+  if (pBar) pBar.style.width=prog.pct+'%';
+  const pProg = document.getElementById('p-prog');
+  if (pProg) pProg.textContent=prog.label;
 
   // strikes
   const sb2=document.getElementById('strike-bar');
-  for(let i=0;i<3;i++){const d=document.createElement('div');d.className='sdot'+(i<(prof.strikes||0)?' on':'');sb2.appendChild(d);}
-  if(prof.strikes>0){const sp=document.createElement('span');sp.className='mono tr';sp.style.fontSize='.7rem';sp.textContent=' '+(prof.strikes)+'/3 Strikes';sb2.appendChild(sp);}
+  if (sb2) {
+    sb2.innerHTML = '';
+    for(let i=0;i<3;i++){const d=document.createElement('div');d.className='sdot'+(i<(prof.strikes||0)?' on':'');sb2.appendChild(d);}
+    if(prof.strikes>0){const sp=document.createElement('span');sp.className='mono';sp.style.fontSize='.7rem';sp.style.marginLeft='6px';sp.textContent=' '+(prof.strikes)+'/3 Strikes';sb2.appendChild(sp);}
+  }
 
-  // global rank
+  // global rank calculation
   try{const{count}=await sb.from('profiles').select('*',{count:'exact',head:true}).gt('points',prof.points||0);document.getElementById('d-rank').textContent='#'+((count||0)+1);}catch(e){}
 
-  // check-in
+  // check-in verification block
   document.getElementById('ci-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
   try{const{data:ci}=await sb.from('attendance').select('id').eq('user_id',me.id).eq('date',today()).maybeSingle();if(ci){document.getElementById('ci-btn').style.display='none';document.getElementById('ci-done').style.display='block';}}catch(e){}
 
   loadAnnouncements();
   loadCurrentLevel();
   loadCTF();
+}
+
+function setupMobileMenu(){
+  const menuToggle = document.getElementById('menu-toggle');
+  const navMenu = document.getElementById('nav-menu');
+  if(menuToggle && navMenu){
+      menuToggle.addEventListener('click', () => {
+          navMenu.classList.toggle('active');
+      });
+  }
 }
 
 async function doCheckIn(){
@@ -152,55 +430,92 @@ async function doCheckIn(){
     await sb.from('profiles').update({points:(prof.points||0)+pts,attendance_days:(prof.attendance_days||0)+1,streak:(prof.streak||0)+1}).eq('id',me.id);
     btn.style.display='none';document.getElementById('ci-done').style.display='block';
     toast('✓ Checked in! +'+pts+' pts'+(late?' (late)':''),'ok');
-  }catch(e){toast('Error. Try again.','');btn.disabled=false;}
+    
+    // Refresh header data nodes smoothly
+    prof.points = (prof.points||0) + pts;
+    prof.attendance_days = (prof.attendance_days||0) + 1;
+    prof.streak = (prof.streak||0) + 1;
+    document.getElementById('p-pts').textContent=prof.points+' PTS';
+    document.getElementById('d-streak').textContent=prof.streak;
+    document.getElementById('d-att').textContent=prof.attendance_days;
+    const prog=getRankProgress(prof.points);
+    if(document.getElementById('p-bar')) document.getElementById('p-bar').style.width=prog.pct+'%';
+  }catch(e){toast('Error mapping matrix link. Try again.','');btn.disabled=false;}
 }
 
 async function loadAnnouncements(){
   const box=document.getElementById('ann-list');
   try{
     const{data}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(3);
-    if(!data||!data.length){box.innerHTML='<div class="info-box">No announcements yet.</div>';return;}
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No network system broadcasts compiled yet.</div>';return;}
     box.innerHTML=data.map(a=>`
       <div class="card mb10" style="padding:14px 18px;">
         <div class="flex-between mb8">
-          <div class="fw" style="color:${a.urgent?'var(--red)':'var(--txt)'};font-size:.9rem;">${a.urgent?'🚨 ':''}${esc(a.title)}</div>
+          <div class="fw" style="color:${a.urgent?'var(--text-red)':'var(--text-main)'};font-size:.9rem;">${a.urgent?'🚨 ':''}${esc(a.title)}</div>
           <div class="mono td" style="font-size:.65rem;">${fmtDate(a.created_at)}</div>
         </div>
-        <div class="td fs">${esc(a.body||'')}</div>
+        <div class="td" style="font-size:0.8rem; word-break:break-word;">${esc(a.body||'')}</div>
       </div>`).join('');
-  }catch(e){box.innerHTML='<div class="info-box">Could not load announcements.</div>';}
+  }catch(e){box.innerHTML='<div class="info-box">Could not establish clean readout line with announcements.</div>';}
 }
 
 async function loadCurrentLevel(){
   const box=document.getElementById('current-level-box');
   const lvl=prof.current_level||1;
   box.innerHTML=`
-    <div class="lcard active" onclick="location.href='levels.html'">
+    <div class="lcard" onclick="location.href='levels.html'">
       <div class="lc-num">${lvl}</div>
       <div class="lc-inf">
-        <div class="lc-title">Level ${lvl} — Continue Training</div>
-        <div class="lc-meta mono">Click to view all levels and continue where you left off</div>
+        <div class="lc-title">Level ${lvl} — Continue Sector Map Training</div>
+        <div class="lc-meta mono">Initialize module block array and parse training steps.</div>
       </div>
-      <a href="levels.html" class="btn btn-sm" onclick="event.stopPropagation()">Open →</a>
+      <a href="levels.html" class="btn btn-sm" onclick="event.stopPropagation()">Open Matrix →</a>
     </div>`;
 }
 
 async function loadCTF(){
   const box=document.getElementById('ctf-box');
-  try{
-    const now=new Date().toISOString();
+  try {
     const{data}=await sb.from('ctf_public').select('*').eq('active',true).order('created_at',{ascending:false}).limit(3);
-    if(!data||!data.length){box.innerHTML='<div class="info-box">No CTF challenges this week yet. Check back on Sunday.</div>';return;}
+    if(!data||!data.length){box.innerHTML='<div class="info-box">No CTF target matrices active. Next drop on Sunday.</div>';return;}
     box.innerHTML=data.map(c=>`
       <div class="chcard mb10" onclick="location.href='ctf.html'">
         <div class="ci">${esc(c.icon)}</div>
-        <div class="cf"><div class="ct">${esc(c.title)}</div><div class="cm"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.solver_count||0} solvers</div></div>
-        <div class="cp">${c.points} PTS<small>OPEN</small></div>
+        <div class="cf">
+          <div class="ct">${esc(c.title)}</div>
+          <div class="cm"><span class="diff d${c.difficulty[0]}">${c.difficulty}</span> ${esc(c.category)} · ${c.solver_count||0} solvers</div>
+        </div>
+        <div class="cp">${c.points} PTS<small>ONLINE</small></div>
       </div>`).join('');
-  }catch(e){box.innerHTML='<div class="info-box">Could not load CTF challenges.</div>';}
+  }catch(e){box.innerHTML='<div class="info-box">Could not query active live challenge arrays.</div>';}
 }
 
 async function doLogout(){await sb.auth.signOut();window.location='index.html';}
+
+// Background Connected Graph Core Physics Particle Engine
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(35, window.innerWidth / 40);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+
 init();
 </script>
 </body>
