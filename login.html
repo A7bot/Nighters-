@@ -4,353 +4,284 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Login // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  /* Base structural corrections for total cross-device compatibility */
-  body.matrix-portal {
-    background-color: #050a05 !important;
-    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0));
-    background-size: 100% 4px, 6px 100%;
-    font-family: 'JetBrains Mono', monospace !important;
-    color: #39ff14 !important;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
-    overflow-x: hidden; /* Prevents mobile side-scrolling completely */
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --font: 'JetBrains Mono', monospace;
   }
 
-  *, *:before, *:after {
-    box-sizing: inherit;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
   }
 
-  /* Robust container wrapping everything seamlessly on desktop & mobile */
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.3;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.12; pointer-events: none;
+  }
+
   .portal-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-    flex-grow: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 50px;
+      position: relative;
+      z-index: 10;
+      flex-grow: 1;
   }
 
-  .portal-form-wrapper {
-    width: 100%;
-    max-width: 480px; /* Restricts width on desktop to look tight, fills screen on mobile */
-    padding: 10px;
+  .auth-box {
+      width: 100%; max-width: 440px; background: var(--bg-surface);
+      border: 1px solid var(--border); border-top: 4px solid var(--accent-cyan);
+      padding: 35px; border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.05);
   }
 
-  /* Responsive typography scaling */
-  .portal-header {
-    margin-bottom: 30px;
+  .portal-header h2 {
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      margin-bottom: 6px;
   }
 
-  .portal-title {
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    font-weight: 700;
-    color: #39ff14;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.2;
+  .portal-header p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 25px;
   }
 
-  .portal-subtitle {
-    font-size: clamp(0.75rem, 2vw, 0.95rem);
-    color: #20c20e;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    opacity: 0.8;
-    margin-top: 4px;
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;}
+  
+  .form-control {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+      padding: 14px; color: #fff; font-family: var(--font); font-size: 0.95rem; outline: none;
+      border-radius: 8px;
+      transition: all 0.25s ease;
+  }
+  .form-control:focus { 
+      border-color: var(--accent-cyan); 
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
   }
 
-  .portal-form-title {
-    font-size: clamp(1.2rem, 3vw, 1.6rem);
-    color: #39ff14;
-    font-weight: 700;
-    margin-bottom: 20px;
-    text-transform: uppercase;
+  .btn {
+      width: 100%; background: transparent; border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan); padding: 14px; font-family: var(--font);
+      font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+  }
+  .btn:hover { 
+      background: var(--accent-cyan); color: #000; 
+      box-shadow: 0 0 20px rgba(0,240,255,0.35); 
+  }
+  .btn:disabled {
+      border-color: var(--border);
+      color: var(--text-muted);
+      background: transparent;
+      cursor: not-allowed;
   }
 
-  /* Form Elements layout */
-  .matrix-field {
-    margin-bottom: 20px;
-  }
+  .meta-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 18px; text-align: center; }
+  .meta-text a { color: var(--accent-cyan); text-decoration: none; cursor: pointer; }
+  .meta-text a:hover { text-decoration: underline; }
 
-  .matrix-field label {
-    display: block;
-    color: #39ff14 !important;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    margin-bottom: 6px;
+  /* --- TOAST NOTIFICATIONS --- */
+  .toast-container {
+      position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+      display: flex; flex-direction: column; gap: 10px; max-width: 350px; width: calc(100% - 40px);
   }
-
-  .matrix-field input {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7) !important;
-    color: #39ff14 !important;
-    border: 2px solid #20c20e !important;
-    border-radius: 6px !important;
-    padding: 12px 14px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1rem;
-    outline: none;
-    box-shadow: 0 0 8px rgba(57, 255, 20, 0.15);
-    -webkit-appearance: none; /* Disables standard iOS rendering styles */
+  .toast {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-main); padding: 16px; border-radius: 8px; font-size: 0.85rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center;
+      gap: 12px; transform: translateY(20px); opacity: 0; animation: toastIn 0.3s cubic-bezier(0.1, 1, 0.1, 1) forwards;
   }
+  .toast.err { border-left: 4px solid var(--text-red); }
+  .toast.ok { border-left: 4px solid var(--accent-cyan); }
+  @keyframes toastIn { to { transform: translateY(0); opacity: 1; } }
 
-  .matrix-field input:focus {
-    border-color: #39ff14 !important;
-    box-shadow: 0 0 12px rgba(57, 255, 20, 0.4) !important;
-  }
-
-  .matrix-field input::placeholder {
-    color: rgba(57, 255, 20, 0.3) !important;
-  }
-
-  /* Solid responsive button adjustments */
-  .matrix-btn {
-    width: 100%;
-    background: #39ff14 !important;
-    color: #000000 !important;
-    border: none !important;
-    border-radius: 6px !important;
-    padding: 14px 20px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
-    transition: background 0.2s ease;
-  }
-
-  .matrix-btn:hover {
-    background: #20c20e !important;
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.7);
-  }
-
-  .matrix-btn:disabled {
-    background: #124d07 !important;
-    color: #555 !important;
-    box-shadow: none;
-  }
-
-  /* Decorative Graphic Component styling */
   .portal-graphic {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 500px;
+      flex: 1; display: flex; justify-content: center; align-items: center; max-width: 450px;
   }
-
-  .portal-graphic svg {
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-  }
+  .portal-graphic svg { width: 100%; height: auto; max-height: 380px; }
 
   .portal-footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.7rem;
-    color: rgba(57, 255, 20, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+      text-align: center; padding: 20px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; z-index: 10;
   }
 
-  .matrix-links {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    gap: 10px;
-    flex-wrap: wrap; /* Wraps links on tiny screens to avoid breaking out */
-  }
-
-  .matrix-links a {
-    color: #20c20e !important;
-    text-decoration: none;
-    font-size: 0.75rem;
-  }
-  
-  .matrix-links a:hover {
-    color: #39ff14 !important;
-    text-decoration: underline;
-  }
-  
-  .matrix-alert {
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 16px;
-    font-size: 0.85rem;
-    display: none;
-  }
-  .matrix-alert.err {
-    display: block;
-    background: rgba(220, 38, 38, 0.2);
-    border: 1px solid #dc2626;
-    color: #fca5a5;
-  }
-  .matrix-alert.ok {
-    display: block;
-    background: rgba(34, 197, 94, 0.2);
-    border: 1px solid #22c55e;
-    color: #bbf7d0;
-  }
-
-  /* Hard Breakpoint fixes targeting all smartphone devices */
   @media (max-width: 820px) {
-    .portal-container {
-      flex-direction: column;
-      padding: 30px 16px;
-    }
-    .portal-graphic {
-      display: none !important; /* Hides heavy decorative elements for performance & layout fit */
-    }
-    .portal-form-wrapper {
-      max-width: 100%;
-    }
+      .portal-container { flex-direction: column; padding: 40px 20px; }
+      .portal-graphic { display: none !important; }
+      .auth-box { max-width: 100%; }
   }
 </style>
 </head>
-<body class="matrix-portal">
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="toast-wrapper" class="toast-container"></div>
 
 <div class="portal-container">
-  <!-- Interactive Credentials Section -->
-  <div class="portal-form-wrapper">
+  <div class="auth-box">
     <header class="portal-header">
-      <div class="portal-title">Nighters Cyber Academy</div>
-      <div class="portal-subtitle">Offensive Security Pathway</div>
+      <h2>System Login</h2>
+      <p>Nighters Cyber Academy Gateway</p>
     </header>
 
     <main>
-      <div class="portal-form-title">Secure Access Portal</div>
-      
-      <div id="la" class="matrix-alert"></div>
-      
-      <div class="matrix-field">
-        <label for="email">Username</label>
-        <input type="email" id="email" placeholder="USERNAME" autocomplete="off">
+      <div class="form-group">
+        <label for="email">Cadet Email / Handle</label>
+        <input type="email" id="email" class="form-control" placeholder="operator_x" autocomplete="off" spellcheck="false">
       </div>
       
-      <div class="matrix-field">
-        <label for="pw">Password</label>
-        <input type="password" id="pw" placeholder="****************" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="form-group">
+        <label for="pw">Passphrase</label>
+        <input type="password" id="pw" class="form-control" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       
-      <button class="matrix-btn" id="login-btn" onclick="doLogin()">Initiate Session</button>
+      <button class="btn" id="login-btn" onclick="doLogin()">Initialize Link</button>
       
-      <div class="matrix-links">
-        <a href="register.html">Register New Operative →</a>
-        <a href="reset.html">Forgot Password?</a>
+      <div class="meta-text">
+        New Operative? <a href="register.html">Enlist Here</a>
+      </div>
+      <div class="meta-text" style="margin-top: 6px;">
+        <a href="reset.html" style="color: var(--text-muted);">Forgot Passphrase?</a>
       </div>
     </main>
   </div>
 
-  <!-- Vector Map Grid Graphic Component -->
   <div class="portal-graphic">
-    <svg viewBox="0 0 100 100" style="stroke: #20c20e; stroke-width: 0.3; fill: none;">
+    <svg viewBox="0 0 100 100" style="stroke: var(--border); stroke-width: 0.4; fill: none;">
       <line x1="10" y1="30" x2="30" y2="10" opacity="0.3"/>
       <line x1="30" y1="10" x2="60" y2="15" />
-      <line x1="60" y1="15" x2="80" y2="35" stroke-width="0.6" style="stroke: #39ff14;" />
+      <line x1="60" y1="15" x2="80" y2="35" stroke-width="0.6" style="stroke: var(--accent-cyan);" />
       <line x1="80" y1="35" x2="90" y2="65" />
       <line x1="90" y1="65" x2="70" y2="85" />
       <line x1="70" y1="85" x2="40" y2="80" />
-      <line x1="40" y1="80" x2="15" y2="55" opacity="0.4"/>
       <line x1="15" y1="55" x2="10" y2="30" />
       <line x1="30" y1="10" x2="50" y2="45" opacity="0.5"/>
       <line x1="60" y1="15" x2="50" y2="45" />
       <line x1="80" y1="35" x2="50" y2="45" stroke-width="0.5" />
-      <line x1="90" y1="65" x2="75" y2="55" />
       <line x1="75" y1="55" x2="50" y2="45" />
-      <line x1="70" y1="85" x2="50" y2="45" />
-      <line x1="60" y1="15" x2="75" y2="55" />
-      <line x1="80" y1="35" x2="90" y2="65" />
       
-      <circle cx="30" cy="10" r="1.5" fill="#20c20e" />
-      <circle cx="60" cy="15" r="2.5" fill="#39ff14" style="filter: drop-shadow(0 0 3px #39ff14);" />
-      <circle cx="80" cy="35" r="2" fill="#20c20e" />
-      <circle cx="90" cy="65" r="3" fill="#39ff14" style="filter: drop-shadow(0 0 4px #39ff14);" />
-      <circle cx="70" cy="85" r="2" fill="#20c20e" />
-      <circle cx="40" cy="80" r="1.5" fill="#124d07" />
-      <circle cx="15" cy="55" r="1.5" fill="#20c20e" />
-      <circle cx="10" cy="30" r="2" fill="#124d07" />
-      <circle cx="75" cy="55" r="2" fill="#39ff14" />
-      
-      <g transform="translate(42, 38) scale(0.25)" stroke="#39ff14" stroke-width="1.2" fill="none">
-        <path d="M10,20 Q10,5 30,5 Q50,5 50,20 Q50,40 30,50 Q10,40 10,20 Z" />
-        <path d="M18,18 Q23,13 26,18 Q23,20 18,18 Z" fill="#39ff14" />
-        <path d="M42,18 Q37,13 34,18 Q37,20 42,18 Z" fill="#39ff14" />
-        <path d="M20,32 Q30,42 40,32" />
-        <path d="M16,30 Q22,32 30,28 Q38,32 44,30" />
-        <line x1="30" y1="42" x2="30" y2="48" />
-      </g>
-      
-      <g transform="translate(45, 58) scale(0.18)" stroke="#20c20e" stroke-width="1.5">
-        <line x1="5" y1="5" x2="35" y2="35" />
-        <line x1="5" y1="35" x2="35" y2="5" />
-        <line x1="5" y1="35" x2="9" y2="31" stroke-width="3" />
-        <line x1="35" y1="35" x2="31" y2="31" stroke-width="3" />
-      </g>
+      <circle cx="60" cy="15" r="2.5" fill="var(--accent-cyan)" />
+      <circle cx="90" cy="65" r="3" fill="var(--accent-cyan)" />
+      <circle cx="75" cy="55" r="2" fill="var(--accent-cyan)" />
     </svg>
   </div>
 </div>
 
 <footer class="portal-footer">
-  For Educational Purpose Only.
+  Authorized Personnel Only // Cryptographic Link Active
 </footer>
 
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-(async()=>{try{const{data:{user}}=await sb.auth.getUser();if(user)window.location=ADMIN_EMAILS.includes(user.email)?'admin.html':'dashboard.html';}catch(e){}})();[cite: 2]
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function showAlert(id, msg, type) {
-  const alertEl = document.getElementById(id);
-  alertEl.className = 'matrix-alert ' + type;
-  alertEl.textContent = msg;
+function showToast(msg, type) {
+  const wrapper = document.getElementById('toast-wrapper');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${msg}</span>`;
+  wrapper.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 4000);
 }
 
 async function doLogin(){
-  const email=document.getElementById('email').value.trim();[cite: 2]
-  const pw=document.getElementById('pw').value;[cite: 2]
-  const btn=document.getElementById('login-btn');[cite: 2]
-  if(!email||!pw)return showAlert('la','Email and password required.','err');[cite: 2]
-  btn.disabled=true;btn.textContent='Authenticating...';[cite: 2]
-  try{
-    const{data,error}=await sb.auth.signInWithPassword({email,password:pw});[cite: 2]
-    if(error){
-      let msg=error.message;[cite: 2]
-      if(msg.includes('Invalid login'))msg='Wrong email or password.';[cite: 2]
-      if(msg.includes('Email not confirmed'))msg='Please confirm your email first. Or ask admin to disable email confirmation in Supabase.';[cite: 2]
-      showAlert('la',msg,'err');btn.disabled=false;btn.textContent='Initiate Session';return;
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('pw').value;
+  const btn = document.getElementById('login-btn');
+  
+  if(!email || !pw) return showToast('Email and password required.', 'err');
+  
+  btn.disabled = true; btn.textContent = 'Authenticating...';
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if(error) {
+      let msg = error.message;
+      if(msg.includes('Invalid login')) msg = 'Wrong email or password.';
+      showToast(msg, 'err'); btn.disabled = false; btn.textContent = 'Initialize Link'; return;
     }
-    const user=data.user;[cite: 2]
-    try{
-      const{data:prof}=await sb.from('profiles').select('id').eq('id',user.id).maybeSingle();
-      if(!prof){
-        const uname=user.user_metadata?.username||email.split('@')[0];[cite: 2]
-        await sb.from('profiles').insert({id:user.id,username:uname,email,points:0,current_level:1,phase:1,strikes:0,completed_challenges:0,attendance_days:0,streak:0});[cite: 2]
-      }
-    }catch(e){}
-    try{await sb.from('login_log').insert({user_id:user.id,fingerprint:fingerprint()});}catch(e){}
-    showAlert('la','Access granted.','ok');[cite: 2]
-    setTimeout(()=>window.location=ADMIN_EMAILS.includes(email)?'admin.html':'dashboard.html',700);
-  }catch(e){showAlert('la','Connection error. Check Supabase URL in app.js','err');btn.disabled=false;btn.textContent='Initiate Session';}[cite: 2]
+    
+    const user = data.user;
+    const username = user.user_metadata?.username || email.split('@')[0];
+    
+    // Real life UX Toast notification trigger requested
+    showToast(`Welcome back, ${username} // Access Granted`, 'ok');
+    
+    setTimeout(() => {
+      window.location = ADMIN_EMAILS.includes(email) ? 'admin.html' : 'dashboard.html';
+    }, 1200);
+  } catch(e) {
+    showToast('Connection error. Check platform infrastructure.', 'err');
+    btn.disabled = false; btn.textContent = 'Initialize Link';
+  }
 }
+
+// Background vector generation logic
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(40, window.innerWidth / 30);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 150) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
 </script>
 </body>
 </html>
