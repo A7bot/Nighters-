@@ -2,83 +2,287 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Setup Guide // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --gold: #f59e0b;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.20; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  .nav-links a.danger:hover { color: var(--text-red); text-shadow: 0 0 8px rgba(239,68,68,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
+  .wrap-md { 
+      width: 100%;
+      max-width: 860px; 
+      margin: 120px auto 60px auto; 
+      padding: 0 16px; 
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* --- CARD INTERFACES ARCHITECTURE --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25); position: relative; overflow: hidden;
+  }
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-top: 3px solid var(--text-red);
+      border-radius: 8px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  }
+  .card-hd { font-size: 1rem; color: #fff; font-weight: bold; margin-bottom: 18px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* Grid Frameworks */
+  .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+  /* Form Fields & Info Modules */
+  .info-box { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 6px; padding: 16px; font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); }
+  .info-box.warn { border-color: var(--text-red); color: var(--text-red); background: rgba(239, 68, 68, 0.02); }
+
+  /* Tactical Code Blocks Display */
+  .tdemo { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 16px; }
+  .tdemo-bar { background: #0b111e; padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .tdots { display: flex; gap: 6px; }
+  .tdots i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+  .tdots .d1 { background: var(--text-red); }
+  .tdots .d2 { background: var(--gold); }
+  .tdots .d3 { background: #10b981; }
+  .tlabel { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .tdemo-body { padding: 16px; font-size: 0.82rem; line-height: 1.6; }
+  
+  /* Prompt Outputs Typographies */
+  .tc { color: var(--text-muted); font-style: italic; margin-bottom: 4px; }
+  .cmd { color: var(--accent-cyan); font-weight: bold; margin-bottom: 6px; display: block; }
+  .cmd::before { content: "$ "; color: var(--text-muted); }
+  .ok { color: #10b981; margin-bottom: 12px; }
+  .out { color: var(--text-main); opacity: 0.85; margin-bottom: 12px; }
+  .er { color: var(--text-red); margin-bottom: 12px; }
+  .p { color: #fff; font-weight: bold; margin-bottom: 8px; }
+
+  /* Sub-term layout panels inside grid paths */
+  .card .term { background: var(--bg-input); padding: 14px; border-radius: 6px; border: 1px solid var(--border); margin-top: 10px; }
+
+  /* --- DATA TABLES ARRAYS --- */
+  .dtable { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
+  .dtable th { padding: 12px 16px; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); background: rgba(0, 240, 255, 0.02); }
+  .dtable td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); line-height: 1.5; }
+  .dtable tr:hover td { background: rgba(255,255,255,0.01); }
+  .dtable td:first-child { color: var(--gold); font-weight: bold; width: 40%; }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; outline: none;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.05); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.25); }
+  .btn.btn-lg { padding: 16px 36px; border-color: #10b981; color: #10b981; font-size: 0.95rem; }
+  .btn.btn-lg:hover { background: rgba(16, 185, 129, 0.05); box-shadow: 0 0 25px rgba(16, 185, 129, 0.3); color: #fff; }
+
+  /* Utilities */
+  .mb8 { margin-bottom: 8px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb24 { margin-bottom: 24px; }
+  .mb32 { margin-bottom: 32px; }
+  .mt16 { margin-top: 16px; }
+  .td { color: var(--text-muted); }
+  .ts { color: #10b981 !important; }
+  .tr { color: var(--text-red) !important; }
+  .fs { font-size: 0.85rem; line-height: 1.6; }
+  .tc-center { text-align: center; }
+
+  /* --- FOOTER LAYER --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE VIEWPORT OPERATIONAL ADAPTATION MEDIA QUERIES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      
+      .wrap-md { margin-top: 100px; padding-left: 14px; padding-right: 14px; }
+      .g2 { grid-template-columns: 1fr; }
+      .dtable th { font-size: 0.65rem; padding: 10px; }
+      .dtable td { padding: 10px; font-size: 0.76rem; }
+      .dtable td:first-child { width: 45%; }
+  }
+</style>
 </head>
 <body class="page">
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Top Fixed System Navigation Architecture -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links">
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Navigation Options Menu Menu Grid">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
       <a href="index.html">Home</a>
       <a href="setup.html" class="on">Setup Guide</a>
       <a href="login.html">Login</a>
     </div>
   </div>
 </nav>
-<div class="wrap-md" style="padding-top:40px;padding-bottom:60px;">
-  <div class="stitle mb8">Setup Guide</div>
-  <p class="td fs mb32">Follow these steps before starting Level 1. This is the most important thing you will do. A bad setup breaks everything after it.</p>
+
+<!-- Main Interface Shell Container -->
+<div class="wrap-md">
+  <div class="stitle mb8">System Provisioning</div>
+  <p class="td fs mb32">Follow these deployment blueprints carefully before initializing Level 1 parameters. This configuration forms your environment infrastructure; a broken workspace layout will invalidate future laboratory exploits.</p>
 
   <!-- STEP 1 -->
   <div class="card-red mb16">
     <div class="card-hd">Step 1 — Install Termux from F-Droid</div>
-    <div class="info-box warn mb16">⚠ Do NOT use Termux from Play Store. It is old and broken. Use F-Droid only.</div>
-    <ol style="color:var(--dim);font-size:.9rem;line-height:2.2;padding-left:20px;">
-      <li>Open your phone browser</li>
-      <li>Go to <strong style="color:var(--red);">f-droid.org</strong></li>
-      <li>Download the F-Droid app and install it</li>
-      <li>Open F-Droid → search <strong style="color:var(--txt);">Termux</strong></li>
-      <li>Install Termux from F-Droid</li>
-      <li>Open Termux → tap Allow when it asks for storage</li>
+    <div class="info-box warn mb16">⚠ Operational Alert: Do NOT provision Termux packages from the Google Play Store. Those releases are obsolete and deprecate package path updates. Utilize F-Droid binaries exclusively.</div>
+    <ol style="color:var(--text-main); opacity: 0.85; font-size:.84rem; line-height:2.2; padding-left:20px; font-family: var(--font);">
+      <li>Open your native architecture mobile browser module.</li>
+      <li>Route path destination directly to: <strong style="color:var(--accent-cyan);">f-droid.org</strong></li>
+      <li>Download the core F-Droid package client manager and install.</li>
+      <li>Open F-Droid app workspace → execute lookup query: <strong>Termux</strong></li>
+      <li>Locate and pull the system emulator component build.</li>
+      <li>Initialize Termux execution interface → approve requested disk storage allocation flags.</li>
     </ol>
     <div class="tdemo mt16">
       <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Termux — First commands</div></div>
       <div class="tdemo-body">
-        <div class="tc"># First thing after opening Termux</div>
+        <div class="tc"># Synchronize package repositories & patch active distribution structures</div>
         <div class="cmd">pkg update && pkg upgrade -y</div>
-        <div class="ok">All packages are up to date.</div>
+        <div class="ok">All binary repositories mirrors are verified up to date.</div>
       </div>
     </div>
-    <div class="info-box mt16"><strong>If pkg update fails:</strong> Make sure WiFi or mobile data is ON. Try again. If still failing, run: <code style="color:var(--red);">termux-setup-storage</code> first.</div>
+    <div class="info-box mt16"><strong>Fault Interception Matrix:</strong> If 'pkg update' times out or drops paths, verify network configuration flags are active. If dependencies refuse lookup allocations, execute terminal command: <code style="color:var(--text-red);">termux-setup-storage</code> first to clear storage hook hooks.</div>
   </div>
 
   <!-- STEP 2 -->
   <div class="card-red mb16">
     <div class="card-hd">Step 2 — Install Debian Inside Termux</div>
-    <p class="td fs mb16">Debian is a full Linux system. We run it inside Termux using proot-distro. This gives us access to all the security tools we need.</p>
+    <p class="td fs mb16">Debian provisions a clean GNU/Linux execution container framework. We execute this sandbox sub-environment inside Termux utilizing the proot-distro manager to bridge underlying core architecture dependencies for penetration tools.</p>
     <div class="tdemo">
       <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Installing Debian</div></div>
       <div class="tdemo-body">
-        <div class="tc"># Install proot-distro (the tool that manages Linux systems)</div>
+        <div class="tc"># Download and register proot-distro virtualization component layers</div>
         <div class="cmd">pkg install proot-distro -y</div>
-        <div class="ok">Installed proot-distro.</div>
-        <div class="tc"># Install Debian (takes 5–10 minutes first time)</div>
+        <div class="ok">Installed utility proot-distro successfully.</div>
+        <div class="tc"># Pull and unpack Debian rootfs matrix layers (estimated time: 5-10 minutes)</div>
         <div class="cmd">proot-distro install debian</div>
-        <div class="out">Downloading Debian rootfs...<br>Extracting... this takes a while<br>Installation complete.</div>
-        <div class="tc"># Login to Debian</div>
+        <div class="out">Downloading Debian rootfs repository targets...<br>Extracting container components into local disk layout...<br>Installation manifest compiled successfully.</div>
+        <div class="tc"># Instantiate isolated authentication access to virtual machine environment</div>
         <div class="cmd">proot-distro login debian</div>
         <div class="p">root@localhost:~#</div>
-        <div class="tc"># You are now inside Debian. Update it.</div>
+        <div class="tc"># Execute verification sequence update parameters from inside Debian framework</div>
         <div class="cmd">apt update && apt upgrade -y</div>
-        <div class="ok">All packages upgraded.</div>
+        <div class="ok">All container software packages compiled and upgraded safely.</div>
       </div>
     </div>
-    <div class="info-box mt16"><strong>If download stops halfway:</strong> Run the same command again. It will continue from where it stopped.</div>
+    <div class="info-box mt16"><strong>Execution Trace Interruption:</strong> If remote downloads disconnect during runtime, re-run the allocation command string. The toolset automatically resumes validation arrays from cached storage chunks.</div>
   </div>
 
   <!-- STEP 3 -->
   <div class="card-red mb16">
     <div class="card-hd">Step 3 — Install All Tools for Month 1</div>
-    <div class="info-box warn mb16">⚠ Only install what is listed here. Do NOT install Metasploit or PostgreSQL — they are too heavy for phone and you do not need them in Month 1.</div>
+    <div class="info-box warn mb16">⚠ Operational Alert: Bind installations exclusively to target listings declared below. Do NOT initialize large dependencies (e.g. Metasploit Framework, heavy PostgreSQL instances) — mobile execution limits will experience processing overhead bottlenecks unneeded during early modules.</div>
     <div class="tdemo">
       <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Debian — Tool Installation</div></div>
       <div class="tdemo-body">
-        <div class="tc"># Make sure you are inside Debian first</div>
+        <div class="tc"># Verify environment prompt path specifies active Debian workspace container target</div>
         <div class="cmd">apt install -y curl wget git nmap whois dnsutils net-tools python3 python3-pip</div>
-        <div class="ok">Done. All tools installed.</div>
-        <div class="tc"># Verify tools are ready</div>
+        <div class="ok">Process completed. Tactical monitoring binaries mounted inside workspace.</div>
+        <div class="tc"># Verify software pathways maps match system path pointers</div>
         <div class="cmd">which nmap curl wget git python3</div>
         <div class="out">/usr/bin/nmap<br>/usr/bin/curl<br>/usr/bin/wget<br>/usr/bin/git<br>/usr/bin/python3</div>
       </div>
@@ -88,74 +292,110 @@
   <!-- STEP 4 -->
   <div class="card-red mb16">
     <div class="card-hd">Step 4 — Create a Shortcut to Enter Debian</div>
-    <p class="td fs mb16">Every time you open Termux, you need to type proot-distro login debian. Make a shortcut so you only type one word.</p>
+    <p class="td fs mb16">To bypass manually referencing the explicit runtime statement 'proot-distro login debian' every time your device opens a fresh terminal instance, provision an executable alias script shell wrapper shortcut.</p>
     <div class="tdemo">
       <div class="tdemo-bar"><div class="tdots"><i class="d1"></i><i class="d2"></i><i class="d3"></i></div><div class="tlabel">Termux — Create shortcut</div></div>
       <div class="tdemo-body">
-        <div class="tc"># Exit Debian back to Termux first</div>
+        <div class="tc"># Terminate inner Debian child session to return back to root context execution space</div>
         <div class="cmd">exit</div>
-        <div class="tc"># Create a shortcut file</div>
+        <div class="tc"># Pipe login instruction variables straight into user configuration binary path maps</div>
         <div class="cmd">echo 'proot-distro login debian' > ~/deb.sh && chmod +x ~/deb.sh</div>
-        <div class="tc"># Now to enter Debian just type:</div>
+        <div class="tc"># Trigger entry profile shortcut command array from any parent context location</div>
         <div class="cmd">bash ~/deb.sh</div>
         <div class="p">root@localhost:~#</div>
-        <div class="ok">You are in Debian. Type 'exit' to go back to Termux.</div>
+        <div class="ok">Decoupled access terminal confirmed. Execute command directive 'exit' to pop container array stacks.</div>
       </div>
     </div>
   </div>
 
   <!-- WHAT TERMUX CAN/CANNOT DO -->
-  <div class="stitle mb16">What Termux + Debian Can and Cannot Do</div>
+  <div class="stitle mb16">Capabilities Matrix Scope</div>
   <div class="g2 mb32">
     <div class="card">
-      <div class="card-hd ts">✓ What You CAN Do</div>
+      <div class="card-hd ts">✓ Approved Vector Utilities</div>
       <div class="term" style="font-size:.76rem;">
-        <div class="ok">Run full Linux commands (nmap, curl, dig)</div>
-        <div class="ok">Write and run bash scripts</div>
-        <div class="ok">Scan networks (with permission only)</div>
-        <div class="ok">Test web applications</div>
-        <div class="ok">Use Git and download tools from GitHub</div>
-        <div class="ok">Run Python scripts and tools</div>
-        <div class="ok">Practice all Month 1 and most Month 2 content</div>
+        <div class="ok">Execute full Linux suites (nmap, curl, dig)</div>
+        <div class="ok">Compile, scale, and test structural bash automation</div>
+        <div class="ok">Conduct passive mapping arrays (with explicit scopes)</div>
+        <div class="ok">Validate web interface software attack vectors</div>
+        <div class="ok">Pull source targets seamlessly from GitHub portals</div>
+        <div class="ok">Develop script configurations via Python framework</div>
+        <div class="ok">Process all Module 1 and advanced Module 2 vectors</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-hd tr">✗ What You CANNOT Do</div>
+      <div class="card-hd tr">✗ System Architectural Restrictions</div>
       <div class="term" style="font-size:.76rem;">
-        <div class="er">Run Metasploit (too heavy, needs laptop)</div>
-        <div class="er">Use WiFi injection adapters (need special hardware)</div>
-        <div class="er">Run GUI tools like Burp Suite (no desktop)</div>
-        <div class="er">Run VirtualBox (needs laptop)</div>
-        <div class="er">Attack real systems without permission (this is illegal)</div>
-        <div class="er">Run heavy database tools (PostgreSQL will freeze your phone)</div>
+        <div class="er">Metasploit deployment payload execution constraints</div>
+        <div class="er">Hardware monitoring injection card interfaces</div>
+        <div class="er">Running heavy GUI interfaces natively (Burp Suite)</div>
+        <div class="er">Host nesting hypervisor modules (VirtualBox)</div>
+        <div class="er">Unauthenticated operations targeting live infrastructure</div>
+        <div class="er">Hosting concurrent raw relational storage platforms</div>
       </div>
     </div>
   </div>
 
   <!-- TROUBLESHOOTING -->
-  <div class="stitle mb16">Common Problems &amp; Fixes</div>
-  <div class="card mb32">
+  <div class="stitle mb16">Troubleshooting Exception Tree Logs</div>
+  <div class="card mb32" style="padding: 0; overflow-x: auto;">
     <table class="dtable">
-      <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+      <thead><tr><th>System Log Exception</th><th>Recovery Action Manifest Route</th></tr></thead>
       <tbody>
-        <tr><td>pkg update gives error</td><td>Turn on WiFi/data. Try again.</td></tr>
-        <tr><td>Permission denied in Termux</td><td>Do not use sudo in base Termux. Just run the command directly.</td></tr>
-        <tr><td>Not enough space</td><td>Free up 2GB on phone. Delete unused apps and files.</td></tr>
-        <tr><td>Debian download stops halfway</td><td>Run proot-distro install debian again. It continues.</td></tr>
-        <tr><td>proot-distro: command not found</td><td>Run: pkg install proot-distro first</td></tr>
-        <tr><td>apt command not found in Debian</td><td>You are in Termux, not Debian. Run: proot-distro login debian</td></tr>
-        <tr><td>E: Unable to locate package</td><td>Run: apt update first, then try installing again</td></tr>
-        <tr><td>Phone slows down</td><td>Exit Debian (type exit). Do not run too many tools at once.</td></tr>
-        <tr><td>Termux session lost</td><td>Open Termux again. Run: bash ~/deb.sh to re-enter Debian.</td></tr>
+        <tr><td>pkg update errors out</td><td>Verify interfaces layer has internet access rules. Retry runtime loop.</td></tr>
+        <tr><td>Permission denied error</td><td>Do not escalate privilege flags inside native Termux container profiles.</td></tr>
+        <tr><td>Insufficient block space</td><td>Deallocate 2GB of physical system memory assets from non-essential storage.</td></tr>
+        <tr><td>Download sequence stalls</td><td>Execute proot-distro sequence command loops; setup will self-heal from current offsets.</td></tr>
+        <tr><td>proot-distro missing map</td><td>Manually trigger configuration setup routine: pkg install proot-distro</td></tr>
+        <tr><td>apt commands unrecognized</td><td>Active runtime terminal state is outside Debian context hooks. Run alias shortcut.</td></tr>
+        <tr><td>E: Unable to locate package</td><td>Re-index package repository maps directly by processing: apt update</td></tr>
+        <tr><td>Mobile device tracking lag</td><td>Drop current processing worker loads by passing the exit command out of active boxes.</td></tr>
+        <tr><td>Terminal stream dropped</td><td>Restore active window workspace structure and pass initialization string: bash ~/deb.sh</td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="tc">
-    <a href="register.html" class="btn btn-lg">Setup Done → Create Account</a>
+  <div class="tc-center" style="margin-top: 40px; margin-bottom: 20px;">
+    <a href="register.html" class="btn btn-lg">Infrastructure Verified → Initialize Account</a>
   </div>
 </div>
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<!-- Bottom Structural Anchor Base Layer -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend — System Provisioning Base Platform Terminal
+</footer>
+
 <script src="app.js"></script>
+<script>
+/* Mobile Menu Toggle Component Hook */
+document.getElementById('menu-toggle')?.addEventListener('click', () => {
+    document.getElementById('nav-menu')?.classList.toggle('active');
+});
+
+/* Ambient Node Matrix Physics System Engine */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(25, window.innerWidth / 50);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+</script>
 </body>
 </html>
