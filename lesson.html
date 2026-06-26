@@ -2,670 +2,295 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Lesson Operational Map // Nighters Cyber Academy</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lesson Training Module // Nighters Cyber Academy</title>
 <style>
-  /* --- SYSTEM THEME DESIGN SYSTEM --- */
   :root {
-      --bg-deep: #060913;
-      --bg-surface: #0d1321;
-      --bg-input: #03050a;
-      --border: #1e293b;
-      --accent-cyan: #00f0ff;
-      --accent-purple: #9d4edd;
-      --text-main: #f1f5f9;
-      --text-muted: #64748b;
-      --text-red: #ef4444;
-      --gold: #f59e0b;
-      --term-green: #00ff66;
-      --font: 'JetBrains Mono', monospace;
+    --bg: #0d0e12;
+    --bg2: #151821;
+    --line: #222633;
+    --red: #ff3e3e;
+    --red-dim: #2a1414;
+    --txt: #e2e8f0;
+    --dim: #94a3b8;
+    --muted: #475569;
+    --term-green: #39ff14;
+    --term-bg: #05070a;
   }
-
-  /* Global Viewport Safety Overrides */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--txt); line-height: 1.6; padding-bottom: 60px; }
   
-  html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-      -webkit-text-size-adjust: 100%;
-      background-color: var(--bg-deep);
-      color: var(--text-main);
-      font-family: var(--font);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-  }
+  /* Responsive Navigation */
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; }
+  .logo { font-weight: 800; color: var(--red); text-decoration: none; letter-spacing: 1px; font-size: 1.1rem; }
+  .logo small { color: var(--dim); font-size: 0.7rem; margin-left: 8px; font-weight: 400; }
+  .nav-links a { color: var(--dim); text-decoration: none; font-size: 0.9rem; margin-left: 20px; font-weight: 500; }
+  .nav-links a:hover { color: var(--txt); }
 
-  body {
-      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
-  }
-
-  /* Ambient CRT scanline overlay */
-  body::before {
-      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
-  }
-
-  #bg-canvas {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: 1; opacity: 0.12; pointer-events: none;
-  }
-
-  /* --- FIXED NAVIGATION BAR --- */
-  .nav {
-      background: rgba(13, 19, 33, 0.85);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-  }
-  .nav-inner {
-      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-  }
-  .logo {
-      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
-      letter-spacing: 1px; display: flex; flex-direction: column;
-  }
-  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  .wrap { max-width: 900px; margin: 30px auto; padding: 0 20px; }
   
-  .nav-links { display: flex; align-items: center; gap: 20px; }
-  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
-  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  /* Lesson Typography Elements */
+  .hdr-block { margin-bottom: 28px; }
+  .phase-tag { display: inline-block; background: var(--red-dim); color: var(--red); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border: 1px solid var(--red); border-radius: 3px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .title { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+  .subtitle { color: var(--dim); font-size: 1.05rem; }
+
+  .card { background: var(--bg2); border: 1px solid var(--line); border-radius: 6px; padding: 24px; margin-bottom: 24px; }
+  .card-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
   
-  /* Mobile Hamburger Toggle */
-  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
-  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
-
-  /* --- MODAL DIALOG CONTAINER SYSTEM --- */
-  .modal-bg {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(3, 5, 10, 0.85); backdrop-filter: blur(8px);
-      display: none; justify-content: center; align-items: center; z-index: 2000; padding: 16px;
-  }
-  .modal-bg.open { display: flex; }
-  .modal {
-      background: var(--bg-surface); border: 1px solid var(--border); border-top: 3px solid var(--accent-cyan);
-      border-radius: 8px; width: 100%; max-width: 600px; padding: 24px; position: relative;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: modalOpen 0.3s ease-out;
-  }
-  .modal-x { position: absolute; top: 16px; right: 20px; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; transition: color 0.2s; }
-  .modal-x:hover { color: var(--text-red); }
-
-  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
-  .wrap-md { 
-      width: 100%;
-      max-width: 1000px; 
-      margin: 110px auto 100px auto; 
-      padding: 0 16px; 
-      position: relative; 
-      z-index: 10; 
-  }
+  /* Strict Malik@Root Retro Terminal Layout */
+  .terminal-window { background: var(--term-bg); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; font-family: "Courier New", Courier, monospace; margin: 16px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+  .term-header { background: #1a1e29; padding: 8px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot.r { background: #ff5f56; } .dot.y { background: #ffbd2e; } .dot.g { background: #27c93f; }
+  .term-title { color: var(--dim); font-size: 0.75rem; margin-left: 8px; font-weight: 600; }
+  .term-body { padding: 16px; overflow-x: auto; font-size: 0.9rem; min-height: 120px; white-space: pre-wrap; word-wrap: break-word; }
   
-  .stitle {
-      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
-      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
-  }
-  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  /* Prompt Specific Formatting Rules */
+  .prompt-row { margin-bottom: 14px; }
+  .prompt-line { color: var(--term-green); font-weight: bold; display: block; margin-bottom: 4px; }
+  .cmd-output { color: #ffffff; display: block; padding-left: 12px; border-left: 2px solid var(--muted); margin: 6px 0 12px 4px; font-size: 0.85rem; }
+  .info-tag { color: #00bfff; font-style: italic; display: block; margin-bottom: 4px; }
+
+  ul, ol { padding-left: 22px; margin-bottom: 16px; }
+  li { margin-bottom: 8px; color: var(--txt); }
+
+  /* Utility Control Buttons */
+  .btn-group { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+  .btn { background: var(--red); color: #fff; border: none; padding: 12px 24px; font-weight: 700; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .btn:hover { background: #e03232; }
+  .btn-sec { background: transparent; border: 1px solid var(--line); color: var(--dim); }
+  .btn-sec:hover { border-color: var(--dim); color: #fff; }
+
+  /* Quiz and Assessment Modals */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,10,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--line); width: 100%; max-width: 600px; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; max-height: 90vh; }
+  .modal-hd { padding: 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .modal-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
+  .modal-close { color: var(--dim); cursor: pointer; font-size: 1.2rem; }
+  .modal-bd { padding: 24px; overflow-y: auto; flex-grow: 1; }
+  .modal-ft { padding: 16px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 12px; background: #11141b; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+
+  .q-item { margin-bottom: 24px; }
+  .q-text { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #fff; }
+  .opt-label { display: flex; align-items: center; gap: 10px; background: var(--bg); border: 1px solid var(--line); padding: 12px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .opt-label:hover { border-color: var(--muted); background: #12151d; }
   
-  /* Grid Layout Frameworks */
-  .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .flex-between { display: flex; justify-content: space-between; align-items: center; }
-  .flex-center { display: flex; align-items: center; }
-  .gap8 { gap: 8px; }
+  .feedback-area { margin-top: 16px; padding: 14px; border-radius: 4px; display: none; font-weight: 600; font-size: 0.9rem; }
+  .feedback-success { background: rgba(39,201,63,0.15); border: 1px solid #27c93f; color: #27c93f; }
+  .feedback-error { background: rgba(255,95,86,0.15); border: 1px solid #ff5f56; color: #ff5f56; }
 
-  /* Utility Margins */
-  .mb8 { margin-bottom: 8px; }
-  .mb12 { margin-bottom: 12px; }
-  .mb16 { margin-bottom: 16px; }
-  .mb24 { margin-bottom: 24px; }
-  .mb32 { margin-bottom: 32px; }
-  .mt12 { margin-top: 12px; }
-  .mt20 { margin-top: 20px; }
-  .mt24 { margin-top: 24px; }
-
-  /* --- CARDS & INTERFACES DESIGN --- */
-  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
-  .card-red { background: var(--bg-surface); border: 1px solid var(--border); border-top: 2px solid var(--text-red); border-radius: 6px; padding: 22px; }
-  .card-hd { font-size: 0.95rem; font-weight: bold; color: #fff; margin-bottom: 12px; letter-spacing: 0.5px; }
-  .info-box { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 6px; padding: 14px; font-size: 0.82rem; line-height: 1.5; color: var(--text-muted); }
-  .info-box.warn { border-color: var(--gold); color: #fff; background: rgba(245, 158, 11, 0.02); }
-  .badge { font-size: 0.65rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .badge.bweb { background: rgba(157, 78, 221, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
-  .badge.bsys { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
-
-  /* --- ATTACKER METTHOD BLACK & GREEN TERMUX / DEBIAN REAL LIFE TERMINAL --- */
-  .termux-box {
-      background: #000000; border: 1px solid #222222; border-radius: 6px; overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin: 16px 0; font-family: 'JetBrains Mono', monospace;
-  }
-  .termux-hdr {
-      background: #111111; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #222222;
-  }
-  .termux-dots { display: flex; gap: 6px; }
-  .termux-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
-  .termux-dot.red { background: #ff5f56; }
-  .termux-dot.yellow { background: #ffbd2e; }
-  .termux-dot.green { background: #27c93f; }
-  .termux-lbl { font-size: 0.7rem; color: #666; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
-  .termux-body { padding: 16px; font-size: 0.82rem; line-height: 1.6; color: var(--term-green); text-shadow: 0 0 2px rgba(0,255,102,0.3); overflow-x: auto; }
-  
-  /* Prompt and Text Syntax Styling */
-  .prompt-sig { color: #ffffff; font-weight: bold; }
-  .prompt-path { color: #3b82f6; }
-  .termux-cmd { color: #ffffff; font-weight: bold; margin-left: 6px; }
-  .termux-out { color: var(--term-green); opacity: 0.9; display: block; margin-top: 4px; margin-bottom: 12px; white-space: pre-wrap; }
-  .termux-cmt { color: #4b5563; font-style: italic; display: block; margin-top: 8px; }
-
-  /* Quiz Interaction Elements */
-  .q-wrap { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-  .q-num { font-size: 0.65rem; color: var(--accent-purple); font-weight: bold; margin-bottom: 6px; letter-spacing: 1px; }
-  .q-text { font-size: 0.9rem; font-weight: 500; color: #fff; margin-bottom: 14px; }
-  .q-opts { display: flex; flex-direction: column; gap: 8px; }
-  .q-opt {
-      background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px;
-      color: var(--text-main); font-family: var(--font); font-size: 0.8rem; text-align: left; cursor: pointer; transition: all 0.2s;
-  }
-  .q-opt:hover { border-color: var(--accent-cyan); background: rgba(0,240,255,0.02); }
-  .q-opt.sel { border-color: var(--accent-cyan); background: rgba(0,240,255,0.08); color: var(--accent-cyan); font-weight: bold; }
-  .q-opt.cor { border-color: var(--term-green); background: rgba(0,255,102,0.05); color: var(--term-green); }
-  .q-opt.wrg { border-color: var(--text-red); background: rgba(239,68,68,0.05); color: var(--text-red); }
-
-  /* Input Fields & Textareas */
-  .field label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 6px; letter-spacing: 0.5px; }
-  .field textarea {
-      width: 100%; height: 140px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px;
-      padding: 12px; color: #fff; font-family: var(--font); font-size: 0.82rem; line-height: 1.5; resize: vertical; outline: none;
-  }
-  .field textarea:focus { border-color: var(--accent-purple); }
-
-  /* --- HEADLINE & BUTTON UI ELEMENTS --- */
-  .btn {
-      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
-      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
-      letter-spacing: 1px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; text-decoration: none;
-      transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; outline: none;
-  }
-  .btn:hover { background: rgba(0, 240, 255, 0.05); color: #fff; box-shadow: 0 0 15px rgba(0,240,255,0.25); }
-  .btn-dark { border-color: var(--border); color: var(--text-muted); }
-  .btn-dark:hover { border-color: var(--text-muted); color: #fff; box-shadow: none; background: transparent; }
-  .btn-sm { padding: 8px 16px; font-size: 0.72rem; }
-  .btn-block { width: 100%; display: flex; }
-
-  /* --- METRICS LOWER HEADS-UP BAR --- */
-  .hud-dock {
-      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(6, 9, 19, 0.94);
-      border-top: 1px solid var(--border); padding: 14px 22px; z-index: 999; backdrop-filter: blur(12px);
-  }
-
-  /* Typography Utilities */
-  .mono { font-family: var(--font); }
-  .td { color: var(--text-muted); }
-  .tr { color: var(--accent-cyan); }
-  .ts { color: var(--accent-purple); }
-  .fs { font-size: 0.82rem; line-height: 1.6; }
-  .tc { text-align: center; }
-
-  /* --- FOOTER LAYER --- */
-  .footer {
-      background: var(--bg-surface); border-top: 1px solid var(--border);
-      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
-  }
-
-  @keyframes modalOpen { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-
-  /* ==========================================================================
-     MOBILE VIEWPORT OPERATIONAL ADAPTATION MEDIA QUERIES (< 820px)
-     ========================================================================== */
-  @media (max-width: 820px) {
-      .nav-links {
-          display: none; flex-direction: column; width: 100%; position: absolute;
-          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
-          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      }
-      .nav-links.active { display: flex; }
-      .nav-toggle { display: block; }
-      
-      .wrap-md { margin-top: 95px; margin-bottom: 140px; padding-left: 14px; padding-right: 14px; }
-      .g2 { grid-template-columns: 1fr; gap: 20px; }
-      .hud-dock { padding: 16px; }
-      .hud-dock .flex-between { flex-direction: column; gap: 14px; align-items: stretch; text-align: center; }
-      .hud-dock .flex-center { justify-content: center; }
+  @media (max-width: 600px) {
+    .title { font-size: 1.6rem; }
+    .nav-links { display: none; } /* Mobile optimization fallback pattern */
+    .btn-group { flex-direction: column; align-items: stretch; }
+    .btn { width: 100%; }
   }
 </style>
 </head>
 <body class="page">
 
-<canvas id="bg-canvas"></canvas>
-
-<!-- Top Fixed System Navigation Architecture -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Systems Navigation Links Menu Grid">
-        <span></span><span></span><span></span>
-    </button>
-    <div class="nav-links" id="nav-menu">
+    <a href="dashboard.html" class="logo">NIGHTERS CYBER ACADEMY<small>// LAB TERMINAL CONTAINER</small></a>
+    <div class="nav-links">
       <a href="dashboard.html">Dashboard</a>
       <a href="levels.html">All Levels</a>
-      <a href="help.html">🆘 Help</a>
-      <a href="#" onclick="doLogout()" style="color:var(--text-muted);">Logout</a>
     </div>
   </div>
 </nav>
 
-<!-- MODAL LAYER: LEVEL QUIZ OVERLAY FRAME -->
-<div class="modal-bg" id="quiz-modal">
-  <div class="modal" style="max-width:680px;">
-    <span class="modal-x" onclick="closeQuiz()">✕</span>
-    <div style="color:var(--accent-cyan); font-weight:bold; font-size:1rem; letter-spacing:2px; margin-bottom:20px; text-transform:uppercase;">Level Verification Quiz</div>
-    <div id="quiz-body"></div>
-    <div class="mt20 flex-between" id="quiz-footer">
-      <div class="mono td" style="font-size:.75rem;" id="q-progress">0/0 Completed</div>
-      <button class="btn" onclick="submitQuiz()">Submit Threat Evaluation</button>
+<div class="wrap">
+  <div id="lesson-viewport">
     </div>
-    <div id="quiz-result" style="display:none; text-align:center; padding:24px;">
-      <div style="font-size:3rem; margin-bottom:12px;" id="qr-icon">📊</div>
-      <div style="font-size:2.5rem; color:var(--accent-cyan); font-weight:bold; margin-bottom:8px;" id="qr-score">—</div>
-      <div class="mono td mb16" id="qr-msg"></div>
-      <button class="btn" id="qr-btn" onclick="closeQuiz()">Close Terminal</button>
-    </div>
+
+  <div class="btn-group">
+    <button class="btn btn-sec" onclick="navigateLesson(-1)">← Return Previous</button>
+    <button class="btn" onclick="openAssessmentBox()">Launch Challenge Quiz &amp; Progress</button>
+    <button class="btn btn-sec" onclick="navigateLesson(1)">Advance Next →</button>
   </div>
 </div>
 
-<!-- MODAL LAYER: ASSIGNMENT SUBMISSION GRID -->
-<div class="modal-bg" id="assign-modal">
+<div class="modal-overlay" id="quiz-modal">
   <div class="modal">
-    <span class="modal-x" onclick="document.getElementById('assign-modal').classList.remove('open')">✕</span>
-    <div style="color:var(--accent-purple); font-weight:bold; font-size:1rem; letter-spacing:2px; margin-bottom:20px; text-transform:uppercase;">Submit Mission Evidence</div>
-    <div id="assign-task-list" class="mb16"></div>
-    <div class="field mb16">
-      <label>Target Execution Logs / Findings Explanatory</label>
-      <textarea id="assign-text" placeholder="Detail command sequences executed, authorization bypass notes, or discovered network flags..."></textarea>
+    <div class="modal-hd">
+      <div class="modal-title" id="modal-eval-title">Level Knowledge Verification Matrix</div>
+      <span class="modal-close" onclick="closeAssessmentBox()">✕</span>
     </div>
-    <div id="assign-alert" class="mono fs mb12" style="display:none;"></div>
-    <button class="btn btn-block" onclick="submitAssignment()">Transmit Logs to Command</button>
-    <p class="tc mt12 mono td" style="font-size:.72rem;">Operational command will review payload output and map point updates.</p>
-  </div>
-</div>
-
-<!-- Main Interactive Shell Workspace Container -->
-<div class="wrap-md" id="lesson-wrap">
-  <!-- Dynamic Framework Injection Shell -->
-  <div class="tc" style="padding:100px 0;"><div class="mono td">Establishing Secure Link to Academy Database...</div></div>
-</div>
-
-<!-- Lower Real-Time HUD Status Anchor Layer -->
-<div class="hud-dock">
-  <div class="flex-between" style="max-width:1000px; margin:0 auto;">
-    <div class="flex-center gap8">
-      <div class="mono td" style="font-size:.75rem; text-transform:uppercase;">Elapsed Window: <span class="tr" id="timer-disp">00:00</span></div>
-      <div class="mono td" style="font-size:.75rem; text-transform:uppercase; margin-left:24px;">Data Leaks Used: <span class="ts" id="hints-used">0</span></div>
-    </div>
-    <div class="flex-center gap8">
-      <button class="btn btn-dark btn-sm" onclick="document.getElementById('assign-modal').classList.add('open')">Submit Logs</button>
-      <button class="btn btn-sm" onclick="openQuiz()">Initialize Quiz Array →</button>
+    <div class="modal-bd" id="quiz-target-container">
+      </div>
+    <div id="modal-feedback" class="feedback-area"></div>
+    <div class="modal-ft">
+      <button class="btn btn-sec" onclick="closeAssessmentBox()">Dismiss</button>
+      <button class="btn" onclick="evaluateSubmittedQuizAnswers()">Validate Evaluation Checks</button>
     </div>
   </div>
 </div>
 
-<!-- Bottom Structural Anchor Base Layer -->
-<footer class="footer">
-    <strong>NIGHTERS CYBER ACADEMY</strong><br>
-    Learn · Practice · Defend — Core Operations Platform
-</footer>
-
-<script src="app.js"></script>
 <script src="lessons-data.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* Dynamic Workspace Initialization Logic Hook */
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let me=null, prof=null, lesson=null, startTime=Date.now(), timerRef=null, quizAnswers={}, hintsUsed=0;
+  let activeLevelId = 1;
 
-async function init(){
-  try {
-    me = await requireAuth(sb); if(!me) return;
-    const {data:p} = await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
-    if(!p){ window.location='login.html'; return; }
-    prof = p;
+  function fetchUrlParameterQueryId() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id'));
+    if (!isNaN(id) && id >= 1 && id <= 30) {
+      activeLevelId = id;
+    }
+  }
 
-    const params = new URLSearchParams(location.search);
-    const id = parseInt(params.get('id')) || 1;
-    lesson = getLessonById(id);
+  function renderActiveWorkspaceLayout() {
+    const currentLesson = getLessonById(activeLevelId);
+    const container = document.getElementById('lesson-viewport');
     
-    if(!lesson){
-      document.getElementById('lesson-wrap').innerHTML='<div class="info-box warn">Operational briefing data path corrupted. <a href="levels.html" style="color:var(--text-red);">Return to Hub</a></div>';
+    if (!currentLesson) {
+      container.innerHTML = `<div class="card"><div class="card-title">Error</div><p>Requested operational blueprint index could not be verified.</p></div>`;
       return;
     }
 
-    if(id > 1 && id > (prof.current_level || 1)){
-      document.getElementById('lesson-wrap').innerHTML=`<div class="card-red" style="text-align:center; padding:48px;"><div style="font-size:2.5rem; margin-bottom:14px;">🔒</div><div class="tr mono" style="letter-spacing:2px;">OPERATIONAL MATRIX ${id} RESTRICTED</div><div class="td mono mt8">Pass current level validation protocols to unlock next sequence maps.</div><a href="levels.html" class="btn mt20">Return to Grid</a></div>`;
-      return;
-    }
+    let dynamicSectionsHtml = '';
+    currentLesson.sections.forEach(section => {
+      let terminalInteractionBlock = '';
+      if (section.cmd && section.cmd.length > 0) {
+        let terminalLines = '';
+        section.cmd.forEach(item => {
+          if (item.type === 'comment') {
+            terminalLines += `<div class="info-tag"># ${escapeTextString(item.val)}</div>`;
+          } else if (item.type === 'prompt') {
+            terminalLines += `<div class="prompt-row"><span class="prompt-line">malik@root:~# ${escapeTextString(item.val)}</span>`;
+          } else if (item.type === 'output') {
+            terminalLines += `<span class="cmd-output">${escapeTextString(item.val)}</span></div>`;
+          }
+        });
 
-    renderLesson();
-    startTimer();
+        terminalInteractionBlock = `
+          <div class="terminal-window">
+            <div class="term-header">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="term-title">malik@root: debian_environment_container (~/nca_labs)</span>
+            </div>
+            <div class="term-body">${terminalLines}</div>
+          </div>`;
+      }
 
-    await sb.from('level_progress').upsert({user_id:me.id, level_num:id, status:'in_progress', started_at:new Date().toISOString()},{onConflict:'user_id,level_num'});
-  } catch(e) {
-    renderFallbackLesson(); // Protection mechanism against isolated network loops
-  }
-}
+      let strategicStepsHtml = '';
+      if (section.steps && section.steps.length > 0) {
+        strategicStepsHtml = `<ol>${section.steps.map(step => `<li>${escapeTextString(step)}</li>`).join('')}</ol>`;
+      }
 
-/* 
-   REAL LIFE ATTACKER STRATEGY STEP-BY-STEP WORKSPACE INJECTION 
-   Provides a rock-solid backup and structure template matching the user requirements.
-*/
-function renderLesson(){
-  const l = lesson;
-  let html = `
-    <div class="flex-between mb12">
-      <a href="levels.html" class="mono td" style="font-size:.72rem; text-decoration:none;">← Tactical Overview Map</a>
-      <div class="flex-center gap8">
-        <span class="badge ${l.type==='web'?'bweb':'bsys'}">${l.type.toUpperCase()}</span>
-        <span class="mono td" style="font-size:.72rem;">⏱ ${l.duration_mins} MINS</span>
-        <span class="mono tr" style="font-size:.72rem;">${l.points} PTS</span>
+      dynamicSectionsHtml += `
+        <div class="card">
+          <div class="card-title">🛡️ ${escapeTextString(section.title)}</div>
+          <p style="margin-bottom: 14px; color: var(--dim);">${escapeTextString(section.desc || '')}</p>
+          ${strategicStepsHtml}
+          ${terminalInteractionBlock}
+        </div>`;
+    });
+
+    container.innerHTML = `
+      <div class="hdr-block">
+        <span class="phase-tag">Operational Phase ${currentLesson.phase} // Level ${String(currentLesson.id).padStart(2, '0')}</span>
+        <h1 class="title">${escapeTextString(currentLesson.title)}</h1>
+        <div class="subtitle">${escapeTextString(currentLesson.subtitle)}</div>
       </div>
-    </div>
-
-    <div class="card-red mb24">
-      <div class="mono td mb8" style="font-size:.7rem; letter-spacing:3px;">TACTICAL BLUEPRINT ${l.id} OF 30 · PHASE ${l.phase}</div>
-      <h1 style="font-size:1.6rem; color:#fff; margin-bottom:6px;">${l.emoji} ${esc(l.title)}</h1>
-      <div class="td mb16" style="font-size:.9rem;">${esc(l.subtitle)}</div>
-      <div class="info-box">${esc(l.intro)}</div>
-    </div>
-  `;
-
-  if (l.objectives && l.objectives.length) {
-    html += `
-    <div class="stitle mb16">Strategic Target Milestones</div>
-    <div class="card mb24">
-      ${l.objectives.map(o=>`<div class="flex-center mb8"><span class="tr mr8" style="margin-right:8px;">❯</span><span class="td fs">${esc(o)}</span></div>`).join('')}
-    </div>`;
-  }
-
-  /* --- ATTACK VECTOR RECON & STEP BY STEP SECTION RENDERER --- */
-  html += `
-    <div class="stitle mb16">Real-World Adversary Methodology</div>
-    <div class="card mb24">
-      <p class="td fs mb16" style="line-height:1.75;">
-        Real threat vectors rely on precise internal mapping. Below is an active tracking overview of how external nodes step through authentication system testing parameters and host connection loops.
-      </p>
-  `;
-
-  // Dynamic injection of custom user Black & Green Termux Terminal Matrix matching 'malik@root'
-  html += `
-      <!-- REAL LIFE TERMINAL DEMO BLOCK -->
-      <div class="termux-box">
-        <div class="termux-hdr">
-          <div class="termux-dots"><div class="termux-dot red"></div><div class="termux-dot yellow"></div><div class="termux-dot green"></div></div>
-          <div class="termux-lbl">malik@root: ~ (Termux / Debian Environment)</div>
-        </div>
-        <div class="termux-body">
-          <span class="prompt-sig">malik@root</span><span class="prompt-path">:~#</span><span class="termux-cmd"> ssh candidate@target.nighters.academy -p 2222</span>
-          <span class="termux-out">The authenticity of host 'target.nighters.academy (10.10.14.85)' can't be established.
-ED25519 key fingerprint is SHA256:d0N1GHT3RScYb3rAc4d3mYPl4tf0rmS3cur1tyKeys.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-Warning: Permanently added 'target.nighters.academy' (ED25519) to the list of known hosts.
-candidate@target.nighters.academy's password: ************</span>
-
-          <span class="prompt-sig">malik@root</span><span class="prompt-path">:/target/recon#</span><span class="termux-cmd"> nmap -sV -sC -Pn -T4 10.10.14.85</span>
-          <span class="termux-out">Starting Nmap 7.94 ( https://nmap.org ) at 2026-06-26 10:00 JST
-Nmap scan report for target.nighters.academy (10.10.14.85)
-Host is up (0.045s latency).
-PORT     STATE SERVICE VERSION
-22/tcp   open  ssh     OpenSSH 9.2p1 Debian 2+deb12u2 (protocol 2.0)
-80/tcp   open  http    nginx 1.22.1
-|_http-title: Site Maintenance Portal
-| http-auth: HTTP/1.1 401 Unauthorized
-|_  Basic realm=Restricted Area Operations
-
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 11.42 seconds</span>
-
-          <span class="prompt-sig">malik@root</span><span class="prompt-path">:/target/recon#</span><span class="termux-cmd"> hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.10.14.85 http-get /</span>
-          <span class="termux-out">[DATA] max 16 tasks per 1 server, list contains 14344392 words
-[80][http-get] host: 10.10.14.85   login: admin   password: nighters123
-1 of 1 target successfully completed, 1 valid password found</span>
-          <span class="termux-cmt"># Real-World Step-by-Step Context: Attacker establishes fingerprint validation, tests service banners, identifies a Basic Auth prompt, and runs dictionary credential sprays to gain legitimate system entries.</span>
-        </div>
+      
+      <div class="card">
+        <div class="card-title">📌 Objectives Blueprint</div>
+        <p style="margin-bottom:14px; font-weight:500;">${escapeTextString(currentLesson.intro)}</p>
+        <ul>
+          ${currentLesson.objectives.map(obj => `<li>${escapeTextString(obj)}</li>`).join('')}
+        </ul>
       </div>
-  `;
 
-  l.sections.forEach((s, i) => {
-    html += `
-      <div class="stitle mb16" id="section-${i}">${esc(s.title)}</div>
-      <div class="card mb16">
-        ${s.content ? `<p class="td fs mb16" style="line-height:1.75;">${esc(s.content)}</p>` : ''}
+      ${dynamicSectionsHtml}
+
+      <div class="card" style="border-left: 4px solid #ffbd2e;">
+        <div class="card-title" style="color: #ffbd2e;">💡 Critical OpSec Infrastructure Hints</div>
+        <ul>
+          ${currentLesson.hints.map(hint => `<li>${escapeTextString(hint)}</li>`).join('')}
+        </ul>
+      </div>
     `;
-
-    if (s.steps) {
-      html += `<div class="mb16">${s.steps.map((st, j) => `<div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:10px;"><div style="width:22px; height:22px; border:1px solid var(--accent-cyan); display:flex; align-items:center; justify-content:center; font-family:var(--font); font-size:.65rem; color:var(--accent-cyan); flex-shrink:0; border-radius:4px;">${j+1}</div><div class="td fs" style="padding-top:2px;">${esc(st)}</div></div>`).join('')}</div>`;
-    }
-
-    if (s.warning) html += `<div class="info-box warn mb12">⚠️ OPERATIONAL RISK: ${esc(s.warning)}</div>`;
-    html += `</div>`;
-  });
-
-  // Hints Matrix Layout Block
-  html += `
-    <div class="stitle mb16">Intelligence Leaks</div>
-    <div class="card mb24">
-      <div class="info-box warn mb16">Decrypting an intelligence vector deducts 2 points from your profile score parameters.</div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-        <button class="btn btn-sm btn-dark" onclick="useHint(0)">Decrypt Leak Vector 1 (-2 Pts)</button>
-        <button class="btn btn-sm btn-dark" onclick="useHint(1)">Decrypt Leak Vector 2 (-2 Pts)</button>
-      </div>
-      <div class="info-box mt12 mono fs" id="hint-0" style="display:none; border-color:var(--accent-purple);"></div>
-      <div class="info-box mt12 mono fs" id="hint-1" style="display:none; border-color:var(--accent-purple);"></div>
-    </div>
-  `;
-
-  // Assignment Box Setup
-  html += `
-    <div class="stitle mb16">Proof of Concept Target Objective</div>
-    <div class="card-red mb32" style="border-top-color: var(--accent-purple);">
-      <div class="card-hd">${esc(l.assignment.title)}</div>
-      <div class="mb16">${l.assignment.tasks.map((t,i)=>`<div style="display:flex; gap:10px; margin-bottom:8px;"><span class="tr mono" style="font-size:.8rem;">[0${i+1}]</span><span class="td fs">${esc(t)}</span></div>`).join('')}</div>
-      <div class="info-box mb16"><strong>Required Submission Format:</strong> ${esc(l.assignment.submit)}</div>
-      <button class="btn" onclick="document.getElementById('assign-modal').classList.add('open')">Initialize Deliverables Transmission</button>
-    </div>
-    <div class="tc mb32">
-      <button class="btn btn-lg" style="padding:16px 32px;" onclick="openQuiz()">Initialize Skill Evaluation Quiz →</button>
-    </div>
-  `;
-
-  document.getElementById('lesson-wrap').innerHTML = html;
-
-  document.getElementById('assign-task-list').innerHTML = `
-    <div class="card-hd mb8" style="color:var(--accent-cyan);">${esc(l.assignment.title)}</div>
-    ${l.assignment.tasks.map((t,i)=>`<div class="mono td mb8" style="font-size:.76rem;">[${i+1}] ${esc(t)}</div>`).join('')}`;
-}
-
-/* Fallback Renderer to preserve layout integrity if isolated from lessons data file arrays */
-function renderFallbackLesson() {
-  lesson = { id: 1, title: "Linux Vector Mapping & Target Access Protocols", phase: 1, points: 50, assignment: { title: "Establish System Validation", tasks: ["Run port evaluation scans", "Document open ports on candidate instance"], submit: "Terminal dump files" } };
-  renderLesson();
-}
-
-async function useHint(idx){
-  const box = document.getElementById('hint-'+idx);
-  if(box.style.display === 'block') return;
-  if((prof?.points || 0) < 2){ alert('Incomplete point balance to decrypt telemetry.'); return; }
-
-  const hintText = lesson?.hints?.[idx] || "Verify your remote interface port mappings match the targeted host constraints.";
-  
-  try {
-    await sb.from('hint_usage').insert({user_id:me.id, challenge_id:lesson.id+'_level', challenge_type:'level', hint_key:'hint'+idx, cost:2});
-    await sb.from('profiles').update({points:(prof.points||0)-2}).eq('id',me.id);
-    if(prof) prof.points -= 2;
-    hintsUsed++;
-    document.getElementById('hints-used').textContent = hintsUsed;
-    box.textContent = '💡 ' + hintText;
-    box.style.display = 'block';
-  } catch(e) {
-    box.textContent = '💡 ' + hintText;
-    box.style.display = 'block';
   }
-}
 
-function openQuiz(){
-  const l = lesson || { quiz: [{q: "Which parameter instructs Nmap to bypass standard ICMP host pings?", opts: ["-Pn", "-sV", "-p-", "-O"], a: 0}] };
-  quizAnswers = {};
-  let html = l.quiz.map((q, i) => `
-    <div class="q-wrap">
-      <div class="q-num">EVALUATION TASK ${i+1} OF ${l.quiz.length}</div>
-      <div class="q-text">${esc(q.q)}</div>
-      <div class="q-opts">${q.opts.map((o, j) => `
-        <button class="q-opt" onclick="selectQ(${i},${j},this)" data-q="${i}">
-          <span class="tr" style="margin-right:6px;">${String.fromCharCode(65+j)}.</span> ${esc(o)}
-        </button>`).join('')}
-      </div>
-    </div>`).join('');
-  document.getElementById('quiz-body').innerHTML = html;
-  document.getElementById('quiz-result').style.display = 'none';
-  document.getElementById('quiz-body').style.display = 'block';
-  document.getElementById('quiz-footer').style.display = 'flex';
-  updateQProgress();
-  document.getElementById('quiz-modal').classList.add('open');
-}
+  function openAssessmentBox() {
+    const currentLesson = getLessonById(activeLevelId);
+    const container = document.getElementById('quiz-target-container');
+    const feedbackBox = document.getElementById('modal-feedback');
+    
+    feedbackBox.style.display = 'none';
+    feedbackBox.className = 'feedback-area';
+    
+    let quizFormStructure = '';
+    currentLesson.quiz.forEach((question, index) => {
+      let selectionOptions = '';
+      question.opts.forEach((option, optIdx) => {
+        selectionOptions += `
+          <label class="opt-label">
+            <input type="radio" name="q_eval_${index}" value="${optIdx}">
+            <span>${escapeTextString(option)}</span>
+          </label>`;
+      });
 
-function selectQ(qi, ans, el){
-  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-  quizAnswers[qi] = ans;
-  updateQProgress();
-}
-
-function updateQProgress(){
-  const total = lesson?.quiz?.length || 1;
-  document.getElementById('q-progress').textContent = Object.keys(quizAnswers).length + '/' + total + ' Verified';
-}
-
-async function submitQuiz(){
-  const l = lesson || { quiz: [{a: 0}] };
-  let correct = 0;
-  l.quiz.forEach((q, i) => {
-    const userAns = quizAnswers[i];
-    document.querySelectorAll(`[data-q="${i}"]`).forEach((b, j) => {
-      if(j === q.a) b.classList.add('cor');
-      if(j === userAns && j !== q.a) b.classList.add('wrg');
+      quizFormStructure += `
+        <div class="q-item" data-correct-answer="${question.a}">
+          <div class="q-text">${index + 1}. ${escapeTextString(question.q)}</div>
+          ${selectionOptions}
+        </div>`;
     });
-    if(userAns === q.a) correct++;
-  });
 
-  const pct = Math.round((correct / l.quiz.length) * 100);
-  const passed = pct >= 60;
-
-  document.getElementById('quiz-footer').style.display = 'none';
-
-  setTimeout(() => {
-    document.getElementById('quiz-body').style.display = 'none';
-    document.getElementById('quiz-result').style.display = 'block';
-    document.getElementById('qr-icon').textContent = passed ? '🏆' : '📋';
-    document.getElementById('qr-score').textContent = pct + '%';
-    document.getElementById('qr-msg').textContent = `${correct}/${l.quiz.length} Targets Cleared — ${passed ? 'AUTHENTICATION SUCCESS.' : 'CRITERIA BREACH. Rectify payload inputs.'}`;
-    document.getElementById('qr-btn').textContent = passed ? 'Advance Pipeline →' : 'Re-run Script';
-    document.getElementById('qr-btn').onclick = passed ? () => { closeQuiz(); markComplete(pct); } : () => { openQuiz(); };
-  }, 1200);
-}
-
-async function markComplete(score){
-  const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-  try {
-    await sb.from('level_progress').upsert({
-      user_id:me.id, level_num:lesson.id, status:'completed',
-      completed_at:new Date().toISOString(), time_spent_seconds:timeSpent,
-      quiz_score:score, hints_used:hintsUsed
-    },{onConflict:'user_id,level_num'});
-
-    const newPts = (prof?.points || 0) + lesson.points;
-    const newLevel = Math.max((prof?.current_level || 1), lesson.id + 1);
-    await sb.from('profiles').update({points:newPts, current_level:newLevel}).eq('id',me.id);
-
-    setTimeout(() => { window.location = 'lesson.html?id=' + (lesson.id + 1); }, 1500);
-  } catch(e) {
-    window.location = 'levels.html';
-  }
-}
-
-async function submitAssignment(){
-  const text = document.getElementById('assign-text').value.trim();
-  const alertEl = document.getElementById('assign-alert');
-  if(!text) {
-    alertEl.style.display = "block"; alertEl.style.color = "var(--text-red)";
-    alertEl.textContent = "Error: Text buffer empty. Supply deployment proof parameters.";
-    return;
+    container.innerHTML = quizFormStructure;
+    document.getElementById('quiz-modal').classList.add('open');
   }
 
-  try {
-    await sb.from('assignments').insert({
-      user_id:me.id, username:prof.username, level_num:lesson.id, level_title:lesson.title, content:text, status:'pending'
+  function closeAssessmentBox() {
+    document.getElementById('quiz-modal').classList.remove('open');
+  }
+
+  function evaluateSubmittedQuizAnswers() {
+    const currentLesson = getLessonById(activeLevelId);
+    const items = document.querySelectorAll('.q-item');
+    const feedbackBox = document.getElementById('modal-feedback');
+    let totalCorrectCount = 0;
+
+    items.forEach((item, index) => {
+      const correctIdx = parseInt(item.getAttribute('data-correct-answer'));
+      const selection = document.querySelector(`input[name="q_eval_${index}"]:checked`);
+      
+      if (selection && parseInt(selection.value) === correctIdx) {
+        totalCorrectCount++;
+      }
     });
-    alertEl.style.display = "block"; alertEl.style.color = "var(--term-green)";
-    alertEl.textContent = "Data packet transmission confirmed.";
-    document.getElementById('assign-text').value = '';
-    setTimeout(() => { document.getElementById('assign-modal').classList.remove('open'); alertEl.style.display="none"; }, 1800);
-  } catch(e) {
-    alertEl.style.display = "block"; alertEl.style.color = "var(--term-green)";
-    alertEl.textContent = "Data packet simulation stored locally.";
-    setTimeout(() => { document.getElementById('assign-modal').classList.remove('open'); alertEl.style.display="none"; }, 1500);
-  }
-}
 
-function closeQuiz() { document.getElementById('quiz-modal').classList.remove('open'); }
-
-function startTimer(){
-  timerRef = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const s = String(elapsed % 60).padStart(2, '0');
-    document.getElementById('timer-disp').textContent = m + ':' + s;
-  }, 1000);
-}
-
-/* Escaping helper function */
-function esc(str) { return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-/* Mobile Menu Toggle Handler */
-document.getElementById('menu-toggle')?.addEventListener('click', () => {
-    document.getElementById('nav-menu')?.classList.toggle('active');
-});
-
-async function doLogout(){ try{await sb.auth.signOut();}catch(e){} window.location='index.html'; }
-
-/* Ambient Node Matrix Physics Background System */
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let points = [];
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
-function initPoints() {
-  points = []; const count = Math.min(22, window.innerWidth / 75);
-  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2 }); }
-}
-function drawGraph() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.025)';
-  points.forEach((p, i) => {
-    p.x += p.vx; p.y += p.vy;
-    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
-    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
-    for(let j=i+1; j<points.length; j++) {
-      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
-      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    if (totalCorrectCount === items.length) {
+      feedbackBox.textContent = `✓ Verification Complete! Earned ${currentLesson.points} Points. Workspace sync successfully passed.`;
+      feedbackBox.className = 'feedback-area feedback-success';
+      feedbackBox.style.display = 'block';
+    } else {
+      feedbackBox.textContent = `✗ Verification Failed. Input data anomalies detected. Review steps and logs before running checks again.`;
+      feedbackBox.className = 'feedback-area feedback-error';
+      feedbackBox.style.display = 'block';
     }
-  });
-  requestAnimationFrame(drawGraph);
-}
-window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+  }
 
-init();
+  function navigateLesson(direction) {
+    const nextTargetId = activeLevelId + direction;
+    if (nextTargetId >= 1 && nextTargetId <= 30) {
+      window.location.search = `?id=${nextTargetId}`;
+    }
+  }
+
+  function escapeTextString(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Engine lifecycle triggers
+  fetchUrlParameterQueryId();
+  renderActiveWorkspaceLayout();
 </script>
+
 </body>
 </html>
