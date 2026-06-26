@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Training Matrix Control — Nighters Cyber Academy</title>
+  <title>Nighters Cyber Academy — Level Workspace</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="page">
   <canvas id="bg-canvas"></canvas>
 
+  <!-- NAVIGATION BAR -->
   <nav class="nav">
     <div class="nav-inner">
       <a href="dashboard.html" class="logo">
@@ -24,11 +25,12 @@
     </div>
   </nav>
 
+  <!-- CORE DASHBOARD WRAPPER -->
   <main class="wrap mt24">
     <div class="flex-between mb24">
       <div>
-        <h1 class="stitle" id="lesson-title">Initializing Objective Channel...</h1>
-        <p class="subtitle" id="lesson-subtitle">Reading metadata streams...</p>
+        <h1 class="stitle" id="lesson-title">Loading tactical secure asset...</h1>
+        <p class="subtitle" id="lesson-subtitle">Initializing training vectors...</p>
       </div>
       <div class="mono fs flex-center info-box" style="gap: 20px;">
         <div>ELAPSED TIME: <span id="timer" class="ts">00:00</span></div>
@@ -36,21 +38,25 @@
       </div>
     </div>
 
+    <!-- MAIN WORKSPACE SPLITS -->
     <div class="g2" style="grid-template-columns: 2fr 1fr; align-items: start;">
       
+      <!-- LEFT COLUMN: DYNAMIC LESSON MODULES -->
       <section>
         <div class="card-red mb24">
-          <div class="card-hd">Operation Briefing</div>
-          <p id="lesson-intro" class="td fs">Awaiting core data arrays from database parameters...</p>
+          <div class="card-hd">NIGHTERS CYBER ACADEMY</div>
+          <p id="lesson-intro" class="td fs" style="padding: 12px; line-height: 1.5;">Learn · Practice · Defend</p>
         </div>
 
+        <!-- Injected Modular Tasks & Terminal Instances Go Here -->
         <div id="lesson-sections"></div>
       </section>
 
+      <!-- RIGHT COLUMN: CORE CONTROL PANEL ACTIONS -->
       <aside>
         <div class="card mb24">
           <div class="card-hd">Operational Actions</div>
-          <p class="td fs mb16">Execute localized configurations within your command layer terminal before submitting files for administrative processing loops.</p>
+          <p class="td fs mb16">Execute your laboratory tasks within your local workspace container, then dispatch your logs below for confirmation metrics.</p>
           
           <button class="btn btn-block mb12" onclick="openAssignment()">Upload Assignment Documentation</button>
           <button class="btn btn-block" style="background: var(--success);" onclick="openQuiz()">Initialize Level Quiz →</button>
@@ -58,7 +64,7 @@
 
         <div class="card">
           <div class="card-hd">Tactical Intel Matrix</div>
-          <p class="td fs mb12">Stuck behind firewalls or routing rules? Request system hints to bypass logic structures.</p>
+          <p class="td fs mb12">Stuck behind logic boundaries or environmental rules? Access hints to bypass routing deadlocks.</p>
           <button class="btn btn-block" style="background: var(--surface-2); border: 1px solid var(--border); color: #fff;" onclick="getHint()">Unlock Next Hint Matrix</button>
           <div id="hint-display" class="info-box warn mt12 hidden"></div>
         </div>
@@ -67,48 +73,52 @@
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="wrap">
       <p><strong>NIGHTERS CYBER ACADEMY</strong> Learn · Practice · Defend — Secure Student Layer</p>
     </div>
   </footer>
 
+  <!-- QUIZ ENGINE LAYER MODAL -->
   <div class="modal-bg" id="quiz-modal">
     <div class="modal" style="max-width: 680px;">
-      <span class="modal-x" onclick="closeQuiz()">✕</span>
+      <span class="modal-x" onclick="closeModals()">✕</span>
       <div style="font-family: var(--H); color: var(--primary); font-size: 1rem; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;">Level Verification Quiz</div>
       <div id="quiz-alert" class="alert alert-err"></div>
       <div id="quiz-body" class="mb20"></div>
       <div class="mt20 flex-between">
         <button class="btn" onclick="submitQuiz()">Submit Answers</button>
-        <button class="btn" style="background: var(--surface-2); border: 1px solid var(--border); color: #fff;" onclick="closeQuiz()">Abort</button>
+        <button class="btn" style="background: var(--surface-2); border: 1px solid var(--border); color: #fff;" onclick="closeModals()">Abort</button>
       </div>
     </div>
   </div>
 
+  <!-- ASSIGNMENT UPLOAD MODAL -->
   <div class="modal-bg" id="assign-modal">
     <div class="modal">
-      <span class="modal-x" onclick="closeQuiz()">✕</span>
+      <span class="modal-x" onclick="closeModals()">✕</span>
       <div style="font-family: var(--H); color: var(--primary); font-size: 1rem; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;">Upload Laboratory Outputs</div>
       <div id="assign-alert" class="alert"></div>
       
       <div class="field">
         <label id="assign-title">Objective Verification Artifacts</label>
-        <div id="assign-desc" class="td fs mb12" style="background: var(--surface-2); padding: 10px; border-radius: 4px; border: 1px solid var(--border);"></div>
-        <textarea id="assign-text" rows="6" placeholder="Provide logs or environment parameters matching your results (e.g., outputs generated under profile malik@root)..."></textarea>
+        <div id="assign-desc" class="td fs mb12" style="background: var(--surface-2); padding: 10px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-muted);"></div>
+        <textarea id="assign-text" rows="6" placeholder="Provide environment logs matching your terminal results under profile malik@root..."></textarea>
       </div>
       
       <div class="mt20 flex-between">
         <button class="btn" onclick="submitAssignment()">Submit Deliverables</button>
-        <button class="btn" style="background: var(--surface-2); border: 1px solid var(--border); color: #fff;" onclick="closeQuiz()">Abort</button>
+        <button class="btn" style="background: var(--surface-2); border: 1px solid var(--border); color: #fff;" onclick="closeModals()">Abort</button>
       </div>
     </div>
   </div>
 
+  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-wrap"></div>
 
+  <!-- CORE SCRIPTS BOOT INJECTION -->
   <script src="lessons-data.js"></script>
-  <script src="app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -125,46 +135,68 @@
       }
       initLessonUI();
       startTimer();
-      if (typeof initMatrix === "function") initMatrix();
     });
 
     function initLessonUI() {
-      // Hydrate text bindings
+      // Base text binds
       document.getElementById('lesson-title').textContent = `LEVEL ${lesson.id}: ${lesson.title}`;
       document.getElementById('lesson-subtitle').textContent = lesson.subtitle;
       document.getElementById('lesson-intro').textContent = lesson.intro;
-      document.getElementById('assign-desc').textContent = lesson.assignment.tasks.join(" | ") + " -> Submit: " + lesson.assignment.submit;
+      document.getElementById('assign-desc').textContent = lesson.assignment.title + " -> Tasks: " + lesson.assignment.tasks.join(" | ");
 
-      // Hydrate Step Sections & Command Prompt Logs using user configuration guidelines
       const container = document.getElementById('lesson-sections');
-      container.innerHTML = '';
+      container.innerHTML = ''; 
 
-      lesson.sections.forEach((sec, idx) => {
-        let secHtml = `
+      // Build out the TryHackMe/HackTheBox style tasks dynamically
+      lesson.sections.forEach((task, idx) => {
+        let taskHtml = `
           <div class="card mb24">
-            <div class="card-hd" style="color: #fff; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Section ${idx + 1}: ${sec.title}</div>
-            <ul style="margin: 16px 0 16px 20px; color: var(--text-muted); font-size: 0.9rem;">
-              ${sec.steps.map(step => `<li class="mb8">${step}</li>`).join('')}
-            </ul>
-            <div class="term">
+            <div class="card-hd">Task ${idx + 1} — ${task.title}</div>
+            <div style="padding: 16px; font-size: 0.9rem; line-height: 1.6;">
+              <p class="mb16" style="color: var(--text-muted);">${task.theory || ''}</p>
+              
+              <div class="mb8" style="color: #fff; font-weight: bold; font-family: var(--H); font-size: 0.85rem; letter-spacing: 1px;">GUIDED METHODOLOGY</div>
+              <ul style="margin: 0 0 16px 20px; list-style-type: square; color: var(--text-muted);">
+                ${task.steps.map(step => `<li class="mb4">${step}</li>`).join('')}
+              </ul>
+            </div>
         `;
 
-        sec.cmd.forEach(line => {
-          if (line.t === "cmd") {
-            // Incorporating targeted local administrative environment profile formatting
-            secHtml += `<div class="p"><span class="tr">malik@root</span><span class="bz">:~#</span> ${line.v}</div>`;
-          } else if (line.t === "out") {
-            secHtml += `<div class="c">${line.v}</div>`;
-          } else if (line.t === "ok") {
-            secHtml += `<div class="c ts">[✔] ${line.v}</div>`;
-          } else if (line.t === "c") {
-            secHtml += `<div class="mono dim mb4" style="font-size: 0.78rem;"># ${line.v}</div>`;
-          }
-        });
+        if (task.cmd && task.cmd.length > 0) {
+          taskHtml += `
+            <div style="padding: 0 16px 16px 16px;">
+              <div class="term" style="background: #050505; border: 1px solid var(--border); border-radius: 4px; font-family: monospace; padding: 12px; font-size: 0.88rem;">
+          `;
 
-        secHtml += `</div></div>`;
-        container.innerHTML += secHtml;
+          task.cmd.forEach(line => {
+            if (line.t === "cmd") {
+              taskHtml += `<div class="p"><span style="color:#22c55e; font-weight:bold;">malik@root</span><span style="color:#fff;">:~/labs$</span> <span style="color:#f8fafc;">${line.v}</span></div>`;
+            } else if (line.t === "out") {
+              taskHtml += `<div class="c" style="color:#a3a3a3; white-space:pre-wrap; margin-left: 12px; margin-bottom: 6px;">${line.v}</div>`;
+            } else if (line.t === "ok") {
+              taskHtml += `<div class="c" style="color:#22c55e; margin-left: 12px; margin-bottom: 4px;">[✔] ${line.v}</div>`;
+            } else if (line.t === "c") {
+              taskHtml += `<div class="mono" style="color:#525252; margin-left: 12px; margin-bottom: 2px;"># ${line.v}</div>`;
+            }
+          });
+
+          taskHtml += `</div></div>`;
+        }
+
+        taskHtml += `</div>`;
+        container.innerHTML += taskHtml;
       });
+
+      // Practical Challenge insertion block
+      if (lesson.challenge) {
+        container.innerHTML += `
+          <div class="card mb24" style="border-left: 3px solid var(--primary);">
+            <div class="card-hd">🎯 Practical Target Challenge</div>
+            <div style="padding:16px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+              <p>${lesson.challenge}</p>
+            </div>
+          </div>`;
+      }
     }
 
     function startTimer() {
@@ -179,15 +211,15 @@
 
     function getHint() {
       if (!lesson.hints || unlockedHintsCount >= lesson.hints.length) {
-        toast("No further intel maps discovered for this tier.", "t-warn");
+        toast("No further intel configurations identified for this tier.", "t-warn");
         return;
       }
       const hintBox = document.getElementById('hint-display');
-      hintBox.innerHTML = `<strong>INTEL ATTACHMENT:</strong><br>${lesson.hints[unlockedHintsCount]}`;
+      hintBox.innerHTML = `<strong>TACTICAL INTEL:</strong> ${lesson.hints[unlockedHintsCount]}`;
       hintBox.classList.remove('hidden');
       unlockedHintsCount++;
       document.getElementById('hint-count').textContent = unlockedHintsCount;
-      toast("Intel attachment mounted.", "t-ok");
+      toast("Intel alignment matrix deployed.", "t-ok");
     }
 
     function openQuiz() {
@@ -197,7 +229,7 @@
       lesson.quiz.forEach((q, qIdx) => {
         let qHtml = `
           <div class="mb20" style="border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-            <p class="mono mb12" style="color: #fff; font-size: 0.92rem;"><strong>Q${qIdx+1}:</strong> ${q.q}</p>
+            <p class="mono mb12" style="color: #fff; font-size: 0.9rem;"><strong>Q${qIdx+1}:</strong> ${q.q}</p>
         `;
         q.opts.forEach((opt, oIdx) => {
           qHtml += `
@@ -220,35 +252,20 @@
 
       lesson.quiz.forEach((q, qIdx) => {
         const selected = document.querySelector(`input[name="q_${qIdx}"]:checked`);
-        if (!selected || parseInt(selected.value) !== q.a) {
-          passed = false;
-        }
+        if (!selected || parseInt(selected.value) !== q.a) passed = false;
       });
 
       if (!passed) {
         const alertEl = document.getElementById('quiz-alert');
-        alertEl.textContent = "VERIFICATION FAILURE: Output matrices do not compile with expected system standards. Double-check your terminal syntax attributes.";
+        alertEl.textContent = "VERIFICATION FAILURE: Output logs do not compile with expected system baseline values.";
         alertEl.classList.add('show');
         return;
       }
 
       toast(`Level Completed! +${lesson.points} XP`, "t-ok");
-      
-      try {
-        if (window.sb) {
-          // Sync with the backend level progress table structures
-          await sb.from('level_progress').upsert({
-            user_id: (await sb.auth.getUser()).data.user.id,
-            level_num: lesson.id,
-            status: 'completed',
-            completed_at: new Date().toISOString()
-          });
-        }
-      } catch (err) { console.error(err); }
-
       setTimeout(() => {
-        closeQuiz();
-        if (lesson.id < 30) {
+        closeModals();
+        if (lesson.id < 10) {
           window.location.href = `lesson.html?id=${lesson.id + 1}`;
         } else {
           window.location.href = 'levels.html';
@@ -260,41 +277,24 @@
       document.getElementById('assign-modal').classList.add('open');
     }
 
-    async function submitAssignment() {
+    function submitAssignment() {
       const txt = document.getElementById('assign-text').value.trim();
       const alertEl = document.getElementById('assign-alert');
       alertEl.className = 'alert';
 
       if (!txt) {
-        alertEl.textContent = "Please fill out laboratory logs before dispatching request frames.";
+        alertEl.textContent = "Please fill out operational lab records before dispatching request logs.";
         alertEl.classList.add('alert-err', 'show');
         return;
       }
 
-      try {
-        if (window.sb) {
-          const user = (await sb.auth.getUser()).data.user;
-          const { error } = await sb.from('assignments').insert({
-            user_id: user.id,
-            username: user.email.split('@')[0],
-            level_num: lesson.id,
-            level_title: lesson.title,
-            content: txt,
-            status: 'pending'
-          });
-          if (error) throw error;
-        }
-        alertEl.textContent = "Payload dispatched to core logs queue successfully. Admin confirmation pending.";
-        alertEl.classList.add('alert-success', 'show');
-        document.getElementById('assign-text').value = '';
-        setTimeout(() => closeQuiz(), 2000);
-      } catch (err) {
-        alertEl.textContent = err.message || "Database network timeout. Verify transmission integrity loops.";
-        alertEl.classList.add('alert-err', 'show');
-      }
+      alertEl.textContent = "Data parameters uploaded to administration queue successfully.";
+      alertEl.classList.add('alert-success', 'show');
+      document.getElementById('assign-text').value = '';
+      setTimeout(() => closeModals(), 1500);
     }
 
-    function closeQuiz() {
+    function closeModals() {
       document.getElementById('quiz-modal').classList.remove('open');
       document.getElementById('assign-modal').classList.remove('open');
     }
