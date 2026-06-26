@@ -2,15 +2,184 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Resources // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --gold: #f59e0b;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.15; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
+  .wrap { 
+      width: 100%;
+      max-width: 1100px; 
+      margin: 120px auto 60px auto; 
+      padding: 0 16px; 
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  
+  /* Link Grid Layout Architecture */
+  .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+  /* Spacing Blocks */
+  .mb8 { margin-bottom: 8px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb32 { margin-bottom: 32px; }
+
+  /* --- INTERACTIVE CARDS DESIGN --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Resource Hyperlink Hover States */
+  a.card:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(13, 19, 33, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.1);
+  }
+  .card-title { font-weight: 600; color: #fff; margin-bottom: 4px; font-size: 0.92rem; transition: color 0.2s; }
+  a.card:hover .card-title { color: var(--accent-cyan); }
+
+  /* --- RESPONSIVE TABLE LAYER SYSTEM --- */
+  .table-responsive {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+      overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;
+  }
+  .dtable { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; min-width: 750px; }
+  .dtable th { background: rgba(3, 5, 10, 0.6); padding: 14px 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-purple); border-bottom: 1px solid var(--border); }
+  .dtable td { padding: 14px 16px; border-bottom: 1px solid rgba(30, 41, 59, 0.5); color: var(--text-main); vertical-align: middle; }
+  .dtable tr:last-child td { border-bottom: none; }
+  .dtable tr:hover td { background: rgba(255, 255, 255, 0.01); }
+
+  /* Custom Inline Terminal Syntax Chips */
+  .code-chip { background: var(--bg-input); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; color: var(--accent-cyan); }
+
+  /* Typography Utilities */
+  .mono { font-family: var(--font); }
+  .td { color: var(--text-muted); }
+  .fs { font-size: 0.85rem; line-height: 1.6; }
+
+  /* --- FOOTER LAYER --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE VIEWPORT OPERATIONAL ADAPTATION MEDIA QUERIES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      
+      .wrap { margin-top: 95px; padding-left: 14px; padding-right: 14px; }
+      .g2 { grid-template-columns: 1fr; gap: 14px; }
+  }
+</style>
 </head>
-<body class="page">
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Top Fixed System Navigation Architecture -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links">
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Systems Navigation Links Menu Grid">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
       <a href="dashboard.html">Dashboard</a>
       <a href="levels.html">Levels</a>
       <a href="resources.html" class="on">Resources</a>
@@ -18,120 +187,223 @@
     </div>
   </div>
 </nav>
-<div class="wrap" style="padding-top:40px;padding-bottom:60px;">
-  <div class="stitle mb8">Learning Resources</div>
-  <p class="td fs mb32">Curated tools and sites for each phase. Use these alongside your lessons.</p>
 
+<!-- Main Interface Shell Container -->
+<div class="wrap">
+  <div class="stitle mb8">Learning Resources</div>
+  <p class="td fs mb32">Curated operational arrays and external testing grounds calibrated for each certification phase. Utilize these platforms alongside structured lesson briefs.</p>
+
+  <!-- PHASE 1 MATRIX -->
   <div class="stitle mb16">Phase 1 — Foundation (Phone + Debian)</div>
   <div class="g2 mb32">
-    <a href="https://f-droid.org" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">📱</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">F-Droid</div><div class="mono td" style="font-size:.74rem;">Download Termux correctly from here. NOT Play Store.</div></div>
+    <a href="https://f-droid.org" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">📱</div>
+      <div>
+        <div class="card-title">F-Droid App Store</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Download Termux build packages securely here. Do not deploy from Google Play Store.</div>
+      </div>
     </a>
-    <a href="https://linuxjourney.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🐧</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Linux Journey</div><div class="mono td" style="font-size:.74rem;">Interactive Linux basics. Covers all Level 1-3 topics.</div></div>
+    <a href="https://linuxjourney.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🐧</div>
+      <div>
+        <div class="card-title">Linux Journey</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Interactive environment maps for shell basics. Covers core parameters for Levels 1-3.</div>
+      </div>
     </a>
-    <a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">⚔️</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">OverTheWire Bandit</div><div class="mono td" style="font-size:.74rem;">Linux practice wargame. Good for Levels 2-3.</div></div>
+    <a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">⚔️</div>
+      <div>
+        <div class="card-title">OverTheWire // Bandit</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Gamified Linux connection labs. High utility for strengthening early terminal levels.</div>
+      </div>
     </a>
-    <a href="https://tryhackme.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🏠</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">TryHackMe</div><div class="mono td" style="font-size:.74rem;">Guided paths. Pre-Security and Linux Fundamentals paths.</div></div>
+    <a href="https://tryhackme.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🏠</div>
+      <div>
+        <div class="card-title">TryHackMe Network Labs</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Guided learning pathways. Highly recommend Pre-Security and Linux Fundamentals fields.</div>
+      </div>
     </a>
-    <a href="https://hunter.io" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">📧</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Hunter.io</div><div class="mono td" style="font-size:.74rem;">Find company email formats. Good for Level 9 OSINT.</div></div>
+    <a href="https://hunter.io" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">📧</div>
+      <div>
+        <div class="card-title">Hunter.io Target Scout</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Extract operational email schemas. Crucial data pipeline mapping for Level 9 OSINT.</div>
+      </div>
     </a>
-    <a href="https://web.archive.org" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">📼</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Wayback Machine</div><div class="mono td" style="font-size:.74rem;">Old versions of websites. Level 9-10 OSINT tool.</div></div>
+    <a href="https://web.archive.org" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">📼</div>
+      <div>
+        <div class="card-title">Wayback Machine Registry</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Review archived historic code bases. Vital resource for Level 9-10 footprint audits.</div>
+      </div>
     </a>
   </div>
 
-  <div class="stitle mb16">Phase 2 — Reconnaissance</div>
+  <!-- PHASE 2 MATRIX -->
+  <div class="stitle mb16">Phase 2 — Reconnaissance & Vulnerabilities</div>
   <div class="g2 mb32">
-    <a href="https://portswigger.net/web-security" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🕷</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">PortSwigger Web Academy</div><div class="mono td" style="font-size:.74rem;">Free Burp Suite training. All major web vulnerabilities.</div></div>
+    <a href="https://portswigger.net/web-security" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🕷</div>
+      <div>
+        <div class="card-title">PortSwigger Web Academy</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Definitive training tracks for Burp Suite. Covers injection and access bypass techniques.</div>
+      </div>
     </a>
-    <a href="https://hackthebox.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">📦</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Hack The Box</div><div class="mono td" style="font-size:.74rem;">Real machines. Starting Point is free. Level 12+ practice.</div></div>
+    <a href="https://hackthebox.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">📦</div>
+      <div>
+        <div class="card-title">Hack The Box Complexes</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Live, advanced network configurations. Leverage Starting Point instances for Level 12+ targets.</div>
+      </div>
     </a>
-    <a href="https://crt.sh" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🔐</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">crt.sh</div><div class="mono td" style="font-size:.74rem;">Certificate transparency logs. Best passive subdomain finder. Level 14.</div></div>
+    <a href="https://crt.sh" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🔐</div>
+      <div>
+        <div class="card-title">crt.sh Certificate Monitor</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Passive SSL/TLS certificate log harvesting. Flawless subdomain mapping for Level 14.</div>
+      </div>
     </a>
-    <a href="https://shodan.io" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🌐</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Shodan</div><div class="mono td" style="font-size:.74rem;">Search engine for internet-connected devices. Level 9.</div></div>
+    <a href="https://shodan.io" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🌐</div>
+      <div>
+        <div class="card-title">Shodan Device Indexer</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">IoT internet discovery grid. Query device banner profiles directly during Level 9 operations.</div>
+      </div>
     </a>
-    <a href="http://testphp.vulnweb.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🎯</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">testphp.vulnweb.com</div><div class="mono td" style="font-size:.74rem;">Legal vulnerable site for practice. Levels 16-24.</div></div>
+    <a href="http://testphp.vulnweb.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🎯</div>
+      <div>
+        <div class="card-title">Acunetix Vulnerability Target</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Authorized, live vulnerable web node target. Validated sandbox for Levels 16-24 testing.</div>
+      </div>
     </a>
-    <a href="https://scanme.nmap.org" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🔭</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">scanme.nmap.org</div><div class="mono td" style="font-size:.74rem;">Legal nmap practice target. Set up by nmap creators. Levels 12-13.</div></div>
+    <a href="https://scanme.nmap.org" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🔭</div>
+      <div>
+        <div class="card-title">ScanMe Nmap Laboratory</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Legal remote network node provided by Nmap founders. Calibrated for Level 12-13 scans.</div>
+      </div>
     </a>
   </div>
 
+  <!-- PHASE 3 MATRIX -->
   <div class="stitle mb16">Phase 3 — Red Team Operations</div>
   <div class="g2 mb32">
-    <a href="https://attack.mitre.org" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🗺</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">MITRE ATT&CK</div><div class="mono td" style="font-size:.74rem;">The definitive Red Team tactics reference. Essential reading.</div></div>
+    <a href="https://attack.mitre.org" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🗺</div>
+      <div>
+        <div class="card-title">MITRE ATT&CK Framework</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">The foundational lexicon of real-world corporate adversary behavior maps. Crucial reading.</div>
+      </div>
     </a>
-    <a href="https://www.exploit-db.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🗄</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">Exploit-DB</div><div class="mono td" style="font-size:.74rem;">Public exploit archive. Also has Google Hacking Database. Level 10.</div></div>
+    <a href="https://www.exploit-db.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🗄</div>
+      <div>
+        <div class="card-title">Exploit-DB Database</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Public proof-of-concept repository. Houses the Google Hacking Database (GHDB) for Level 10.</div>
+      </div>
     </a>
-    <a href="https://gtfobins.github.io" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">⬆️</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">GTFOBins</div><div class="mono td" style="font-size:.74rem;">Linux binary exploitation for privesc. Level 25 essential.</div></div>
+    <a href="https://gtfobins.github.io" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">⬆️</div>
+      <div>
+        <div class="card-title">GTFOBins Binary Index</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Misconfigured Unix binary breakout commands. Mandatory reference for Level 25 privilege escalation.</div>
+      </div>
     </a>
-    <a href="https://crackstation.net" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🔓</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">CrackStation</div><div class="mono td" style="font-size:.74rem;">Online MD5/SHA1 hash cracker. Level 26.</div></div>
+    <a href="https://crackstation.net" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🔓</div>
+      <div>
+        <div class="card-title">CrackStation Tables</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">High-speed cryptographic hash lookup array. Essential toolkit for Level 26 credential decodes.</div>
+      </div>
     </a>
-    <a href="https://www.virustotal.com" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">🛡</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">VirusTotal</div><div class="mono td" style="font-size:.74rem;">Check suspicious URLs and files. Level 28 phishing tool.</div></div>
+    <a href="https://www.virustotal.com" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">🛡</div>
+      <div>
+        <div class="card-title">VirusTotal Multi-Scanner</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Analyze payload signatures and malicious URI paths. Utilized extensively during Level 28 phishing labs.</div>
+      </div>
     </a>
-    <a href="https://www.first.org/cvss/calculator/3.1" target="_blank" rel="noopener" class="card" style="text-decoration:none;display:flex;gap:14px;padding:16px 18px;">
-      <div style="font-size:1.5rem;">📊</div>
-      <div><div style="font-weight:600;color:var(--txt);margin-bottom:4px;">CVSS Calculator</div><div class="mono td" style="font-size:.74rem;">Score vulnerabilities properly for your report. Level 29.</div></div>
+    <a href="https://www.first.org/cvss/calculator/3.1" target="_blank" rel="noopener" class="card" style="text-decoration:none; display:flex; gap:16px; padding:18px;">
+      <div style="font-size:1.6rem; margin-top: 2px;">📊</div>
+      <div>
+        <div class="card-title">CVSS v3.1 Severity Calculator</div>
+        <div class="mono td" style="font-size:.76rem; line-height: 1.5;">Mathematical vulnerability indexing utility. Translates risk findings into Level 29 executive reports.</div>
+      </div>
     </a>
   </div>
 
-  <div class="stitle mb16">Tool Reference</div>
-  <div class="card mb16" style="overflow:auto;">
+  <!-- CORE PACKAGES PLATFORM REFERENCE -->
+  <div class="stitle mb16">Tool Reference & Terminal Provisioning Map</div>
+  <div class="table-responsive mb32">
     <table class="dtable">
-      <thead><tr><th>Tool</th><th>Install</th><th>Used In</th><th>Purpose</th></tr></thead>
-      <tbody>
-        <tr><td>nmap</td><td class="mono" style="font-size:.72rem;">apt install nmap</td><td>Levels 5,12,13,17</td><td>Port scanning and service detection</td></tr>
-        <tr><td>dirb</td><td class="mono" style="font-size:.72rem;">apt install dirb</td><td>Level 16</td><td>Directory busting</td></tr>
-        <tr><td>gobuster</td><td class="mono" style="font-size:.72rem;">apt install gobuster</td><td>Level 16</td><td>Faster directory busting</td></tr>
-        <tr><td>nikto</td><td class="mono" style="font-size:.72rem;">apt install nikto</td><td>Level 18</td><td>Web vulnerability scanner</td></tr>
-        <tr><td>sublist3r</td><td class="mono" style="font-size:.72rem;">pip3 install sublist3r</td><td>Level 14</td><td>Subdomain enumeration</td></tr>
-        <tr><td>amass</td><td class="mono" style="font-size:.72rem;">apt install amass</td><td>Level 14</td><td>Deep subdomain enumeration</td></tr>
-        <tr><td>whatweb</td><td class="mono" style="font-size:.72rem;">apt install whatweb</td><td>Level 15</td><td>Web technology fingerprinting</td></tr>
-        <tr><td>theHarvester</td><td class="mono" style="font-size:.72rem;">apt install theharvester</td><td>Level 9</td><td>OSINT email and subdomain finder</td></tr>
-        <tr><td>dnsrecon</td><td class="mono" style="font-size:.72rem;">apt install dnsrecon</td><td>Level 11</td><td>DNS enumeration</td></tr>
-        <tr><td>sqlmap</td><td class="mono" style="font-size:.72rem;">apt install sqlmap</td><td>Level 21</td><td>Automated SQL injection</td></tr>
-        <tr><td>hydra</td><td class="mono" style="font-size:.72rem;">apt install hydra</td><td>Level 23</td><td>Brute force login attacks</td></tr>
-        <tr><td>john</td><td class="mono" style="font-size:.72rem;">apt install john</td><td>Level 26</td><td>Password hash cracking</td></tr>
-        <tr><td>steghide</td><td class="mono" style="font-size:.72rem;">apt install steghide</td><td>Level 27</td><td>Steganography</td></tr>
-        <tr><td>binwalk</td><td class="mono" style="font-size:.72rem;">apt install binwalk</td><td>Level 27</td><td>Find files inside files</td></tr>
-        <tr><td>exiftool</td><td class="mono" style="font-size:.72rem;">apt install exiftool</td><td>Level 27</td><td>Read file metadata</td></tr>
-        <tr><td>netcat</td><td class="mono" style="font-size:.72rem;">apt install netcat-openbsd</td><td>Level 17</td><td>Connect to any TCP/UDP port</td></tr>
+      <thead>
+        <tr>
+          <th>Core Tool</th>
+          <th>Debian Environment Setup Command</th>
+          <th>Target Phase Focus</th>
+          <th>Strategic Purpose</th>
+        </tr>
+      </thead>
+      <tbody class="mono">
+        <tr><td><strong>nmap</strong></td><td><span class="code-chip">apt install nmap</span></td><td style="color:var(--accent-cyan)">Levels 5,12,13,17</td><td class="td">Port scanning and service detection arrays</td></tr>
+        <tr><td><strong>dirb</strong></td><td><span class="code-chip">apt install dirb</span></td><td style="color:var(--accent-cyan)">Level 16</td><td class="td">Web path content enforcement brute-forcing</td></tr>
+        <tr><td><strong>gobuster</strong></td><td><span class="code-chip">apt install gobuster</span></td><td style="color:var(--accent-cyan)">Level 16</td><td class="td">High-velocity Go web directory enumeration</td></tr>
+        <tr><td><strong>nikto</strong></td><td><span class="code-chip">apt install nikto</span></td><td style="color:var(--accent-cyan)">Level 18</td><td class="td">CGI directory security exposure scanner</td></tr>
+        <tr><td><strong>sublist3r</strong></td><td><span class="code-chip">pip3 install sublist3r</span></td><td style="color:var(--accent-cyan)">Level 14</td><td class="td">OSINT multithread subdomain aggregator</td></tr>
+        <tr><td><strong>amass</strong></td><td><span class="code-chip">apt install amass</span></td><td style="color:var(--accent-cyan)">Level 14</td><td class="td">Deep infrastructure active/passive asset mapping</td></tr>
+        <tr><td><strong>whatweb</strong></td><td><span class="code-chip">apt install whatweb</span></td><td style="color:var(--accent-cyan)">Level 15</td><td class="td">Web application engine fingerprint scanning</td></tr>
+        <tr><td><strong>theHarvester</strong></td><td><span class="code-chip">apt install theharvester</span></td><td style="color:var(--accent-cyan)">Level 9</td><td class="td">Public domain corporate name/email scanner</td></tr>
+        <tr><td><strong>dnsrecon</strong></td><td><span class="code-chip">apt install dnsrecon</span></td><td style="color:var(--accent-cyan)">Level 11</td><td class="td">Advanced Zone transfer execution & DNS mapping</td></tr>
+        <tr><td><strong>sqlmap</strong></td><td><span class="code-chip">apt install sqlmap</span></td><td style="color:var(--accent-cyan)">Level 21</td><td class="td">Blind/Error-based SQL injection automation system</td></tr>
+        <tr><td><strong>hydra</strong></td><td><span class="code-chip">apt install hydra</span></td><td style="color:var(--accent-cyan)">Level 23</td><td class="td">Network authentication credential spray runner</td></tr>
+        <tr><td><strong>john</strong></td><td><span class="code-chip">apt install john</span></td><td style="color:var(--accent-cyan)">Level 26</td><td>Password hash dictionary payload cracker</td></tr>
+        <tr><td><strong>steghide</strong></td><td><span class="code-chip">apt install steghide</span></td><td style="color:var(--accent-cyan)">Level 27</td><td class="td">Extract hidden data inside image/audio channels</td></tr>
+        <tr><td><strong>binwalk</strong></td><td><span class="code-chip">apt install binwalk</span></td><td style="color:var(--accent-cyan)">Level 27</td><td class="td">Firmware analysis and binary block extraction</td></tr>
+        <tr><td><strong>exiftool</strong></td><td><span class="code-chip">apt install exiftool</span></td><td style="color:var(--accent-cyan)">Level 27</td><td class="td">Read/write embedded asset file metadata structures</td></tr>
+        <tr><td><strong>netcat</strong></td><td><span class="code-chip">apt install netcat-openbsd</span></td><td style="color:var(--accent-cyan)">Level 17</td><td class="td">Raw TCP/UDP socket network connections</td></tr>
       </tbody>
     </table>
   </div>
 </div>
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<!-- Bottom Structural Anchor Base Layer -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend — Core Operations Platform
+</footer>
+
 <script src="app.js"></script>
+<script>
+/* Mobile Menu Toggle Component Hook */
+document.getElementById('menu-toggle')?.addEventListener('click', () => {
+    document.getElementById('nav-menu')?.classList.toggle('active');
+});
+
+/* Ambient Node Matrix Physics Background System */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(25, window.innerWidth / 70);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+</script>
 </body>
 </html>
