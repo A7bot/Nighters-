@@ -2,43 +2,273 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Reset Password // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --gold: #f59e0b;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.20; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
+  .wrap-sm { 
+      width: 100%;
+      max-width: 450px; 
+      margin: auto; 
+      padding: 0 16px; 
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* Terminal Info Box */
+  .term {
+      background: var(--bg-input); border-left: 3px solid var(--accent-purple); padding: 14px 18px;
+      border-radius: 0 6px 6px 0; margin-bottom: 24px; font-size: 0.8rem; line-height: 1.6;
+  }
+  .term .p { color: var(--text-main); font-weight: bold; margin-bottom: 4px; }
+  .term .c { color: var(--text-muted); }
+
+  /* --- CARD INTERFACES ARCHITECTURE --- */
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-top: 3px solid var(--text-red);
+      border-radius: 8px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  }
+
+  /* Form Fields Styling */
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .field label { font-size: 0.68rem; font-weight: bold; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+  .field input {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px; padding: 12px;
+      color: #fff; font-family: var(--font); font-size: 0.88rem; width: 100%; outline: none; transition: border-color 0.2s;
+  }
+  .field input:focus { border-color: var(--accent-cyan); }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 12px 24px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+      transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; outline: none;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.05); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.25); }
+  .btn-block { width: 100%; display: flex; }
+
+  /* Notification Alerts */
+  .alert { padding: 12px 16px; font-size: 0.78rem; border-radius: 4px; margin-bottom: 16px; display: none; line-height: 1.5; border: 1px solid transparent; }
+  .alert.show { display: block; }
+  .alert-err { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.2); color: var(--text-red); }
+  .alert-ok { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+  /* Utilities */
+  .mb12 { margin-bottom: 12px; }
+  .mb24 { margin-bottom: 24px; }
+  .mt16 { margin-top: 16px; }
+  .mono { font-family: var(--font); }
+  .td { color: var(--text-muted); }
+  .tc { text-align: center; }
+  .tc a { text-decoration: none; transition: color 0.2s; }
+  .tc a:hover { color: #fff !important; }
+
+  /* --- FOOTER LAYER --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE VIEWPORT OPERATIONAL ADAPTATION MEDIA QUERIES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+  }
+</style>
 </head>
-<body class="page">
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+
 <canvas id="bg-canvas"></canvas>
+
+<!-- Top Fixed System Navigation Architecture -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links"><a href="login.html">Login</a></div>
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Systems Navigation Links Menu Grid">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
+      <a href="login.html">Login</a>
+    </div>
   </div>
 </nav>
-<div class="wrap-sm" style="padding-top:60px;padding-bottom:60px;">
+
+<!-- Main Interface Shell Container -->
+<div class="wrap-sm" style="margin-top: 140px; margin-bottom: 60px;">
   <div class="stitle mb12">Reset Password</div>
+  
   <div class="term mb24">
     <div class="p">Enter your email to receive a reset link.</div>
     <div class="c">Check your spam folder if you do not see the email.</div>
   </div>
+  
   <div class="card-red">
     <div id="ra" class="alert"></div>
-    <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="operative@domain.com" onkeydown="if(event.key==='Enter')doReset()"></div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="operative@domain.com" onkeydown="if(event.key==='Enter')doReset()">
+    </div>
     <button class="btn btn-block" onclick="doReset()">Send Reset Link</button>
-    <p class="tc mt16 mono td" style="font-size:.72rem;"><a href="login.html" style="color:var(--red);">← Back to login</a></p>
+    <p class="tc mt16 mono td" style="font-size:.72rem;"><a href="login.html" style="color:var(--text-red);">← Back to login</a></p>
   </div>
 </div>
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Authorized Training Platform</footer>
+
+<!-- Bottom Structural Anchor Base Layer -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend — Authorized Training Platform
+</footer>
+
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+/* Mobile Hamburger Toggle Action */
+document.getElementById('menu-toggle')?.addEventListener('click', () => {
+    document.getElementById('nav-menu')?.classList.toggle('active');
+});
+
+/* System Notification Feedback Trigger Component */
+function showAlert(id, msg, type){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = msg;
+  el.className = `alert alert-${type === 'err' ? 'err' : 'ok'} show`;
+}
+
 async function doReset(){
   const email=document.getElementById('email').value.trim();
-  if(!email)return showAlert('ra','Enter your email.','err');
-  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/login.html'});
-  if(error)return showAlert('ra',error.message,'err');
-  showAlert('ra','Reset link sent. Check your inbox.','ok');
+  if(!email)return showAlert('ra','Enter your email address to continue.','err');
+  
+  try {
+    const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/login.html'});
+    if(error)return showAlert('ra',error.message,'err');
+    showAlert('ra','Reset link safely transmitted. Please check your inbox stream.','ok');
+  } catch(e) {
+    showAlert('ra','Secure connection pipeline dropped. Retry action execution loop.','err');
+  }
 }
+
+/* Ambient Node Matrix Physics System Engine */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(15, window.innerWidth / 70);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 180) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
 </script>
 </body>
 </html>
