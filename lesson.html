@@ -3,294 +3,487 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Lesson Training Module // Nighters Cyber Academy</title>
+<title>Lesson // Nighters Cyber Academy</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  :root {
-    --bg: #0d0e12;
-    --bg2: #151821;
-    --line: #222633;
-    --red: #ff3e3e;
-    --red-dim: #2a1414;
-    --txt: #e2e8f0;
-    --dim: #94a3b8;
-    --muted: #475569;
-    --term-green: #39ff14;
-    --term-bg: #05070a;
+  /* Extra responsive utility definitions matching system styling */
+  .modal-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(4, 4, 4, 0.85); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  body { background: var(--bg); color: var(--txt); line-height: 1.6; padding-bottom: 60px; }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--bg); border: 1px solid var(--rbdr); width: 100%; max-width: 600px;
+    padding: 24px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .modal-x { position: absolute; top: 16px; right: 20px; cursor: pointer; color: var(--muted); font-size: 1.2rem; }
+  .modal-x:hover { color: var(--red); }
   
-  /* Responsive Navigation */
-  .nav { background: var(--bg2); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 100; }
-  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; }
-  .logo { font-weight: 800; color: var(--red); text-decoration: none; letter-spacing: 1px; font-size: 1.1rem; }
-  .logo small { color: var(--dim); font-size: 0.7rem; margin-left: 8px; font-weight: 400; }
-  .nav-links a { color: var(--dim); text-decoration: none; font-size: 0.9rem; margin-left: 20px; font-weight: 500; }
-  .nav-links a:hover { color: var(--txt); }
-
-  .wrap { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+  /* Quiz Styling Options */
+  .quiz-option {
+    background: var(--bg2); border: 1px solid var(--line); padding: 14px 18px; margin-bottom: 10px;
+    cursor: pointer; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s;
+  }
+  .quiz-option:hover { border-color: var(--red); }
+  .quiz-option.selected { background: rgba(206,32,40,0.06); border-color: var(--red); }
+  .quiz-option input { margin: 0; pointer-events: none; accent-color: var(--red); }
   
-  /* Lesson Typography Elements */
-  .hdr-block { margin-bottom: 28px; }
-  .phase-tag { display: inline-block; background: var(--red-dim); color: var(--red); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border: 1px solid var(--red); border-radius: 3px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-  .title { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
-  .subtitle { color: var(--dim); font-size: 1.05rem; }
-
-  .card { background: var(--bg2); border: 1px solid var(--line); border-radius: 6px; padding: 24px; margin-bottom: 24px; }
-  .card-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+  /* Hint Elements styling */
+  .hint-box { background: var(--bg2); border-left: 3px solid var(--muted); padding: 12px 16px; margin-top: 8px; display: none; }
+  .hint-box.visible { display: block; }
   
-  /* Strict Malik@Root Retro Terminal Layout */
-  .terminal-window { background: var(--term-bg); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; font-family: "Courier New", Courier, monospace; margin: 16px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-  .term-header { background: #1a1e29; padding: 8px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .dot.r { background: #ff5f56; } .dot.y { background: #ffbd2e; } .dot.g { background: #27c93f; }
-  .term-title { color: var(--dim); font-size: 0.75rem; margin-left: 8px; font-weight: 600; }
-  .term-body { padding: 16px; overflow-x: auto; font-size: 0.9rem; min-height: 120px; white-space: pre-wrap; word-wrap: break-word; }
+  /* Visual alignment for command responses and boxes */
+  .cmd-block { background: #0c0c0c; border: 1px solid #1a1a1a; padding: 14px 18px; font-family: var(--mono); font-size: 0.84rem; overflow-x: auto; margin: 12px 0; border-radius: 4px; }
+  .cmd-line { color: #55ff55; margin-bottom: 4px; word-break: break-all; }
+  .cmd-out { color: #cccccc; margin-bottom: 4px; white-space: pre-wrap; word-break: break-all; }
+  .cmd-ok { color: #5555ff; font-weight: bold; margin-bottom: 4px; }
+  .cmd-comment { color: var(--muted); margin-bottom: 4px; font-style: italic; }
   
-  /* Prompt Specific Formatting Rules */
-  .prompt-row { margin-bottom: 14px; }
-  .prompt-line { color: var(--term-green); font-weight: bold; display: block; margin-bottom: 4px; }
-  .cmd-output { color: #ffffff; display: block; padding-left: 12px; border-left: 2px solid var(--muted); margin: 6px 0 12px 4px; font-size: 0.85rem; }
-  .info-tag { color: #00bfff; font-style: italic; display: block; margin-bottom: 4px; }
-
-  ul, ol { padding-left: 22px; margin-bottom: 16px; }
-  li { margin-bottom: 8px; color: var(--txt); }
-
-  /* Utility Control Buttons */
-  .btn-group { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
-  .btn { background: var(--red); color: #fff; border: none; padding: 12px 24px; font-weight: 700; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s; }
-  .btn:hover { background: #e03232; }
-  .btn-sec { background: transparent; border: 1px solid var(--line); color: var(--dim); }
-  .btn-sec:hover { border-color: var(--dim); color: #fff; }
-
-  /* Quiz and Assessment Modals */
-  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,10,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--line); width: 100%; max-width: 600px; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; max-height: 90vh; }
-  .modal-hd { padding: 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-  .modal-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
-  .modal-close { color: var(--dim); cursor: pointer; font-size: 1.2rem; }
-  .modal-bd { padding: 24px; overflow-y: auto; flex-grow: 1; }
-  .modal-ft { padding: 16px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 12px; background: #11141b; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-
-  .q-item { margin-bottom: 24px; }
-  .q-text { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #fff; }
-  .opt-label { display: flex; align-items: center; gap: 10px; background: var(--bg); border: 1px solid var(--line); padding: 12px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-  .opt-label:hover { border-color: var(--muted); background: #12151d; }
-  
-  .feedback-area { margin-top: 16px; padding: 14px; border-radius: 4px; display: none; font-weight: 600; font-size: 0.9rem; }
-  .feedback-success { background: rgba(39,201,63,0.15); border: 1px solid #27c93f; color: #27c93f; }
-  .feedback-error { background: rgba(255,95,86,0.15); border: 1px solid #ff5f56; color: #ff5f56; }
-
-  @media (max-width: 600px) {
-    .title { font-size: 1.6rem; }
-    .nav-links { display: none; } /* Mobile optimization fallback pattern */
-    .btn-group { flex-direction: column; align-items: stretch; }
-    .btn { width: 100%; }
+  @media (max-width: 768px) {
+    .wrap-md { padding-left: 12px !important; padding-right: 12px !important; }
+    .footer-bar-inner { flex-direction: column; text-align: center; gap: 14px !important; }
   }
 </style>
 </head>
 <body class="page">
-
 <nav class="nav">
   <div class="nav-inner">
-    <a href="dashboard.html" class="logo">NIGHTERS CYBER ACADEMY<small>// LAB TERMINAL CONTAINER</small></a>
+    <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
     <div class="nav-links">
       <a href="dashboard.html">Dashboard</a>
       <a href="levels.html">All Levels</a>
+      <a href="help.html">🆘 Help</a>
+      <a href="#" onclick="doLogout()" style="color:var(--muted);">Logout</a>
     </div>
   </div>
 </nav>
 
-<div class="wrap">
-  <div id="lesson-viewport">
-    </div>
-
-  <div class="btn-group">
-    <button class="btn btn-sec" onclick="navigateLesson(-1)">← Return Previous</button>
-    <button class="btn" onclick="openAssessmentBox()">Launch Challenge Quiz &amp; Progress</button>
-    <button class="btn btn-sec" onclick="navigateLesson(1)">Advance Next →</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="quiz-modal">
-  <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-title" id="modal-eval-title">Level Knowledge Verification Matrix</div>
-      <span class="modal-close" onclick="closeAssessmentBox()">✕</span>
-    </div>
-    <div class="modal-bd" id="quiz-target-container">
-      </div>
-    <div id="modal-feedback" class="feedback-area"></div>
-    <div class="modal-ft">
-      <button class="btn btn-sec" onclick="closeAssessmentBox()">Dismiss</button>
-      <button class="btn" onclick="evaluateSubmittedQuizAnswers()">Validate Evaluation Checks</button>
-    </div>
-  </div>
-</div>
-
-<script src="lessons-data.js"></script>
-<script>
-  let activeLevelId = 1;
-
-  function fetchUrlParameterQueryId() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get('id'));
-    if (!isNaN(id) && id >= 1 && id <= 30) {
-      activeLevelId = id;
-    }
-  }
-
-  function renderActiveWorkspaceLayout() {
-    const currentLesson = getLessonById(activeLevelId);
-    const container = document.getElementById('lesson-viewport');
+<div class="modal-bg" id="quiz-modal">
+  <div class="modal" style="max-width:680px;">
+    <span class="modal-x" onclick="closeQuiz()">✕</span>
+    <div style="font-family:var(--H);color:var(--red);font-size:1rem;letter-spacing:2px;margin-bottom:20px;">LEVEL EVALUATION QUIZ</div>
     
-    if (!currentLesson) {
-      container.innerHTML = `<div class="card"><div class="card-title">Error</div><p>Requested operational blueprint index could not be verified.</p></div>`;
+    <div id="quiz-container-view">
+      <div id="quiz-body"></div>
+      <div class="mt20 flex-between" id="quiz-footer" style="align-items:center; border-top:1px solid var(--line); padding-top:16px;">
+        <div class="mono td" style="font-size:.72rem;" id="q-progress">0/0 answered</div>
+        <button class="btn" onclick="submitQuiz()">Submit Answers</button>
+      </div>
+    </div>
+
+    <div id="quiz-result" style="display:none;text-align:center;padding:24px;">
+      <div style="font-size:3.5rem;margin-bottom:12px;" id="qr-icon">📊</div>
+      <div style="font-family:var(--H);font-size:2.8rem;color:var(--red);margin-bottom:8px;" id="qr-score">—</div>
+      <div class="mono td mb24" id="qr-msg" style="line-height: 1.6;"></div>
+      <button class="btn" id="qr-btn" onclick="closeQuiz()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="assign-modal">
+  <div class="modal">
+    <span class="modal-x" onclick="document.getElementById('assign-modal').classList.remove('open')">✕</span>
+    <div style="font-family:var(--H);color:var(--red);font-size:1rem;letter-spacing:2px;margin-bottom:20px;">SUBMIT LABORATORY ASSIGNMENT</div>
+    <div id="assign-task-list" class="mb16" style="background: var(--bg2); padding:14px; border:1px solid var(--line); font-size:0.86rem; line-height:1.6;"></div>
+    <div class="field">
+      <label>Operational Work &amp; Findings Documentation</label>
+      <textarea id="assign-text" rows="8" placeholder="Provide documentation on tasks executed, terminal snippets, logs generated, or explicit vulnerability proofs found..."></textarea>
+    </div>
+    <div id="assign-alert" class="alert" style="display:none; margin-bottom:12px;"></div>
+    <button class="btn btn-block" onclick="submitAssignment()">Submit to Admin for Review</button>
+    <p class="tc mt12 mono td" style="font-size:.72rem;">Academy staff will cross-verify logs and issue grades alongside feedback.</p>
+  </div>
+</div>
+
+<div class="wrap-md" style="padding-top:28px;padding-bottom:100px;" id="lesson-wrap">
+  <div class="tc" style="padding:60px;"><div class="mono td">Loading tactical secure asset...</div></div>
+</div>
+
+<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,8,0.96);border-top:1px solid var(--rbdr);padding:14px 22px;z-index:50;backdrop-filter:blur(10px);">
+  <div class="footer-bar-inner" style="max-width:780px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div class="flex-center">
+      <div class="mono td" style="font-size:.7rem; letter-spacing:1px;">ELAPSED TIME: <span class="tr" id="timer-disp" style="font-weight:600; color:var(--txt);">00:00</span></div>
+      <div class="mono td" style="font-size:.7rem;margin-left:20px; letter-spacing:1px;">HINTS UNLOCKED: <span class="tr" id="hints-used" style="font-weight:600; color:var(--red);">0</span></div>
+    </div>
+    <div class="flex-center gap8">
+      <button class="btn btn-dark btn-sm" onclick="document.getElementById('assign-modal').classList.add('open')">Upload Assignment Documentation</button>
+      <button class="btn btn-sm" onclick="openQuiz()">Initialize Level Quiz →</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:20px; margin-bottom:40px;"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<script src="app.js"></script>
+<script src="lessons-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+let me=null, prof=null, lesson=null, startTime=Date.now(), timerRef=null, quizAnswers={}, hintsUnlockedCount=0;
+
+// Utility safe-escaping mechanism 
+function esc(str){
+  if(!str) return '';
+  return str.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function init(){
+  try {
+    me=await requireAuth(sb); if(!me) return;
+    const {data:p}=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle();
+    if(!p){ window.location='login.html'; return; }
+    prof=p;
+
+    const params=new URLSearchParams(location.search);
+    const id=parseInt(params.get('id'))||1;
+    lesson=getLessonById(id);
+    
+    if(!lesson){
+      document.getElementById('lesson-wrap').innerHTML='<div class="info-box warn">Operational level matrix not configured. <a href="levels.html" style="color:var(--red);">Return to Deck</a></div>';
       return;
     }
 
-    let dynamicSectionsHtml = '';
-    currentLesson.sections.forEach(section => {
-      let terminalInteractionBlock = '';
-      if (section.cmd && section.cmd.length > 0) {
-        let terminalLines = '';
-        section.cmd.forEach(item => {
-          if (item.type === 'comment') {
-            terminalLines += `<div class="info-tag"># ${escapeTextString(item.val)}</div>`;
-          } else if (item.type === 'prompt') {
-            terminalLines += `<div class="prompt-row"><span class="prompt-line">malik@root:~# ${escapeTextString(item.val)}</span>`;
-          } else if (item.type === 'output') {
-            terminalLines += `<span class="cmd-output">${escapeTextString(item.val)}</span></div>`;
-          }
-        });
+    // Dynamic state locking verification logic
+    if(id>1 && id>(prof.current_level||1)){
+      document.getElementById('lesson-wrap').innerHTML=`
+        <div class="card-red" style="text-align:center;padding:48px;">
+          <div style="font-size:2.5rem;margin-bottom:14px;">🔒</div>
+          <div class="tr mono" style="letter-spacing:2px; font-weight:600;">LEVEL ${id} ARCHITECTURE LOCKED</div>
+          <div class="td mono mt8">Complete Phase training benchmarks up to Level ${id-1} to clear decryption flags.</div>
+          <a href="levels.html" class="btn mt20">Back to Operations Hub</a>
+        </div>`;
+      return;
+    }
 
-        terminalInteractionBlock = `
-          <div class="terminal-window">
-            <div class="term-header">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <span class="term-title">malik@root: debian_environment_container (~/nca_labs)</span>
-            </div>
-            <div class="term-body">${terminalLines}</div>
+    renderLesson();
+    startTimer();
+
+    // Persist real-time session registration mapping status updates 
+    await sb.from('level_progress').upsert({
+      user_id:me.id,
+      level_num:id,
+      status:'in_progress',
+      started_at:new Date().toISOString()
+    },{onConflict:'user_id,level_num'});
+
+  } catch(e) {
+    console.error("Initialization anomaly caught:", e);
+  }
+}
+
+function renderLesson(){
+  const l=lesson;
+  
+  let html=`
+    <div class="flex-between mb12" style="align-items:center;">
+      <a href="levels.html" class="mono td" style="font-size:.72rem;text-decoration:none; color:var(--muted);"><span style="color:var(--red);">←</span> Master Level Deck</a>
+      <div class="flex-center gap8">
+        <span class="badge ${l.type==='web'?'bweb':'bsys'}">${l.type.toUpperCase()} TARGET</span>
+        <span class="mono td" style="font-size:.7rem; background:var(--bg2); padding:4px 8px; border:1px solid var(--line);">⏱ ESTIMATE: ${l.duration_mins} MINS</span>
+        <span class="mono tr" style="font-size:.7rem; background:rgba(206,32,40,0.1); border:1px solid var(--rbdr); padding:4px 8px;">VAL: ${l.points} PTS</span>
+      </div>
+    </div>
+
+    <div class="card-red mb24" style="padding:22px 26px;">
+      <div class="mono td mb8" style="font-size:.7rem;letter-spacing:3px;">MODULE OVERVIEW // LEVEL ${l.id} OF 30 · PHASE ${l.phase} // MONTH ${l.month}</div>
+      <div style="font-family:var(--H); font-size:1.8rem; color:var(--txt); display:flex; align-items:center; gap:12px;">
+        <span>${l.emoji}</span> <span>${esc(l.title)}</span>
+      </div>
+      <div class="mono tr mt6" style="font-size:0.82rem; letter-spacing:0.5px; opacity:0.85;">${esc(l.subtitle)}</div>
+    </div>
+
+    <div class="card mb24">
+      <div class="card-hd">TACTICAL BRIEFING BRIEF</div>
+      <p class="td" style="line-height:1.75; font-size:0.94rem; margin:0; padding-top:4px;">${esc(l.intro)}</p>
+    </div>
+  `;
+
+  // Dynamic injection loop mapping layout elements out for lesson segments
+  if(l.sections && l.sections.length > 0){
+    l.sections.forEach((sec, sIdx) => {
+      html += `
+        <div class="card-red mb24" style="border-left: 3px solid var(--red);">
+          <div class="card-hd" style="color:var(--txt); font-size:1rem; border-bottom: 1px solid var(--line); padding-bottom:8px; margin-bottom:14px;">
+            SEC ${sIdx+1} — ${esc(sec.title)}
+          </div>
+          
+          <ol style="padding-left:20px; color:var(--dim); line-height:1.8; font-size:0.9rem; margin-bottom:16px;">
+            ${sec.steps ? sec.steps.map(step => `<li class="mb4">${esc(step)}</li>`).join('') : ''}
+          </ol>
+      `;
+
+      if(sec.cmd && sec.cmd.length > 0){
+        html += `<div class="cmd-block">`;
+        sec.cmd.forEach(c => {
+          if(c.t === 'c') html += `<div class="cmd-comment">// ${esc(c.v)}</div>`;
+          else if(c.t === 'cmd') html += `<div class="cmd-line">$ ${esc(c.v)}</div>`;
+          else if(c.t === 'out') html += `<div class="cmd-out">${esc(c.v)}</div>`;
+          else if(c.t === 'ok') html += `<div class="cmd-ok">✓ ${esc(c.v)}</div>`;
+        });
+        html += `</div>`;
+      }
+
+      if(sec.warning){
+        html += `
+          <div class="info-box warn" style="margin-top:12px; font-size:0.82rem;">
+            <strong>⚠️ SECURE WARNING ALERT:</strong> ${esc(sec.warning)}
           </div>`;
       }
 
-      let strategicStepsHtml = '';
-      if (section.steps && section.steps.length > 0) {
-        strategicStepsHtml = `<ol>${section.steps.map(step => `<li>${escapeTextString(step)}</li>`).join('')}</ol>`;
-      }
-
-      dynamicSectionsHtml += `
-        <div class="card">
-          <div class="card-title">🛡️ ${escapeTextString(section.title)}</div>
-          <p style="margin-bottom: 14px; color: var(--dim);">${escapeTextString(section.desc || '')}</p>
-          ${strategicStepsHtml}
-          ${terminalInteractionBlock}
-        </div>`;
+      html += `</div>`;
     });
+  }
 
-    container.innerHTML = `
-      <div class="hdr-block">
-        <span class="phase-tag">Operational Phase ${currentLesson.phase} // Level ${String(currentLesson.id).padStart(2, '0')}</span>
-        <h1 class="title">${escapeTextString(currentLesson.title)}</h1>
-        <div class="subtitle">${escapeTextString(currentLesson.subtitle)}</div>
-      </div>
-      
-      <div class="card">
-        <div class="card-title">📌 Objectives Blueprint</div>
-        <p style="margin-bottom:14px; font-weight:500;">${escapeTextString(currentLesson.intro)}</p>
-        <ul>
-          ${currentLesson.objectives.map(obj => `<li>${escapeTextString(obj)}</li>`).join('')}
-        </ul>
-      </div>
-
-      ${dynamicSectionsHtml}
-
-      <div class="card" style="border-left: 4px solid #ffbd2e;">
-        <div class="card-title" style="color: #ffbd2e;">💡 Critical OpSec Infrastructure Hints</div>
-        <ul>
-          ${currentLesson.hints.map(hint => `<li>${escapeTextString(hint)}</li>`).join('')}
-        </ul>
-      </div>
+  // Hints Section Render Logic Trigger block
+  if(l.hints && l.hints.length > 0){
+    html += `
+      <div class="card mb24">
+        <div class="card-hd">OPERATIONAL LAB HINTS FIELD RESOURCES</div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
     `;
+    l.hints.forEach((hintText, hIdx) => {
+      html += `
+        <div>
+          <button class="btn btn-dark btn-sm" id="hint-btn-${hIdx}" onclick="revealHint(${hIdx})">Decrypt Intelligent Hint #${hIdx+1}</button>
+          <div class="hint-box" id="hint-text-${hIdx}">
+            <div class="mono td" style="font-size:0.78rem; line-height:1.6; color:var(--txt);">${esc(hintText)}</div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
   }
 
-  function openAssessmentBox() {
-    const currentLesson = getLessonById(activeLevelId);
-    const container = document.getElementById('quiz-target-container');
-    const feedbackBox = document.getElementById('modal-feedback');
-    
-    feedbackBox.style.display = 'none';
-    feedbackBox.className = 'feedback-area';
-    
-    let quizFormStructure = '';
-    currentLesson.quiz.forEach((question, index) => {
-      let selectionOptions = '';
-      question.opts.forEach((option, optIdx) => {
-        selectionOptions += `
-          <label class="opt-label">
-            <input type="radio" name="q_eval_${index}" value="${optIdx}">
-            <span>${escapeTextString(option)}</span>
-          </label>`;
-      });
+  document.getElementById('lesson-wrap').innerHTML = html;
 
-      quizFormStructure += `
-        <div class="q-item" data-correct-answer="${question.a}">
-          <div class="q-text">${index + 1}. ${escapeTextString(question.q)}</div>
-          ${selectionOptions}
-        </div>`;
+  // Initialize Assignment details preview setup inside modal allocation tracking context 
+  if(l.assignment){
+    let aHtml = `<div class="mono tr mb8" style="font-weight:600; font-size:0.9rem; color:var(--red); border-bottom:1px solid var(--line); padding-bottom:4px;">${esc(l.assignment.title)}</div>`;
+    if(l.assignment.tasks && l.assignment.tasks.length > 0){
+      aHtml += `<ul style="padding-left:18px; margin:0 0 12px 0;">`;
+      l.assignment.tasks.forEach(t => { aHtml += `<li class="mb4">${esc(t)}</li>`; });
+      aHtml += `</ul>`;
+    }
+    if(l.assignment.submit) aHtml += `<div class="mono td" style="font-size:0.78rem; font-style:italic;"><strong>Submission Objective:</strong> ${esc(l.assignment.submit)}</div>`;
+    document.getElementById('assign-task-list').innerHTML = aHtml;
+  }
+}
+
+function startTimer(){
+  if(timerRef) clearInterval(timerRef);
+  startTime = Date.now();
+  timerRef = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const s = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('timer-disp').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function revealHint(index){
+  const btn = document.getElementById(`hint-btn-${index}`);
+  const textContainer = document.getElementById(`hint-text-${index}`);
+  if(textContainer && !textContainer.classList.contains('visible')){
+    textContainer.classList.add('visible');
+    btn.style.display = 'none';
+    hintsUnlockedCount++;
+    document.getElementById('hints-used').textContent = hintsUnlockedCount;
+  }
+}
+
+function openQuiz(){
+  if(!lesson || !lesson.quiz || lesson.quiz.length === 0){
+    alert("This evaluation sector does not present direct multi-choice components. Submit the assignment documentation.");
+    return;
+  }
+  
+  quizAnswers = {};
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = '';
+  document.getElementById('quiz-container-view').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+
+  lesson.quiz.forEach((qItem, qIdx) => {
+    let qHtml = `
+      <div class="mb20" style="border-bottom:1px solid var(--line); padding-bottom:16px;">
+        <div class="mono text-label mb8" style="font-size:0.88rem; color:var(--txt); font-weight:600;">QUESTION ${qIdx+1}: ${esc(qItem.q)}</div>
+        <div style="display:flex; flex-direction:column;">
+    `;
+    
+    qItem.opts.forEach((opt, oIdx) => {
+      qHtml += `
+        <div class="quiz-option" id="q-${qIdx}-opt-${oIdx}" onclick="selectQuizOption(${qIdx}, ${oIdx})">
+          <input type="radio" name="q-${qIdx}" id="q-${qIdx}-radio-${oIdx}">
+          <label class="mono td" style="font-size:0.82rem; color:var(--txt); cursor:pointer; width:100%; pointer-events:none;">${esc(opt)}</label>
+        </div>
+      `;
     });
 
-    container.innerHTML = quizFormStructure;
-    document.getElementById('quiz-modal').classList.add('open');
+    qHtml += `</div></div>`;
+    body.innerHTML += qHtml;
+  });
+
+  updateQuizProgress();
+  document.getElementById('quiz-modal').classList.add('open');
+}
+
+function selectQuizOption(qIdx, oIdx){
+  quizAnswers[qIdx] = oIdx;
+  
+  // Unset styles on siblings matching index definitions
+  const questionOpts = lesson.quiz[qIdx].opts;
+  questionOpts.forEach((_, idx) => {
+    const el = document.getElementById(`q-${qIdx}-opt-${idx}`);
+    const rad = document.getElementById(`q-${qIdx}-radio-${idx}`);
+    if(el) el.classList.remove('selected');
+    if(rad) rad.checked = false;
+  });
+
+  // Activate selected option
+  const targetEl = document.getElementById(`q-${qIdx}-opt-${oIdx}`);
+  const targetRad = document.getElementById(`q-${qIdx}-radio-${oIdx}`);
+  if(targetEl) targetEl.classList.add('selected');
+  if(targetRad) targetRad.checked = true;
+
+  updateQuizProgress();
+}
+
+function updateQuizProgress(){
+  const total = lesson.quiz.length;
+  const answered = Object.keys(quizAnswers).length;
+  document.getElementById('q-progress').textContent = `${answered} / ${total} items mapped`;
+}
+
+function closeQuiz(){
+  document.getElementById('quiz-modal').classList.remove('open');
+}
+
+async function submitQuiz(){
+  const total = lesson.quiz.length;
+  const answered = Object.keys(quizAnswers).length;
+  
+  if(answered < total){
+    alert("Operational safety metrics require completing every inquiry vector before compilation submission.");
+    return;
   }
 
-  function closeAssessmentBox() {
-    document.getElementById('quiz-modal').classList.remove('open');
-  }
+  let score = 0;
+  lesson.quiz.forEach((qItem, qIdx) => {
+    if(quizAnswers[qIdx] === qItem.a) {
+      score++;
+    }
+  });
 
-  function evaluateSubmittedQuizAnswers() {
-    const currentLesson = getLessonById(activeLevelId);
-    const items = document.querySelectorAll('.q-item');
-    const feedbackBox = document.getElementById('modal-feedback');
-    let totalCorrectCount = 0;
+  const percentage = Math.round((score / total) * 100);
+  const passed = percentage >= 60; // Standard threshold matching academy constraints
+  const pointsEarned = passed ? lesson.points : 0;
 
-    items.forEach((item, index) => {
-      const correctIdx = parseInt(item.getAttribute('data-correct-answer'));
-      const selection = document.querySelector(`input[name="q_eval_${index}"]:checked`);
+  document.getElementById('quiz-container-view').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  document.getElementById('qr-score').textContent = `${percentage}%`;
+
+  if(passed){
+    document.getElementById('qr-icon').textContent = '🏆';
+    document.getElementById('qr-msg').className = 'mono ts mb24';
+    document.getElementById('qr-msg').innerHTML = `<strong>ACCESS CONFIRMED // OPERATION PASSED</strong><br>You correctly mapped ${score} of ${total} answers. +${pointsEarned} PTS logged dynamically into system profiles.`;
+    
+    // Save state persistence record updates downstream
+    try {
+      const nextLevelNum = lesson.id + 1;
       
-      if (selection && parseInt(selection.value) === correctIdx) {
-        totalCorrectCount++;
+      // Update local profiling state values
+      if((prof.current_level||1) <= lesson.id){
+        prof.current_level = nextLevelNum;
+        prof.points = (prof.points || 0) + pointsEarned;
       }
+
+      await sb.from('level_progress').upsert({
+        user_id: me.id,
+        level_num: lesson.id,
+        status: 'completed',
+        quiz_score: percentage,
+        completed_at: new Date().toISOString()
+      }, { onConflict: 'user_id,level_num' });
+
+      // Update global profile schema parameters matching next structural target metrics 
+      await sb.from('profiles').update({
+        current_level: Math.max(prof.current_level, nextLevelNum),
+        points: prof.points
+      }).eq('id', me.id);
+
+      // Mutate modal tracking progression button routing functionality 
+      document.getElementById('qr-btn').onclick = function(){
+        closeQuiz();
+        if(lesson.id < 30){
+          window.location.href = `lesson.html?id=${lesson.id + 1}`;
+        } else {
+          window.location.href = 'levels.html';
+        }
+      };
+
+    } catch(e) {
+      console.error("Critical verification mapping update exception logged:", e);
+    }
+  } else {
+    document.getElementById('qr-icon').textContent = '⚠️';
+    document.getElementById('qr-msg').className = 'mono tr mb24';
+    document.getElementById('qr-msg').innerHTML = `<strong>FLAG REJECTED // FAIL SEQUENCE</strong><br>Accuracy evaluated at ${score}/${total}. Benchmark requirements specify minimum 60% standard. Review briefing data arrays and re-initialize context parameters.`;
+    
+    document.getElementById('qr-btn').onclick = function(){
+      closeQuiz();
+    };
+  }
+}
+
+async function submitAssignment(){
+  const txtArea = document.getElementById('assign-text');
+  const alertEl = document.getElementById('assign-alert');
+  const submissionContent = txtArea.value.trim();
+
+  if(!submissionContent){
+    alertEl.style.display = 'block';
+    alertEl.className = 'alert err';
+    alertEl.textContent = 'Documentation field payload missing.';
+    return;
+  }
+
+  try {
+    alertEl.style.display = 'block';
+    alertEl.className = 'alert';
+    alertEl.textContent = 'Transmitting data arrays securely...';
+
+    const { error } = await sb.from('assignments').insert({
+      user_id: me.id,
+      username: prof.username,
+      level_num: lesson.id,
+      level_title: lesson.title,
+      content: submissionContent,
+      status: 'pending'
     });
 
-    if (totalCorrectCount === items.length) {
-      feedbackBox.textContent = `✓ Verification Complete! Earned ${currentLesson.points} Points. Workspace sync successfully passed.`;
-      feedbackBox.className = 'feedback-area feedback-success';
-      feedbackBox.style.display = 'block';
-    } else {
-      feedbackBox.textContent = `✗ Verification Failed. Input data anomalies detected. Review steps and logs before running checks again.`;
-      feedbackBox.className = 'feedback-area feedback-error';
-      feedbackBox.style.display = 'block';
+    if(error) {
+      alertEl.className = 'alert err';
+      alertEl.textContent = error.message;
+      return;
     }
-  }
 
-  function navigateLesson(direction) {
-    const nextTargetId = activeLevelId + direction;
-    if (nextTargetId >= 1 && nextTargetId <= 30) {
-      window.location.search = `?id=${nextTargetId}`;
-    }
-  }
+    alertEl.className = 'alert ok';
+    alertEl.textContent = 'Operational report uploaded cleanly. System tracking locked.';
+    txtArea.value = '';
+    
+    setTimeout(() => {
+      document.getElementById('assign-modal').classList.remove('open');
+      alertEl.style.display = 'none';
+    }, 2200);
 
-  function escapeTextString(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  } catch(err) {
+    alertEl.className = 'alert err';
+    alertEl.textContent = 'Transmission mapping error framework crash. Confirm channel link.';
   }
+}
 
-  // Engine lifecycle triggers
-  fetchUrlParameterQueryId();
-  renderActiveWorkspaceLayout();
+// Window load pipeline interface mapping anchor execution hook point
+window.addEventListener('DOMContentLoaded', init);
 </script>
-
 </body>
 </html>
