@@ -2,80 +2,309 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Rules // Nighters Cyber Academy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- SYSTEM THEME DESIGN SYSTEM --- */
+  :root {
+      --bg-deep: #060913;
+      --bg-surface: #0d1321;
+      --bg-input: #03050a;
+      --border: #1e293b;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9d4edd;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-red: #ef4444;
+      --gold: #f59e0b;
+      --font: 'JetBrains Mono', monospace;
+  }
+
+  /* Global Viewport Safety Overrides */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+
+  body {
+      background-image: radial-gradient(circle at center, #0d172e 0%, #060913 100%);
+  }
+
+  /* Ambient CRT scanline overlay */
+  body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.15;
+  }
+
+  #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; opacity: 0.15; pointer-events: none;
+  }
+
+  /* --- FIXED NAVIGATION BAR --- */
+  .nav {
+      background: rgba(13, 19, 33, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+  }
+  .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo {
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem;
+      letter-spacing: 1px; display: flex; flex-direction: column;
+  }
+  .logo small { font-size: 0.65rem; color: var(--accent-cyan); font-weight: normal; margin-top: 2px; }
+  
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.on { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(0,240,255,0.4); }
+  
+  /* Mobile Hamburger Toggle */
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text-main); margin: 4px 0; transition: 0.2s; }
+
+  /* --- RESPONSIVE WORKSPACE WRAPPER --- */
+  .wrap-md { 
+      width: 100%;
+      max-width: 1000px; 
+      margin: 120px auto 60px auto; 
+      padding: 0 16px; 
+      position: relative; 
+      z-index: 10; 
+      animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .stitle {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-cyan);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .stitle::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  
+  /* Grid Frameworks */
+  .g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+  /* Margins & Spacings */
+  .mb8 { margin-bottom: 8px; }
+  .mb12 { margin-bottom: 12px; }
+  .mb16 { margin-bottom: 16px; }
+  .mb24 { margin-bottom: 24px; }
+  .mb32 { margin-bottom: 32px; }
+  .mt24 { margin-top: 24px; }
+  .mt16 { margin-top: 16px; }
+
+  /* --- CARDS INTERFACES ARCHITECTURE --- */
+  .card {
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  }
+  .card-red {
+      background: var(--bg-surface); border: 1px solid var(--border); border-top: 2px solid var(--text-red);
+      border-radius: 6px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  }
+  .card-hd { font-size: 0.95rem; font-weight: bold; color: #fff; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+  /* Terminal Info and Tracker Boxes */
+  .term {
+      background: var(--bg-input); border-left: 3px solid var(--accent-purple); padding: 14px;
+      border-radius: 0 6px 6px 0; font-size: 0.8rem; line-height: 1.6;
+  }
+  .term .p { color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .term .p::before { content: "•"; color: var(--accent-purple); }
+  .term .c { color: var(--text-muted); margin-top: 8px; font-style: italic; }
+
+  .info-box { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 6px; padding: 14px; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); }
+
+  /* Typography Utilities */
+  .mono { font-family: var(--font); }
+  .td { color: var(--text-muted); }
+  .fs { font-size: 0.82rem; line-height: 1.6; }
+  .tc { text-align: center; }
+
+  /* --- BUTTON ARCHITECTURE --- */
+  .btn {
+      background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
+      padding: 14px 28px; font-family: var(--font); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: 6px; font-size: 0.88rem; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; outline: none;
+  }
+  .btn:hover { background: rgba(0, 240, 255, 0.05); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.3); }
+
+  /* --- FOOTER LAYER --- */
+  .footer {
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      text-align: center; padding: 25px 24px; font-size: 0.75rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: auto; z-index: 10; line-height: 1.5;
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     MOBILE VIEWPORT OPERATIONAL ADAPTATION MEDIA QUERIES (< 820px)
+     ========================================================================== */
+  @media (max-width: 820px) {
+      .nav-links {
+          display: none; flex-direction: column; width: 100%; position: absolute;
+          top: 100%; left: 0; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+          padding: 20px; gap: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      }
+      .nav-links.active { display: flex; }
+      .nav-toggle { display: block; }
+      
+      .wrap-md { margin-top: 95px; padding-left: 14px; padding-right: 14px; }
+      .g2 { grid-template-columns: 1fr; gap: 24px; }
+  }
+</style>
 </head>
 <body class="page">
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Top Fixed System Navigation Architecture -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="logo">NIGHTERS CYBER ACADEMY<small>// RED TEAM TRAINING</small></a>
-    <div class="nav-links"><a href="index.html">Home</a><a href="rules.html" class="on">Rules</a><a href="login.html">Login</a></div>
+    <button class="nav-toggle" id="menu-toggle" aria-label="Toggle Systems Navigation Links Menu Grid">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="nav-menu">
+      <a href="index.html">Home</a>
+      <a href="rules.html" class="on">Rules</a>
+      <a href="login.html">Login</a>
+    </div>
   </div>
 </nav>
-<div class="wrap-md" style="padding-top:40px;padding-bottom:60px;">
+
+<!-- Main Interface Shell Container -->
+<div class="wrap-md">
   <div class="stitle mb8">Rules of Engagement</div>
-  <p class="td fs mb32">Read all rules before starting. Breaking any rule leads to strikes. Three strikes means permanent removal.</p>
+  <p class="td fs mb32">Read all system operational mandates before initializing protocols. Breaking deployment criteria yields explicit infraction strikes. Three cumulative strikes trigger permanent system execution revocation.</p>
 
   <div class="g2 mb32">
+    <!-- CORE OPERATIONS FRAMEWORK COLUMN -->
     <div>
       <div class="stitle mb16">Core Rules</div>
+      
       <div class="card-red mb12">
-        <div class="card-hd">1. Authorized Systems Only</div>
-        <p class="td fs">Only test systems you have written permission to test. Never scan or attack systems that do not belong to you. This is a serious crime in most countries.</p>
+        <div class="card-hd">1. Authorized Target Infrastructure Only</div>
+        <p class="td fs">Only perform diagnostic testing arrays against environments you hold documented scope and permission maps for. Unauthorized scans or exploitation vectors constitute legal infractions globally.</p>
       </div>
+      
       <div class="card-red mb12">
-        <div class="card-hd">2. No Flag or Answer Sharing</div>
-        <p class="td fs">Do not share flags, answers, or solutions with anyone — not in private messages, not in group chats, not in any form. First offense is Strike 2.</p>
+        <div class="card-hd">2. Direct Prohibition of Solution/Flag Sharing</div>
+        <p class="td fs">Do not broadcast cryptographic flags, data payloads, or target step-by-step solutions to other candidates via direct vectors, open channels, or logs. First verified event is escalated immediately to Strike 2.</p>
       </div>
+      
       <div class="card-red mb12">
-        <div class="card-hd">3. No Cheating on Exams</div>
-        <p class="td fs">Exams are individual. No discussing questions during exam window. Detected cheating = immediate Strike 3 and removal.</p>
+        <div class="card-hd">3. Assessment Isolation Controls</div>
+        <p class="td fs">All milestone verification exams remain individual operational assessments. Collective collaboration loops during testing availability frames are logged. Detections result in instant Strike 3 terminal termination.</p>
       </div>
+      
       <div class="card-red mb12">
-        <div class="card-hd">4. Respect Every Member</div>
-        <p class="td fs">No harassment. No insults. No discrimination. This is a professional environment. One violation leads to Strike 2.</p>
+        <div class="card-hd">4. Maintain Professional Operational Protocol</div>
+        <p class="td fs">Harassment arrays, toxicity vectors, or explicit disruption attempts targeting other operants will not be tolerated inside academy clusters. Violations trigger an instantaneous Strike 2 assignment.</p>
       </div>
     </div>
+
+    <!-- INFRACTION PENALTY MATRIX COLUMN -->
     <div>
       <div class="stitle mb16">Strike System</div>
-      <div class="card-red mb12">
-        <div class="card-hd" style="color:var(--warn);">Strike 1 — Warning</div>
-        <p class="td fs">Official warning. Your record is flagged. No immediate punishment. Consider this your last chance.</p>
+      
+      <div class="card-red mb12" style="border-top-color: var(--gold);">
+        <div class="card-hd" style="color: var(--gold);">Strike 1 — Formal Flag Warning</div>
+        <p class="td fs">The administrative database notes an anomalous activity marker. No tactical penalties are currently levied. Treat this alert threshold as your final grace state indicator.</p>
       </div>
-      <div class="card-red mb12">
-        <div class="card-hd" style="color:var(--warn);">Strike 2 — Points Penalty</div>
-        <p class="td fs">Admin deducts points from your score. You remain in the program under close monitoring.</p>
+      
+      <div class="card-red mb12" style="border-top-color: var(--gold);">
+        <div class="card-hd" style="color: var(--gold);">Strike 2 — Core Score Points Penalty</div>
+        <p class="td fs">Administrative systems enforce a score value adjustment penalty. Profile telemetry is assigned a restricted, heavily-audited inspection filter for all subsequent actions.</p>
       </div>
+      
       <div class="card-red mb12">
-        <div class="card-hd">Strike 3 — Permanent Removal</div>
-        <p class="td fs">Account disabled. Removed from leaderboard. No appeal. No return.</p>
+        <div class="card-hd">Strike 3 — Definitive Account Exclusion</div>
+        <p class="td fs">The target account footprint is permanently disabled. Dynamic global tracking records are wiped. No arbitration, rollback, or secondary registry attempts are permitted.</p>
       </div>
 
-      <div class="stitle mt24 mb16">Anti-Cheat Monitoring</div>
+      <div class="stitle mt24 mb16">Anti-Cheat Monitoring Arrays</div>
       <div class="card-red">
-        <div class="card-hd">What We Track</div>
+        <div class="card-hd">Automated Tracker Inputs</div>
         <div class="term" style="font-size:.76rem;">
-          <div class="p">Submission timestamps</div>
-          <div class="p">Browser fingerprints</div>
-          <div class="p">Duplicate submission detection</div>
-          <div class="p">Login IP patterns</div>
-          <div class="c">Admin is notified on suspicious activity.</div>
+          <div class="p">Submission timestamp tracking</div>
+          <div class="p">Browser telemetry / canvas matching markers</div>
+          <div class="p">Identical payload submission monitoring loops</div>
+          <div class="p">Concurrent routing / multi-IP footprint audits</div>
+          <div class="c">Internal operations teams receive telemetry pings upon anomaly matches.</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="stitle mb16">Learning Ethics</div>
+  <!-- ETHICAL DISCLOSURE STRATUM -->
+  <div class="stitle mb16">Operational Ethics</div>
   <div class="card mb32">
-    <div class="card-hd">The Right Way to Think</div>
-    <p class="td mb16" style="line-height:1.85;font-size:.92rem;">This academy teaches you to think like an attacker. That knowledge is powerful. Use it ethically. The goal is to make systems more secure — not to cause harm. Every technique you learn here has a legitimate professional use in penetration testing, security auditing, and defensive security.</p>
-    <div class="info-box">Authorized penetration testing is a legal profession. Unauthorized hacking is a crime. The only difference is permission. Always get written authorization before testing anything.</div>
+    <div class="card-hd">The Intentional Trajectory</div>
+    <p class="td mb16" style="line-height:1.85;font-size:.92rem;">This environment trains participants to process environments with an adversarial mindset. This tactical architecture contains high utility. It must only be wielded as an engineering asset. The target outcome is fortification, not disruption. Elements taught within this program track seamlessly into penetration auditing, architecture design validation, and incident readiness.</p>
+    <div class="info-box">Legal security operations require authorized engagement boundaries. Unauthorized exploration actions create criminal hazards. True operational skill is verified through absolute control and strict parameter adherence.</div>
   </div>
 
-  <div class="tc"><a href="register.html" class="btn">I Understand — Enlist Now</a></div>
+  <div class="tc"><a href="register.html" class="btn">I Understand — Enlist In System</a></div>
 </div>
-<footer class="footer"><strong>NIGHTERS CYBER ACADEMY</strong>Learn · Practice · Defend</footer>
+
+<!-- Bottom Structural Anchor Base Layer -->
+<footer class="footer">
+    <strong>NIGHTERS CYBER ACADEMY</strong><br>
+    Learn · Practice · Defend — Core Operations Platform
+</footer>
+
 <script src="app.js"></script>
+<script>
+/* Mobile Menu Toggle Component Hook */
+document.getElementById('menu-toggle')?.addEventListener('click', () => {
+    document.getElementById('nav-menu')?.classList.toggle('active');
+});
+
+/* Ambient Node Matrix Physics Background System */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initPoints(); }
+function initPoints() {
+  points = []; const count = Math.min(25, window.innerWidth / 65);
+  for(let i=0; i<count; i++) { points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2 }); }
+}
+function drawGraph() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#00f0ff'; ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
+  points.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+    for(let j=i+1; j<points.length; j++) {
+      const distance = Math.hypot(p.x-points[j].x, p.y-points[j].y);
+      if(distance < 190) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(points[j].x, points[j].y); ctx.stroke(); }
+    }
+  });
+  requestAnimationFrame(drawGraph);
+}
+window.addEventListener('resize', resizeCanvas); resizeCanvas(); drawGraph();
+</script>
 </body>
 </html>
